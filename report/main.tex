@@ -1,0 +1,24 @@
+\documentclass[12pt,a4paper]{article}
+
+% 1. Carichiamo la configurazione da un file esterno
+\input{preamble}
+
+\begin{document}
+	
+	% 2. Frontespizio (opzionale)
+	\maketitle
+	\tableofcontents
+	\newpage
+	
+	% 3. Includiamo le varie sezioni
+	\input{sections/introduction}
+	\input{sections/implementation_details}
+	\input{sections/system_design}
+	\input{sections/testing}
+	\input{sections/docs}
+	
+	% 4. Bibliografia
+	\bibliographystyle{plain}
+	\bibliography{references}
+	
+\end{document}
