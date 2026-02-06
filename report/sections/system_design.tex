@@ -2,6 +2,50 @@
 
 \subsection{Use Case Diagram}
 
+\vspace{1em}
+	
+	\begin{tikzpicture}
+		
+		\umlusecase[name = browse-review ,x = 6    ,y = 0     ,width = 2.5cm] {Browse Review}
+		\umlusecase[name = apply-filter  ,x = 12   ,y = -1.5  ,width = 2.5cm] {Apply Filter}
+		\umlusecase[name = login         ,x = 9    ,y = -3    ,width = 2.5cm] {Login}
+		\umlusecase[name = submit-review ,x = 14   ,y = -6.7  ,width = 2.5cm] {Submit Review}
+		\umlusecase[name = up-vote       ,x = 6    ,y = -5    ,width = 2.5cm] {Up-Vote}
+		\umlusecase[name = report-user   ,x = 9    ,y = -6.4  ,width = 2.5cm] {Report User}
+		\umlusecase[name = login-admin   ,x = 5    ,y = -9    ,width = 2.5cm] {Login}				
+		\umlusecase[name = manage-review ,x = 6.5  ,y = -11   ,width = 2.5cm] {Manage Reviews}				
+		\umlusecase[name = ban-user      ,x = 5    ,y = -13   ,width = 2.5cm] {Ban User}				
+		\umlusecase[name = delete-review ,x = 13.5 ,y = -13   ,width = 2.5cm] {Delete Review}
+		\umlusecase[name = validate-data ,x = 13.5 ,y = -10   ,width = 2.5cm] {Validate Review Data}
+		
+		
+		\umlactor[y = -1]  {Guest}
+		\umlactor[y = -5]  {Student}
+		\umlactor[y = -11] {Admin}
+		
+		\umlassoc{Guest}   {browse-review}
+		\draw [tikzuml association style](apply-filter)  edge[bend left  =  5]  (Guest);
+   		
+	    \umlassoc{Student} {up-vote}
+		\umlinherit{Student} {Guest}
+		\draw [tikzuml association style](report-user)   edge[bend left  = 10]  (Student);
+		\draw [tikzuml association style](submit-review) edge[bend left  = 20]  (Student);
+		\draw [tikzuml association style](login)         edge[bend right = 10]  (Student);
+		
+		\umlassoc{Admin}  {login-admin}
+		\umlassoc{Admin}  {manage-review}
+		\umlassoc{Admin}  {ban-user}
+		
+		\draw [tikzuml dependency style] (browse-review) edge[bend left  = 10] node[right] {$\ll \text{extends} \gg$} (apply-filter);
+		\draw [tikzuml dependency style] (submit-review) edge[bend right = 35] node[right] {$\ll \text{include} \gg$} (login);
+		\draw [tikzuml dependency style] (up-vote)       --                    node[left]  {$\ll \text{include} \gg$} (login);
+		\draw [tikzuml dependency style] (manage-review) --                    node[above] {$\ll \text{include} \gg$} (validate-data);
+		\draw [tikzuml dependency style] (delete-review) --                    node[right] {$\ll \text{extends} \gg$} (manage-review);
+		\draw [tikzuml dependency style] (report-user)   --                    node[right] {$\ll \text{include} \gg$} (login);
+		
+	\end{tikzpicture}
+	
+
 \subsection{Use Case Template}
 
 \begin{table}[h]
