@@ -16,17 +16,17 @@ The solutions to all these problems is \textbf{EduMeter}, a platform made for st
 
 \subsection{Statement}
 
-\textbf{EduMeter} is a web platform dedicated to the students enrolled in a bachelor or master degree at the University of Florence for the view and publication of reviews on taken courses. \\
+\textbf{EduMeter} is a dedicated web platform for bachelor’s and master’s students at the University of Florence. It serves as a central hub for viewing and publishing reviews of university courses, fostering a transparent academic community. \\
 
-The system provides 3 types of entities: \textbf{guest user} (unauthenticated users), \textbf{student user} (authenticated user) and \textbf{admin}. Each entity is able to perform different and exclusive actions on the system data record. Here it is the descriptions of each entity possibility:
+The system categorizes users into three distinct roles, each with specific permissions and capabilities:
 
 \begin{itemize}
 
-    \item \textbf{Guest User}: this type of user is able to visualize the entire collection of reviews without authentication. It is possible to apply filters on the fields of the review body in order to navigate easily. 
+    \item \textbf{Guest User}: unauthenticated users can browse the entire collection of course reviews. To ensure ease of navigation, guests can apply various filters to search through review content and metadata.
 	
-	\item \textbf{Student User}: a student can authenticate with his personal institutional email, having his identity anonymized. Then he can navigate the review corpus and, additionally, he can post new reviews.
+	\item \textbf{Student User}: once authenticated via a personal institutional email, students can browse the corpus and post new reviews. To encourage honest feedback, all student identities remain strictly anonymous within the platform.
 	
-    \item \textbf{Admin}: this super user has the duty to perform the verification of the informations inserted by the student users in their reviews and accordingly operate the CRUD operations on the data records.  
+    \item \textbf{Admin}: this administrative role is responsible for overseeing the platform's integrity. Admins verify the information submitted by students and hold full CRUD (Create, Read, Update, Delete) permissions to manage the system’s data records.  
 
 \end{itemize} 
 
@@ -59,4 +59,13 @@ The system provides 3 types of entities: \textbf{guest user} (unauthenticated us
 	
 \end{figure}
 
-Each review has a fixed structure composed by numerical and string fields, the student has to fill them in order to post a the review. The fields are: \textbf{degree enrolled} (string), \textbf{reviewed course} (string), \textbf{teacher} (string), \textbf{year of completion} (number), \textbf{grading} (number), \textbf{comment} (string).
+To ensure consistency and data integrity, each review follows a standardized structure. Students must complete the following numerical and string fields to submit their feedback:
+
+\begin{itemize}
+	\item \textbf{Degree Program}: specific degree course the student is currently enrolled in.
+	\item \textbf{Reviewed Course}: name of the subject being evaluated.
+	\item \textbf{Instructor}: name of the teacher who held the course.
+	\item \textbf{Year of Completion}: academic year in which the course was finished.
+	\item \textbf{Rating}: numerical value representing the student's assessment.
+	\item \textbf{Comment}: text field for providing detailed qualitative feedback.
+\end{itemize}
