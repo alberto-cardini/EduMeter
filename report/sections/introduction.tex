@@ -72,4 +72,71 @@ To ensure consistency and data integrity, each review follows a standardized str
 
 \subsection{System architecture and tools}
 
+EduMeter is split between frontend and backend.
 
+% ? An SMTP server is required for authentication, which consists of an OTP (One Time Pin) being sent to the address that has an allowed domain (e.g. @edu.unifit.it). Once logged in, the backend provides a JWT (JSON Web Token), which is meant to identify the user in subsequent comunications.
+
+% ?It is important to note that the User Identifier (userID) is obtained through hashing the email chained to a secret key. This garantuees the anoniminity of students, but still allows to ban certain userIDs that have been flagged for unfair conduct.
+
+The backend handles the bulk of the application logic, connects to the PostgreSQL database and also to the SMTP server. The backend is written in Java, and has a RESTful HTTP interface to communicate with the client. The code structure of the backend has 3 main packges:
+
+\begin{itemize}
+	\item \textbf{Business Logic}: contains all the main logic of the application, including the REST endpoints, the authentication managaer and the SMTP extension.
+	\item \textbf{Domain Model}: defines the entities involved in the program.
+	\item \textbf{DAO}: manages entities through Data Access Objects (DAOs), providing a clean abstraction between the business logic and the underlying database.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[thick, font=\sffamily]
+
+		\begin{umlactor}{User}\end{umlactor}
+	\begin{umlpackage}[x=2.5]{Business Logic}
+		\begin{umlpackage}{auth}
+		\end{umlpackage}
+		\begin{umlpackage}[x=3]{controllers}
+		\end{umlpackage}
+	\end{umlpackage}
+	\begin{umlpackage}[x=3, y=-4]{Domain Model}\end{umlpackage}
+	\begin{umlpackage}[x=8, y=-4]{ORM}\end{umlpackage}
+
+	\umlimport[geometry=|-|]{Business Logic}{Domain Model}
+	\umlimport[geometry=-|]{Business Logic}{ORM}
+	\umlimport[geometry=--]{ORM}{Domain Model}
+
+	% DB node
+	\node[cylinder, 
+		shape border rotate=90, 
+		draw, 
+		minimum height=2.5cm, 
+		minimum width=2cm, 
+		aspect=0.25, 
+		fill=gray!10, 
+		align=center] (db) at (8, -8) {PostgreSQL\\Database};
+
+	\draw[<->, >=latex, line width=1pt] (ORM) -- (db) 
+		node[midway, right] {JDBC};
+
+	\end{tikzpicture}
+	\caption{Package diagram}
+
+\end{figure}
+
+
+\noindent Libraries used:
+
+\begin{itemize}
+	\item jax-rs for REST API.
+	\item JDBC for database connectivity.
+	\item Glassfish for Jakarta EE open source implementation.
+	\item JUnit for testing.
+	\item Apache Commons Net for SMTP support.
+\end{itemize}
+
+\noindent Developed using:
+
+\begin{itemize}
+	\item Intellij Idea as the main IDE.
+	\item Postman / Insomnia as a REST testing client.
+	\item AI models (...)
+\end{itemize}
