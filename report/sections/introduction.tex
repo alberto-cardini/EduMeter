@@ -26,7 +26,7 @@ The system categorizes users into three distinct roles, each with specific permi
 	
 	\item \textbf{Student User}: once authenticated via a personal institutional email, students can browse the corpus and post new reviews. To encourage honest feedback, all student identities remain strictly anonymous within the platform. The community of students can choose to up-vote the best reviews and also report unfair behaviors to the Admin. 
 	
-    \item \textbf{Admin}: this administrative role is responsible for overseeing the platform's integrity. Admins verify the information submitted by students and hold full CRUD (Create, Read, Update, Delete) permissions to manage the system’s data records. Moreover, the Admin has to duty to ban the reported users from the platform.
+    \item \textbf{Admin}: this administrative role is responsible for overseeing the platform's integrity. Admins verify the information submitted by students and hold full CRUD (Create, Read, Update, Delete) permissions to manage the system’s data records. Moreover, the Admin has to duty to ban the reported users from the platform. Every operation is performed on a separate control panel which the Admn can log into with his personal verified email.
 
 \end{itemize} 
 
@@ -55,20 +55,20 @@ The system categorizes users into three distinct roles, each with specific permi
 		\node[scale=0.8] at (1.5, -0.7) {\footnotesize View Reviews}; % Guest (Intersection)
 		
 	\end{tikzpicture}
-	\caption{Permission Overlap}
+	\caption{Permission overlap Venn Diagram with some examples of permitted actions per user category.}
 	
 \end{figure}
 
 To ensure consistency and data integrity, each review follows a standardized structure. Students must complete the following numerical and string fields to submit their feedback:
 
 \begin{itemize}
-	\item \textbf{Degree Program}: specific degree course the student is currently enrolled in.
-	\item \textbf{Reviewed Course}: name of the subject being evaluated.
-	\item \textbf{Instructor}: name of the teacher who held the course.
-	\item \textbf{Year of Completion}: academic year in which the course was finished.
-	\item \textbf{Rating}: numerical value representing the student's assessment.
+	\item \textbf{School}: the specific school in which the student is currently a candidate for a degree.
+	\item \textbf{Degree}: up-to-date enrolled degree of the reviewer.
+	\item \textbf{Teacher}: name of the teacher who held the course.
+	\item \textbf{Course}: name of the subject being reviewed.
+	\item \textbf{Rating}: numerical value representing the student's perceived course difficulty.
 	\item \textbf{Comment}: text field for providing detailed qualitative feedback.
-\end{itemize}
+\end{itemize} 
 
 \subsection{System architecture and tools}
 
