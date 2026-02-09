@@ -285,3 +285,78 @@ The presented diagram covers the entirety of actions that the different kinds of
 \subsection{Class Diagram}
 
 \subsection{Relational Model}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		[every entity/.style={fill=blue!20,draw=blue,thick},
+		 every relationship/.style={fill=orange!20,draw=orange,thick,aspect=1.5},
+		 % Style for the inheritance arrow
+     		 isa arrow/.style={thick,-{Triangle[open, length=8pt, width=8pt]}},
+		 % Style for attributes of entities and relations
+		 attr/.style={circle, draw, fill=white, inner sep=0pt, minimum size=5pt, font=\footnotesize},
+		 pk/.style={circle, draw, fill=black, inner sep=0pt, minimum size=5pt, font=\footnotesize}]
+
+		% User, reviews, reports, bans
+		% \node[relationship](receives){Receives};
+		% \node[entity](ban)[below = of receives]{Ban} edge node[right] {0..1} (receives);
+		% 	\node[pk, label=above:id](ban_id)[above left = 0.5cm of ban]{} edge (ban);
+		% 	\node[attr, label=above:date](date_id)[left = 0.5cm of ban]{} edge (ban);
+
+		\node[entity](user){User};
+			\node[pk, label=left:id](userId)[above left = 0.5cm of user]{} edge (user);
+			\node[attr, label=left:isBanned](userIsBanned)[left = 0.5cm of user]{} edge (user);
+		\node[relationship](files)[below = of user]{Files} edge node[right] {1} (user);
+		\node[entity](report)[below = of files]{Report} edge node[right] {0..n} (files);
+			\node[pk, label=above:id](reportId)[above left = 0.5cm of report]{} edge (report);
+			\node[attr, label=above:date](reportDate)[left = 0.5 cm of report]{} edge (report);
+		\node[relationship](about)[right = of report]{About} edge node[above] {0..n} (report);
+
+		\node[relationship](writes)[right = of user]{Writes} edge node[above] {1} (user);
+		\node[entity](review)[right = of about]{Review};
+			\node[pk, label=right:id](reviewId)[above right = 0.75cm and 0.5cm of review]{} edge (review);
+			\node[attr, label=right:date](reviewDate)[above right = 0cm and 0.75cm of review]{} edge (review);
+			\node[attr, label=right:rating](reviewRating)[right = 0.5cm of review]{} edge (review);
+			\node[attr, label=right:difficulty](reviewDifficulty)[below right = 0.75cm and 0.5cm of review]{} edge (review);
+			\node[attr, label=right:comment](reviewComment)[below right = 0cm and 0.75cm of review]{} edge (review);
+
+			\draw[-] (writes) -| node[below right] {0..n} (review);
+			\draw[-] (about) -- node[above right] {1} (review);
+
+		\node[entity](draftReview)[below = 2cm of review, xshift=-2cm]{Drafted Review};
+		\draw[isa arrow] (draftReview) -- ++(0, 1) -| (review);
+			\node[attr, label=left:school](draftSchool)[above left = 0.75cm and 0.5cm of draftReview]{} edge (draftReview);
+			\node[attr, label=left:degree](draftDegree)[above left = 0cm and 0.75cm of draftReview]{} edge (draftReview);
+			\node[attr, label=left:course](draftCourse)[below left = 0cm and 0.75cm of draftReview]{} edge (draftReview);
+			\node[attr, label=left:professor](draftProfessor)[below left = 0.75cm and 0.5cm of draftReview]{} edge (draftReview);
+		\node[entity](publishedReview)[below = 2cm of review, xshift=2cm]{Published Review};
+		\draw[isa arrow] (publishedReview) -- ++(0, 1) -| (review);
+
+
+		\node[entity](admin)[right = 7cm of user]{Admin};
+			\node[pk, label=right:id](adminId)[above right = 0.5cm of admin]{} edge (admin);
+			\node[attr, label=right:email](adminEmail)[right = 0.5cm of admin]{} edge (admin);
+			%\node[attr, label=right:isActive](adminIsActive)[below right = 0.5cm of admin]{} edge (admin);
+
+		% School, degress, course, professor
+		\node[relationship](teaches)[below = 2cm of publishedReview]{Teaches} edge node[right] {0..n} (publishedReview);
+		\node[entity](prof)[below = of teaches]{Professor} edge node[right] {1..n} (teaches);
+			\node[pk, label=right:id](profId)[above right = 0.5cm of prof]{} edge (prof);
+			\node[attr, label=right:name](profName)[right = 0.5cm of prof]{} edge (prof);
+			\node[attr, label=right:surname](profSurname)[below right = 0.5cm of prof]{} edge (prof);
+		\node[entity](course)[left = of teaches]{Course} edge node[above] {1..n} (teaches);
+			\node[pk, label=below:id](courseId)[below left = 0.5cm of course]{} edge (course);
+			\node[attr, label=below:name](courseName)[below right = 0.5cm of course]{} edge (course);
+		\node[relationship](contains)[left = of course]{Contains} edge node[above] {1..n} (course);
+		\node[entity](degree)[left = of contains]{Degree} edge node[above] {1} (contains);
+			\node[pk, label=left:id](degreeId)[above left = 0.5cm of degree]{} edge (degree);
+			\node[attr, label=left:name](degreeName)[left = 0.5cm of degree]{} edge (degree);
+			\node[attr, label=left:type](degreeType)[below left = 0.5cm of degree]{} edge (degree);
+		\node[relationship](offers)[above = of degree]{Offers} edge node[right] {1..n} (degree);
+		\node[entity][above = of offers](school){School} edge node[right] {1} (offers);
+			\node[pk, label=left:id](schoolId)[above left = 0.5cm of school]{} edge (school);
+			\node[attr, label=left:name](schoolName)[left = 0.5cm of school]{} edge (school);
+
+	\end{tikzpicture}
+	\caption{E-R Model}
+\end{figure}
