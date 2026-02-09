@@ -17,7 +17,7 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\umlusecase[name = login-admin   ,x = 4.5  ,y = -9    ,width = 2.5cm] {Login}				
 		\umlusecase[name = manage-review ,x = 6.5  ,y = -11   ,width = 2.5cm] {Manage Reviews}				
 		\umlusecase[name = delete-review ,x = 13   ,y = -12.5 ,width = 2.5cm] {Delete Review}
-		\umlusecase[name = validate-data ,x = 13   ,y = -9.5  ,width = 3cm] {Validate Review Information}
+		\umlusecase[name = validate-data ,x = 13   ,y = -9.5  ,width = 3.0cm] {Validate Review Information}
 		\umlusecase[name = manage-report ,x = 4.5  ,y = -13   ,width = 2.5cm] {Manage Report}
 		\umlusecase[name = validate-rep  ,x = 10   ,y = -15   ,width = 2.5cm] {Validate Report}
 		\umlusecase[name = ban-user      ,x = 5    ,y = -15.5 ,width = 2.5cm] {Ban User}
@@ -46,7 +46,7 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\draw [tikzuml dependency style] (delete-review) --                    node[right] {$\ll \text{extends} \gg$} (manage-review);
 		\draw [tikzuml dependency style] (report-user)   --                    node[right] {$\ll \text{include} \gg$} (login);
 		\draw [tikzuml dependency style] (manage-report) --					   node[right] {$\ll \text{include} \gg$} (validate-rep);
-		\draw [tikzuml dependency style] (ban-user)      --					   node[left] {$\ll \text{extends} \gg$} (manage-report);
+		\draw [tikzuml dependency style] (ban-user)      --					   node[left]  {$\ll \text{extends} \gg$} (manage-report);
 	\end{tikzpicture}
 	
 
