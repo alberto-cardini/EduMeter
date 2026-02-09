@@ -14,12 +14,13 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\umlusecase[name = submit-review ,x = 14   ,y = -6.7  ,width = 2.5cm] {Submit Review}
 		\umlusecase[name = up-vote       ,x = 6    ,y = -5    ,width = 2.5cm] {Up-Vote}
 		\umlusecase[name = report-user   ,x = 9    ,y = -6.4  ,width = 2.5cm] {Report User}
-		\umlusecase[name = login-admin   ,x = 5    ,y = -9    ,width = 2.5cm] {Login}				
+		\umlusecase[name = login-admin   ,x = 4.5  ,y = -9    ,width = 2.5cm] {Login}				
 		\umlusecase[name = manage-review ,x = 6.5  ,y = -11   ,width = 2.5cm] {Manage Reviews}				
-		\umlusecase[name = ban-user      ,x = 5    ,y = -13   ,width = 2.5cm] {Ban User}				
-		\umlusecase[name = delete-review ,x = 13.5 ,y = -13   ,width = 2.5cm] {Delete Review}
-		\umlusecase[name = validate-data ,x = 13.5 ,y = -10   ,width = 2.5cm] {Validate Review Data}
-		
+		\umlusecase[name = delete-review ,x = 13   ,y = -12.5 ,width = 2.5cm] {Delete Review}
+		\umlusecase[name = validate-data ,x = 13   ,y = -9.5  ,width = 3cm] {Validate Review Information}
+		\umlusecase[name = manage-report ,x = 4.5  ,y = -13   ,width = 2.5cm] {Manage Report}
+		\umlusecase[name = validate-rep  ,x = 10   ,y = -15   ,width = 2.5cm] {Validate Report}
+		\umlusecase[name = ban-user      ,x = 5    ,y = -15.5 ,width = 2.5cm] {Ban User}
 		
 		\umlactor[y = -1]  {Guest}
 		\umlactor[y = -5]  {Student}
@@ -36,7 +37,7 @@ The presented diagram covers the entirety of actions that the different kinds of
 		
 		\umlassoc{Admin}  {login-admin}
 		\umlassoc{Admin}  {manage-review}
-		\umlassoc{Admin}  {ban-user}
+		\umlassoc{Admin}  {manage-report}
 		
 		\draw [tikzuml dependency style] (browse-review) edge[bend left  = 10] node[right] {$\ll \text{extends} \gg$} (apply-filter);
 		\draw [tikzuml dependency style] (submit-review) edge[bend right = 35] node[right] {$\ll \text{include} \gg$} (login);
@@ -44,7 +45,8 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\draw [tikzuml dependency style] (manage-review) --                    node[above] {$\ll \text{include} \gg$} (validate-data);
 		\draw [tikzuml dependency style] (delete-review) --                    node[right] {$\ll \text{extends} \gg$} (manage-review);
 		\draw [tikzuml dependency style] (report-user)   --                    node[right] {$\ll \text{include} \gg$} (login);
-		
+		\draw [tikzuml dependency style] (manage-report) --					   node[right] {$\ll \text{include} \gg$} (validate-rep);
+		\draw [tikzuml dependency style] (ban-user)      --					   node[left] {$\ll \text{extends} \gg$} (manage-report);
 	\end{tikzpicture}
 	
 
