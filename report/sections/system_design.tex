@@ -52,231 +52,198 @@ The presented diagram covers the entirety of actions that the different kinds of
 
 \subsection{Use Case Template} \label{use-case-templates}
 
-\begin{table}[h]
-	\centering
-	\begin{tabular}{lll}
-		\toprule
-		
-		\textbf{UC \#n} & \textbf{Use Case Name} \\
-		\midrule
-		Level 		      &  \\
-		Description 	  &  \\
-		Scope 			  &  \\
-		Actors 			  &  \\
-		Pre-conditions 	  &  \\
-		Steps 			  &  \\
-		Post-conditions   &  \\
-		Alternative Steps &  \\
-		
-		\bottomrule
-	\end{tabular}
-\end{table}
+
 
 \subsubsection{Guest Templates}
-\begin{tabularx}{\textwidth}{l|X}
-	\toprule
-	\textbf{UC \#1} & \textbf{Browse Review} \\ \midrule
-	Level & User Goal \\
-	Description & An unauthenticated user browses the collection of reviews to gather information. \\
-	Actors & Guest (Student) \\
-	Pre-conditions & None \\
-	Steps & 
-	\begin{tabenum}
-		\item The guest accesses the EduMeter platform.
-		\item The system displays a list of reviews.
-		\item The guest scrolls through and reads them.
-	\end{tabenum} \\
-	Post-conditions & The user has viewed the desired information. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[2a.] \textbf{Extension (Apply Filter):} The guest wants to narrow down the search results:
-		\begin{itemize}
-			\item The guest selects specific criteria (e.g., Course or Instructor).
-			\item The system updates the view to show only matching reviews.
-		\end{itemize}
-	\end{tabitem} \\ 
-	\bottomrule
-\end{tabularx}
+\begin{usecasetable}{1}{Browse Review}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & An unauthenticated user browses the collection of reviews to gather information. \\
+		\textbf{Actors} & Guest (Student) \\
+		\textbf{Pre-conditions} & None \\
+		\textbf{Steps} & 
+		\begin{tabenum}
+			\item The guest accesses the EduMeter platform.
+			\item The system displays a list of reviews.
+			\item The guest scrolls through and reads them.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The user has viewed the desired information. \\
+		\textbf{Alternative Steps} & 
+		\begin{tabitem}
+			\item[2a.] \textbf{Extension (Apply Filter):} The guest wants to narrow down the search results:
+			\begin{itemize}
+				\item The guest selects specific criteria.
+				\item The system updates the view to show only matching reviews.
+			\end{itemize}
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
 
-\vspace{2em}
 
 \subsubsection{Student Templates}
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#2} & \textbf{Student Login} \\ \midrule
-	Level & Function \\
-	Description & The user is authenticated via their institutional email. \\
-	Actors & Student \\
-	Pre-conditions & The user possesses a valid institutional email address. \\
-	Steps & 
-	\begin{tabenum}
-		\item The user provides their institutional email address.
-		\item The system sends a verification code to the provided address.
-		\item The user enters the code.
-		\item The system verifies if the entered code matches the one sent.
-		\item The system retrieves the existing unique ID (or generates a new one for first-time access).
-	\end{tabenum} \\
-	Post-conditions & The student is authenticated and identified by their unique ID. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[4a.] If the code does not match, the system signals an error and does not grant access.
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
+
+\begin{usecasetable}{2}{Student Login}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & Function \\
+		\textbf{Description} & The user is authenticated via their institutional email. \\
+		\textbf{Actors} & Student \\
+		\textbf{Pre-conditions} & The user possesses a valid institutional email address. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The user provides their institutional email address.
+			\item The system sends a verification code to the provided address.
+			\item The user enters the code.
+			\item The system verifies if the entered code matches the one sent.
+			\item The system retrieves the existing unique ID (or generates a new one for first-time access).
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The student is authenticated and identified by their unique ID. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[4a.] If the code does not match, the system signals an error and does not grant access.
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
+
+
+\begin{usecasetable}{3}{Submit Review}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & An authenticated user submits a review for a completed course. \\
+		\textbf{Actors} & Student \\
+		\textbf{Pre-conditions} & The user must be authenticated. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The user selects the option to create a review.
+			\item The system displays the review form.
+			\item The user fills the review fields (school, degree, course, professor) by selecting existing option from a provided list.
+			\item The user add a rating and a comment.
+			\item The user confirms the submission.
+			\item The system stores the review and makes it publicly visible.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The review is stored in the database. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[3a.] If the information that the student need is not available in the list: 
+			\begin{itemize}
+				\item The user manually inputs the missing information in the fields.
+				\item Upon submission, the system saves the review but is not published publicly until an Admin approves it (UC \#5: Validate Review Data).
+			\end{itemize} 
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
+
+
+\begin{usecasetable}{4}{Up-Vote}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & An authenticated Student expresses approval for a specific review. \\
+		\textbf{Actors} & Student \\
+		\textbf{Pre-conditions} & The student must be authenticated. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The student selects the upvote option on a specific review.
+			\item The system checks if the student has already voted for this review.
+			\item The system increments the vote counter for the review.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The vote is stored in the database, updating the review's total score. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[3a.] If the student has already voted, the system does not register the new vote.
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
 
 \vspace{2em}
-\noindent
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#3} & \textbf{Submit Review} \\ \midrule
-	Level & User Goal \\
-	Description & An authenticated user submits a review for a completed course. \\
-	Actors & Student \\
-	Pre-conditions & The user must be authenticated. \\
-	Steps & 
-	\begin{tabenum}
-		\item The user selects the option to create a review.
-		\item The system displays the review form.
-		\item The user fills the review fields (school, degree, course, professor) by selecting existing option from a provided list.
-		\item The user add a rating and a comment.
-		\item The user confirms the submission.
-		\item The system stores the review and makes it publicly visible.
-	\end{tabenum} \\
-	Post-conditions & The review is stored in the database.\\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[3a.] If the information that the student need is not available in the list: 
-		\begin{itemize}
-			\item The user manually inputs the missing information in the fields.
-			\item Upon submission, the system saves the review but is not published publicly until an Admin approves it (UC \#5: Validate Review Data).
-		\end{itemize} 
-		
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
-
-\vspace{2em}
-\noindent
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#4} & \textbf{Up-Vote} \\ \midrule
-	Level & User Goal \\
-	Description & An authenticated Student expresses approval for a specific review. \\
-	Actors & Student \\
-	Pre-conditions & The student must be authenticated. \\
-	Steps & 
-	\begin{tabenum}
-		\item The student selects the upvote option on a specific review.
-		\item The system checks if the student has already voted for this review.
-		\item The system increments the vote counter for the review.
-	\end{tabenum} \\
-	Post-conditions & The vote is stored in the database, updating the review's total score. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[3a.] If the student has already voted, the system does not register the new vote.
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
-
-\vspace{2em}
-\noindent
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#5} & \textbf{Report Review} \\ \midrule
-	Level & User Goal\\
-	Description &  \\
-	Actors & Student \\
-	Pre-conditions & The student must be authenticated. \\
-	Steps & 
-	\begin{tabenum}
-		\item The student reads a review with inappropriate content.
-		\item The student selects the option to report the review.
-		\item The student writes a brief comment for the report. 
-		\item The system registers the report. 
-	\end{tabenum} \\
-	Post-conditions & The report is visible to the admin for validation. \\
-	Alternative Steps & None \\ 
-	\bottomrule
-\end{tabularx}
+\begin{usecasetable}{5}{Report Review}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & An authenticated student reports inappropriate content. \\
+		\textbf{Actors} & Student \\
+		\textbf{Pre-conditions} & The student must be authenticated. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The student reads a review with inappropriate content.
+			\item The student selects the option to report the review.
+			\item The student writes a brief comment for the report. 
+			\item The system registers the report.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The report is visible to the admin for validation. \\
+		\textbf{Alternative Steps} & None
+	\end{tabularx}
+\end{usecasetable}
 
 
 \subsubsection{Admin Templates}
 
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#6} & \textbf{Admin Login} \\ \midrule
-	Level & Function \\
-	Description &  The admin log in the system to access his functionality\\
-	Actors & Admin \\
-	Pre-conditions & The admin email must be stored in the database. \\
-	Steps & 
-	\begin{tabenum}
-		\item The admin accesses the dedicated administrative login interface.
-		\item The admin provides their registered email address. 
-		\item The system verifies if the email is in the admin whitelist 
-		\item The system sends a verification code to the provided address.
-		\item The admin enters the code.
-		\item The system verifies if the entered code matches the one sent.
-		\item The system notifies the successful login.
-	\end{tabenum}\\
-	Post-conditions & The admin is logged in and has access to his functionality. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[3a.] If the provided email is not recognized, the system signal the error and ask the admin to provide a new one.
-		\item[7a.] If the provided code don't match the one send, the system ask the Admin to re-enter the code or request a new one.
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
+\begin{usecasetable}{6}{Admin Login}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & Function \\
+		\textbf{Description} & The admin log in the system to access his functionality. \\
+		\textbf{Actors} & Admin \\
+		\textbf{Pre-conditions} & The admin email must be stored in the database. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The admin accesses the dedicated administrative login interface.
+			\item The admin provides their registered email address.
+			\item The system verifies if the email is in the admin whitelist.
+			\item The system sends a verification code to the provided address.
+			\item The admin enters the code.
+			\item The system verifies if the entered code matches the one sent.
+			\item The system notifies the successful login.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The admin is logged in and has access to his functionality. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[3a.] If the provided email is not recognized, the system signal the error and ask the admin to provide a new one.
+			\item[7a.] If the provided code don't match the one send, the system ask the Admin to re-enter the code or request a new one.
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
 
-\vspace{2em}
-\noindent
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#7} & \textbf{Validate Review Information} \\ \midrule
-	Level & User Goal \\
-	Description & The admin verifies the submitted information. \\
-	Actors & Admin \\
-	Pre-conditions & The admin is logged in. \\
-	Steps & 
-	\begin{tabenum}
-		\item The admin selects a review from the queue of pending validations.
-		\item The admin links the following fields to existing database entries:
-		\begin{itemize}[leftmargin=1.5em, nosep]
-			\item School
-			\item Degree
-			\item Course
-			\item Professor
-		\end{itemize}
-		\item The admin validates and publishes the review.
-	\end{tabenum} \\
-	Post-conditions & The review is validated and visible to the public. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[2a.] The admin corrects a field by creating a new entry in the database.
-		\item[2b.] If the fields cannot be linked or verified, the admin discards the review.
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
 
-\vspace{2em}
-\noindent
-\begin{tabularx}{\textwidth}{lX}
-	\toprule
-	\textbf{UC \#8} & \textbf{Validate Report} \\ \midrule
-	Level & User Goal \\
-	Description & The admin evaluates reported reviews and take moderation actions. \\
-	Actors & Admin \\
-	Pre-conditions & The admin is logged in. \\
-	Steps & 
-	\begin{tabenum}
-		\item The admin select the option to view pending reports.
-		\item The admin select a report.
-		\item The admin verifies if the review is to be removed.
-		\item The review is deleted from the system.
-	\end{tabenum} \\
-	Post-conditions & The report has been processed and the moderation procedure is consistent in the database. \\
-	Alternative Steps & 
-	\begin{tabitem}
-		\item[3a.] If the review  do not contains any violation, the report is dismissed and the review remains visible.
-		\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria the admin can map the review to the student ID and suspend his account???
-	\end{tabitem} \\ \bottomrule
-\end{tabularx}
+\begin{usecasetable}{7}{Validate Review Information}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & The admin verifies the submitted information. \\
+		\textbf{Actors} & Admin \\
+		\textbf{Pre-conditions} & The admin is logged in. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The admin selects a review from the queue of pending validations.
+			\item The admin links the following fields to existing database entries:
+			\begin{itemize}[leftmargin=1.5em, nosep]
+				\item School
+				\item Degree
+				\item Course
+				\item Professor
+			\end{itemize}
+			\item The admin validates and publishes the review.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The review is validated and visible to the public. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[2a.] The admin corrects a field by creating a new entry in the database.
+			\item[2b.] If the fields cannot be linked or verified, the admin discards the review.
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
 
+\begin{usecasetable}{8}{Validate Report}
+	\begin{tabularx}{\textwidth}{l|X}
+		\textbf{Level} & User Goal \\
+		\textbf{Description} & The admin evaluates reported reviews and take moderation actions. \\
+		\textbf{Actors} & Admin \\
+		\textbf{Pre-conditions} & The admin is logged in. \\
+		\textbf{Steps} &
+		\begin{tabenum}
+			\item The admin select the option to view pending reports.
+			\item The admin select a report.
+			\item The admin verifies if the review is to be removed.
+			\item The review is deleted from the system.
+		\end{tabenum} \\
+		\textbf{Post-conditions} & The report has been processed and the moderation procedure is consistent in the database. \\
+		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[3a.] If the review  doesn't contain any violation, the report is dismissed and the review remains visible.
+			\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria the admin can map the review to the student ID and suspend his account???
+		\end{tabitem}
+	\end{tabularx}
+\end{usecasetable}
 
 \subsection{Mock-ups}
 

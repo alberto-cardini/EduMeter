@@ -31,9 +31,32 @@
 \usepackage{tabularx}
 \usepackage{enumitem}
 \newlist{tabitem}{itemize}{1}
-\setlist[tabitem]{label=\textbullet, leftmargin=2em, nosep, before=\vspace{-0.6\baselineskip}}
+\setlist[tabitem]{label=\textbullet, leftmargin=2em, nosep, before=\vspace{-0.6\baselineskip}} 
 \newlist{tabenum}{enumerate}{1}
-\setlist[tabenum]{label=\arabic*., leftmargin=*, nosep, before=\vspace{-0.5\baselineskip}}
+\setlist[tabenum]{label=\arabic*., leftmargin=*, nosep, before=\vspace{-0.6\baselineskip}}
+\usepackage[table]{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+\definecolor{UMLBlue}{RGB}{200, 215, 245} 
+\definecolor{UMLDarkBlue}{RGB}{50, 100, 150}
+\newtcolorbox{usecasetable}[2]{
+	enhanced,
+	before upper={\renewcommand{\arraystretch}{1.5}\centering\rowcolors{2}{}{UMLBlue!30}},
+	fonttitle=\bfseries,
+	title={UC \#{#1}: #2},
+	colback=white,
+	colframe=UMLDarkBlue,
+	colbacktitle=UMLBlue,
+	coltitle=black,
+	attach boxed title to top left={xshift=3mm, yshift=-2mm},
+	boxed title style={colframe=UMLDarkBlue, sharp corners},
+	sharp corners,
+	boxrule=0.8pt,
+	top=4mm,
+	before skip=2em, 
+	after skip=5em
+}
+
 
 
 \title{EduMeter technical report}
