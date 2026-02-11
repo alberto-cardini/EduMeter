@@ -8,4 +8,114 @@
 
 \subsection{Database}
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+
+		\umlclass{User}{
+			% The @{} removes extra side padding for a tighter fit
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+					    & email       & \textit{varchar} \\
+					    & banned      & \textit{boolean}
+			\end{tabular}
+		}{}
+
+
+		\umlclass[below = 1cm of User]{Report}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+					    & comment     & \textit{varchar} \\
+					    & date        & \textit{date} \\
+				\textbf{FK} & user\_id    & \textit{int} \\
+				\textbf{FK} & review\_id  & \textit{int}
+			\end{tabular}
+		}{}
+
+		\umlclass[right = 1cm of User]{Drafted Review}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+					    & comment     & \textit{varchar} \\
+					    & date        & \textit{date} \\
+					    & rating      & \textit{int} \\
+					    & difficulty  & \textit{int} \\
+					    & school      & \textit{varchar} \\
+					    & degree      & \textit{varchar} \\
+					    & course      & \textit{varchar} \\
+					    & professor   & \textit{varchar} \\
+				\textbf{FK} & user\_id    & \textit{int} \\
+			\end{tabular}
+		}{}
+
+		\umlclass[below = 1cm of Drafted Review]{Published Review}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id}   & \textit{int} \\
+					    & comment       & \textit{varchar} \\
+					    & date          & \textit{date} \\
+					    & rating        & \textit{int} \\
+					    & difficulty    & \textit{int} \\
+				\textbf{FK} & teaching\_id  & \textit{int} \\
+				\textbf{FK} & user\_id      & \textit{int} \\
+			\end{tabular}
+		}{}
+
+		\umlclass[below = 1cm of Published Review]{Teaching}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK FK} & \textbf{course\_id}    & \textit{int} \\
+				\textbf{PK FK} & \textbf{professor\_id} & \textit{varchar} \\
+			\end{tabular}
+		}{}
+
+		\umlclass[right = 1cm of Teaching]{Course}{
+		    \begin{tabular}{@{} l l l @{}}
+			\textbf{PK} & \textbf{id} & \textit{int} \\
+				    & name        & \textit{varchar} \\
+			\textbf{FK} & degree\_id  & \textit{int} \\
+		    \end{tabular}
+		}{}
+
+		\umlclass[above = 1cm of Course]{Degree}{
+		    \begin{tabular}{@{} l l l @{}}
+			\textbf{PK} & \textbf{id} & \textit{int} \\
+				    & name        & \textit{varchar} \\
+				    & type        & \textit{varchar} \\
+			\textbf{FK} & school\_id  & \textit{int} \\
+		    \end{tabular}
+		}{}
+
+		\umlclass[above = 1cm of Degree]{School}{
+		    \begin{tabular}{@{} l l l @{}}
+			\textbf{PK} & \textbf{id} & \textit{int} \\
+				    & name        & \textit{varchar} \\
+		    \end{tabular}
+		}{}
+
+		\umlclass[left = 1cm of Teaching]{Professor}{
+		    \begin{tabular}{@{} l l l @{}}
+			\textbf{PK} & \textbf{id} & \textit{int} \\
+				    & name        & \textit{varchar} \\
+				    & surname     & \textit{varchar} \\
+		    \end{tabular}
+		}{}
+
+		\umlclass[above = 2cm of School]{Admin}{
+		    \begin{tabular}{@{} l l l @{}}
+			\textbf{PK} & \textbf{id} & \textit{int} \\
+				    & email       & \textit{varchar} \\
+		    \end{tabular}
+		}{}
+
+		\umluniassoc{Report}{User}
+		\umluniassoc{Drafted Review}{User}
+		\umluniassoc[geometry=-|-]{Published Review}{User}
+		\umluniassoc{Course}{Degree}
+		\umluniassoc{Degree}{School}
+		\umluniassoc{Teaching}{Course}
+		\umluniassoc{Teaching}{Professor}
+		\umluniassoc{Published Review}{Teaching}
+
+	\end{tikzpicture}
+	\caption{UML diagram of Database schema}
+\end{figure}
+
 \subsection{Interface}
