@@ -2,6 +2,116 @@
 
 \subsection{Domain Model}
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.7, transform shape]
+		
+		% first column (from left to right)
+		\umlclass[width=5cm]{User}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- banned   & : bool \\
+				-- reviews  & : List<Review>
+			\end{tabular}
+		}{}
+		
+		\umlclass[below=3cm of User, width=5cm]{Admin}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- email    & : string
+			\end{tabular}
+		}{}
+		
+		\umlclass[below=3cm of Admin, width=5cm]{Report}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- issuer   & : User \\
+				-- status   & : ReportStatus
+			\end{tabular}
+		}{}
+		
+		\umlenum[below=2.5cm of Report]{ReportStatus}{
+			Pending \\ Accepted \\ Rejected
+		}
+		
+		% second column
+		\umlclass[right=3cm of User, width=6cm]{Review}{
+			\begin{tabular}{@{} l l @{}}
+				-- id          & : int \\
+				-- comment     & : string \\
+				-- date        & : LocalDate \\
+				-- enjoyment   & : int \\
+				-- difficulty  & : int \\
+				-- professor   & : Professor \\
+				-- creator     & : User
+			\end{tabular}
+		}{
+			\begin{tabular}{@{} l l @{}}
+				-- check\_enjoyment() \\
+				-- check\_difficulty()
+			\end{tabular}
+		}
+		
+		\umlclass[below=4cm of Review, width=6cm]{Professor}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- name     & : string \\
+				-- surname  & : string \\
+				-- reviews  & : List<Review>
+			\end{tabular}
+		}{}
+		
+		% third column
+		\umlenum[right=4cm of Review]{DegreeType}{
+			Bachelor \\ Master
+		}
+		
+		\umlclass[below=2.5cm of DegreeType]{School}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- name     & : string \\
+				-- degrees  & : List<Degree>
+			\end{tabular}
+		}{}
+		
+		\umlclass[below=2.5cm of School, width=5cm]{Degree}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- name     & : string \\
+				-- school   & : School \\
+				-- type     & : DegreeType \\
+				-- courses  & : List<Course>
+			\end{tabular}
+		}{}
+		
+		\umlclass[below=2.5cm of Degree, width=5cm]{Course}{
+			\begin{tabular}{@{} l l @{}}
+				-- id       & : int \\
+				-- name     & : string \\
+				-- degree   & : Degree 
+			\end{tabular}
+		}{}
+		
+		\umlcompo{Degree}{Course}
+		\umlcompo{School}{Degree}
+		\umlcompo[geometry=-|-, arm1=-1.2cm, anchor1=west, anchor2=west]{User}{Report}
+		\umlcompo[geometry=-|-, anchor1 = 160]{School}{Review}
+		\umlcompo[geometry=-|-]{Degree}{Review}
+		\umlcompo[geometry=-|-, anchor1 =-160]{Course}{Review}
+		\umlcompo[geometry=-|-]{User}{Review}
+		\umlcompo{Professor}{Review}
+		
+		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=west, anchor2=-160]{Course}{Degree}
+		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=160, anchor2=west]{Degree}{School}
+		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=-160, anchor2=west]{Review}{Professor}
+		\umlaggreg[geometry=-|, arm1=0.8cm, anchor1=145, anchor2=north]{Review}{User}
+		
+		\umluniassoc[geometry=-|-, arm1=1.2cm, anchor1=east, anchor2=east]{Degree}{DegreeType}
+		\umluniassoc{Report}{ReportStatus}
+		
+	\end{tikzpicture}
+\end{figure}
+
 \subsection{Business Logic}
 
 \subsection{Object-Relation Mapper (ORM)}
@@ -16,8 +126,7 @@
 			% The @{} removes extra side padding for a tighter fit
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK} & \textbf{id} & \textit{int} \\
-					    & email       & \textit{varchar} \\
-					    & banned      & \textit{boolean}
+					    	& banned      & \textit{boolean}
 			\end{tabular}
 		}{}
 
@@ -25,8 +134,8 @@
 		\umlclass[below = 1cm of User]{Report}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK} & \textbf{id} & \textit{int} \\
-					    & comment     & \textit{varchar} \\
-					    & date        & \textit{date} \\
+					    	& comment     & \textit{varchar} \\
+					    	& date        & \textit{date} \\
 				\textbf{FK} & user\_id    & \textit{int} \\
 				\textbf{FK} & review\_id  & \textit{int}
 			\end{tabular}
@@ -35,14 +144,14 @@
 		\umlclass[right = 1cm of User]{Drafted Review}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK} & \textbf{id} & \textit{int} \\
-					    & comment     & \textit{varchar} \\
-					    & date        & \textit{date} \\
-					    & rating      & \textit{int} \\
-					    & difficulty  & \textit{int} \\
-					    & school      & \textit{varchar} \\
-					    & degree      & \textit{varchar} \\
-					    & course      & \textit{varchar} \\
-					    & professor   & \textit{varchar} \\
+						    & comment     & \textit{varchar} \\
+						    & date        & \textit{date} \\
+						    & rating      & \textit{int} \\
+						    & difficulty  & \textit{int} \\
+						    & school      & \textit{varchar} \\
+						    & degree      & \textit{varchar} \\
+						    & course      & \textit{varchar} \\
+						    & professor   & \textit{varchar} \\
 				\textbf{FK} & user\_id    & \textit{int} \\
 			\end{tabular}
 		}{}
@@ -50,10 +159,10 @@
 		\umlclass[below = 1cm of Drafted Review]{Published Review}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK} & \textbf{id}   & \textit{int} \\
-					    & comment       & \textit{varchar} \\
-					    & date          & \textit{date} \\
-					    & rating        & \textit{int} \\
-					    & difficulty    & \textit{int} \\
+						    & comment       & \textit{varchar} \\
+						    & date          & \textit{date} \\
+						    & rating        & \textit{int} \\
+						    & difficulty    & \textit{int} \\
 				\textbf{FK} & teaching\_id  & \textit{int} \\
 				\textbf{FK} & user\_id      & \textit{int} \\
 			\end{tabular}
@@ -68,40 +177,40 @@
 
 		\umlclass[right = 1cm of Teaching]{Course}{
 		    \begin{tabular}{@{} l l l @{}}
-			\textbf{PK} & \textbf{id} & \textit{int} \\
-				    & name        & \textit{varchar} \\
-			\textbf{FK} & degree\_id  & \textit{int} \\
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+						    & name        & \textit{varchar} \\
+				\textbf{FK} & degree\_id  & \textit{int} \\
 		    \end{tabular}
 		}{}
 
 		\umlclass[above = 1cm of Course]{Degree}{
 		    \begin{tabular}{@{} l l l @{}}
-			\textbf{PK} & \textbf{id} & \textit{int} \\
-				    & name        & \textit{varchar} \\
-				    & type        & \textit{varchar} \\
-			\textbf{FK} & school\_id  & \textit{int} \\
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+						    & name        & \textit{varchar} \\
+						    & type        & \textit{varchar} \\
+				\textbf{FK} & school\_id  & \textit{int} \\
 		    \end{tabular}
 		}{}
 
 		\umlclass[above = 1cm of Degree]{School}{
 		    \begin{tabular}{@{} l l l @{}}
-			\textbf{PK} & \textbf{id} & \textit{int} \\
-				    & name        & \textit{varchar} \\
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+						    & name        & \textit{varchar} \\
 		    \end{tabular}
 		}{}
 
 		\umlclass[left = 1cm of Teaching]{Professor}{
 		    \begin{tabular}{@{} l l l @{}}
-			\textbf{PK} & \textbf{id} & \textit{int} \\
-				    & name        & \textit{varchar} \\
-				    & surname     & \textit{varchar} \\
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+						    & name        & \textit{varchar} \\
+						    & surname     & \textit{varchar} \\
 		    \end{tabular}
 		}{}
 
 		\umlclass[above = 2cm of School]{Admin}{
 		    \begin{tabular}{@{} l l l @{}}
-			\textbf{PK} & \textbf{id} & \textit{int} \\
-				    & email       & \textit{varchar} \\
+				\textbf{PK} & \textbf{id} & \textit{int} \\
+						    & email       & \textit{varchar} \\
 		    \end{tabular}
 		}{}
 
