@@ -3,6 +3,8 @@ package com.swe.EduMeter.business_logic;
 import com.swe.EduMeter.orm.DAOFactory;
 import com.swe.EduMeter.orm.in_mem.InMemDAOFactory;
 import com.swe.EduMeter.orm.UserDAO;
+import com.swe.EduMeter.orm.in_mem.InMemUserDAO;
+import com.swe.EduMeter.orm.postgres.PostgreUserDAO;
 import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,7 +14,10 @@ public class MainApplication extends ResourceConfig {
     public static final String IN_MEM_DB = "IN_MEM_DB";
 
     public MainApplication() {
+        // where to find controllers
         packages("com.swe.EduMeter.business_logic");
+
+        // register types for injection
         register(new AbstractBinder() {
             @Override
             protected void configure() {
