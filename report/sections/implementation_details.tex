@@ -37,11 +37,14 @@
 		% second column
 		\umlclass[right=3cm of User, width=6cm]{Review}{
 			\begin{tabular}{@{} l l @{}}
-				-- id          & : int \\
-				-- comment     & : string \\
+				-- id          & : int       \\
+				-- course      & : Course    \\
+				-- degree      & : Degree    \\
+				-- school      & : School    \\ 
+				-- comment     & : string    \\
 				-- date        & : LocalDate \\
-				-- enjoyment   & : int \\
-				-- difficulty  & : int \\
+				-- enjoyment   & : int       \\
+				-- difficulty  & : int       \\
 				-- professor   & : Professor \\
 				-- creator     & : User
 			\end{tabular}
@@ -54,9 +57,9 @@
 		
 		\umlclass[below=4cm of Review, width=6cm]{Professor}{
 			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- name     & : string \\
-				-- surname  & : string \\
+				-- id       & : int       \\
+				-- name     & : string    \\
+				-- surname  & : string    \\
 				-- reviews  & : List<Review>
 			\end{tabular}
 		}{}
