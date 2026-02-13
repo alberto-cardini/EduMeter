@@ -9,9 +9,8 @@
 		% first column (from left to right)
 		\umlclass[width=5cm]{User}{
 			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- banned   & : bool \\
-				-- reviews  & : List<Review>
+				-- id       		& : string \\ % it is the hash related to the user.
+				-- banned   		& : bool 
 			\end{tabular}
 		}{}
 		
@@ -26,7 +25,8 @@
 			\begin{tabular}{@{} l l @{}}
 				-- id       & : int \\
 				-- issuer   & : User \\
-				-- status   & : ReportStatus
+				-- status   & : ReportStatus \\
+				-- review   & : Review
 			\end{tabular}
 		}{}
 		
@@ -45,6 +45,7 @@
 				-- date        & : LocalDate \\
 				-- enjoyment   & : int       \\
 				-- difficulty  & : int       \\
+				-- up-votes    & : int       \\
 				-- professor   & : Professor \\
 				-- creator     & : User
 			\end{tabular}
@@ -59,8 +60,7 @@
 			\begin{tabular}{@{} l l @{}}
 				-- id       & : int       \\
 				-- name     & : string    \\
-				-- surname  & : string    \\
-				-- reviews  & : List<Review>
+				-- surname  & : string    
 			\end{tabular}
 		}{}
 		
@@ -72,8 +72,7 @@
 		\umlclass[below=2.5cm of DegreeType]{School}{
 			\begin{tabular}{@{} l l @{}}
 				-- id       & : int \\
-				-- name     & : string \\
-				-- degrees  & : List<Degree>
+				-- name     & : string
 			\end{tabular}
 		}{}
 		
@@ -82,8 +81,7 @@
 				-- id       & : int \\
 				-- name     & : string \\
 				-- school   & : School \\
-				-- type     & : DegreeType \\
-				-- courses  & : List<Course>
+				-- type     & : DegreeType
 			\end{tabular}
 		}{}
 		
@@ -104,10 +102,7 @@
 		\umlcompo[geometry=-|-]{User}{Review}
 		\umlcompo{Professor}{Review}
 		
-		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=west, anchor2=-160]{Course}{Degree}
-		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=160, anchor2=west]{Degree}{School}
-		\umlaggreg[geometry=-|-, arm1=-0.8cm, anchor1=-160, anchor2=west]{Review}{Professor}
-		\umlaggreg[geometry=-|, arm1=0.8cm, anchor1=145, anchor2=north]{Review}{User}
+		
 		
 		\umluniassoc[geometry=-|-, arm1=1.2cm, anchor1=east, anchor2=east]{Degree}{DegreeType}
 		\umluniassoc{Report}{ReportStatus}
