@@ -3,6 +3,7 @@ package com.swe.EduMeter.orm.postgres;
 import com.swe.EduMeter.model.School;
 import com.swe.EduMeter.orm.SchoolDAO;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class PostgreSchoolDAO implements SchoolDAO {
@@ -14,6 +15,12 @@ public class PostgreSchoolDAO implements SchoolDAO {
 
     @Override
     public Optional<School> getSchoolByName(String name) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<School> getAllSchools() {
         // TODO
         throw new RuntimeException("Not implemented");
     }

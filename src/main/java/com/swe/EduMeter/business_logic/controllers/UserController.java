@@ -7,9 +7,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.Map;
-import java.util.Optional;
-
 @Path("/user")
 public class UserController {
     private final UserDAO userDAO;
@@ -17,6 +14,8 @@ public class UserController {
     public UserController(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
+
+    /* Legacy
 
     @GET
     @Path("/{userHash}")
@@ -26,4 +25,18 @@ public class UserController {
                 .map(user -> Response.ok(user).build())
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
+     */
+
+    @GET
+    @Path("/profile")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserProfile() {
+        String dummy_hash = "dummy_hash";    // TODO: replace this with the authentication procedure.
+        return userDAO.getUserByHash(dummy_hash)
+                .map(user -> Response.ok(user).build())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+    }
+
+    // TODO: add posting related CRUD.
+
 }

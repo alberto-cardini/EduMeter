@@ -1,10 +1,7 @@
 package com.swe.EduMeter.business_logic;
 
-import com.swe.EduMeter.orm.DAOFactory;
-import com.swe.EduMeter.orm.SchoolDAO;
+import com.swe.EduMeter.orm.*;
 import com.swe.EduMeter.orm.in_mem.InMemDAOFactory;
-import com.swe.EduMeter.orm.UserDAO;
-
 import jakarta.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -33,6 +30,7 @@ public class MainApplication extends ResourceConfig {
 
                 bind(backendFactory.getUserDAO()).to(UserDAO.class);
                 bind(backendFactory.getSchoolDAO()).to(SchoolDAO.class);
+                bind(backendFactory.getAdminDAO()).to(AdminDAO.class);
             }
         });
     }

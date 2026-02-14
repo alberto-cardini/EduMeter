@@ -2,10 +2,11 @@ package com.swe.EduMeter.model;
 
 public class School {
 
-    private int id;
+    //This field is filled only by the DAO, in order to maintain the consistency with the PK on the DB.
+    private int id = 0;
     private String name;
 
-    // needed in order to let jersey-media-json-jackson map the JSON on a new School Entity
+    // needed in order to let jersey-media-json-jackson map the JSON on a new School Entity.
     public School() {}
 
     public School(int id, String name) {

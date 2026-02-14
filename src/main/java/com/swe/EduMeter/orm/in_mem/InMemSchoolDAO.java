@@ -3,7 +3,7 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.orm.SchoolDAO;
 import com.swe.EduMeter.model.School;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemSchoolDAO implements SchoolDAO {
@@ -30,15 +30,13 @@ public class InMemSchoolDAO implements SchoolDAO {
     }
 
     @Override
-    public void addSchool(School school){
-        if(!inMemStorage.containsKey(school.getId())) {
-            school.setId(id);
-            inMemStorage.put(id, school);
-            id++;
-        }else{
-            //TODO: manage the error for the insertion of an already existing school with that ID.
-            //      Throw an exception maybe.
-        }
+    public ArrayList<School> getAllSchools() { return Collections.list(inMemStorage.elements()); }
+
+    @Override
+    public void addSchool(School school) {
+        school.setId(id);
+        inMemStorage.put(id, school);
+        id++;
     }
 
     @Override

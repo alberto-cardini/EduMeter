@@ -4,6 +4,7 @@ import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 import jdk.jshell.spi.ExecutionControl;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class PostgreUserDAO implements UserDAO {
@@ -15,6 +16,18 @@ public class PostgreUserDAO implements UserDAO {
 
     @Override
     public Optional<User> getUserByHash(String hash) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<User> getAllUsers() {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<User> getAllBannedUsers() {
         // TODO
         throw new RuntimeException("Not implemented");
     }

@@ -3,8 +3,10 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemUserDAO implements UserDAO {
     private final ConcurrentHashMap<Integer, User> inMemStorage = new ConcurrentHashMap<>();
@@ -30,10 +32,21 @@ public class InMemUserDAO implements UserDAO {
     }
 
     @Override
+    public ArrayList<User> getAllUsers() {
+        return new ArrayList<>(inMemStorage.values());
+    }
+
+    @Override
+    public ArrayList<User> getAllBannedUsers() {
+        return inMemStorage.values().stream()
+                .filter(User::isBanned) // Keep only banned users
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    @Override
     public void addUser(User user) {
         user.setId(id);
         inMemStorage.put(id, user);
-
         id++;
     }
 }
