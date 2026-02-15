@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Unit Tests" type="JUnit" factoryName="JUnit">
+    <module name="EduMeter" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="come.swe.EduMeter.business_logic.controllers.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="come.swe.EduMeter.business_logic.controllers" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="pattern" />
+    <patterns>
+      <pattern testClass="com.swe.EduMeter.business_logic.*Test" />
+    </patterns>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
