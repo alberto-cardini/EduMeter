@@ -1,6 +1,5 @@
 package com.swe.EduMeter.business_logic.controllers;
 
-import com.swe.EduMeter.model.School;
 import com.swe.EduMeter.orm.SchoolDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;

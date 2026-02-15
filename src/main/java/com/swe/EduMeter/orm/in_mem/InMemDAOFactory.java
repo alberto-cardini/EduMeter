@@ -1,22 +1,28 @@
 package com.swe.EduMeter.orm.in_mem;
 
-import com.swe.EduMeter.orm.AdminDAO;
-import com.swe.EduMeter.orm.DAOFactory;
-import com.swe.EduMeter.orm.SchoolDAO;
-import com.swe.EduMeter.orm.UserDAO;
+import com.swe.EduMeter.orm.*;
 
 public class InMemDAOFactory implements DAOFactory {
 
     private final UserDAO userDAO = new InMemUserDAO();
-    private final SchoolDAO schoolDAO = new InMemSchoolDAO();
     private final AdminDAO adminDAO = new InMemAdminDAO();
+    private final SchoolDAO schoolDAO = new InMemSchoolDAO();
+    private final DegreeDAO degreeDAO = new InMemDegreeDAO();
+    private final CourseDAO courseDAO = new InMemCourseDAO();
 
     @Override
     public UserDAO getUserDAO() { return userDAO; }
 
     @Override
+    public AdminDAO getAdminDAO() { return adminDAO; }
+
+    @Override
     public SchoolDAO getSchoolDAO() { return schoolDAO; }
 
     @Override
-    public AdminDAO getAdminDAO() { return adminDAO; }
+    public DegreeDAO getDegreeDAO() { return degreeDAO; }
+
+    @Override
+    public CourseDAO getCourseDAO() { return courseDAO; }
+
 }

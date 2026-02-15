@@ -1,6 +1,5 @@
 package com.swe.EduMeter.business_logic.controllers;
 
-import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -26,6 +25,12 @@ public class UserController {
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
      */
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllUsers() {
+        return Response.ok(userDAO.getAllUsers()).build();
+    }
 
     @GET
     @Path("/profile")
