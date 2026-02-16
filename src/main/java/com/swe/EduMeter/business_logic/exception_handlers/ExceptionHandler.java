@@ -1,4 +1,4 @@
-package com.swe.EduMeter.business_logic;
+package com.swe.EduMeter.business_logic.exception_handlers;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
