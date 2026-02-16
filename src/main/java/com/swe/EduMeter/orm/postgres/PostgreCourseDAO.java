@@ -39,13 +39,29 @@ public class PostgreCourseDAO implements CourseDAO {
     }
 
     @Override
-    public void deleteCourseByName(String name) {
+    public boolean deleteCourseByName(String name) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
     public void updateCourse(int id, Course new_course) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<Course> getAllCoursesBySchool(String school_name) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<Course> getAllCoursesByDegree(String degree_name) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public boolean deleteAllCoursesByDegree(String degree_name) {
         // TODO
         throw new RuntimeException("Not implemented");
     }

@@ -38,7 +38,7 @@ public class PostgreSchoolDAO implements SchoolDAO {
     }
 
     @Override
-    public void deleteSchoolByName(String name) {
+    public boolean deleteSchoolByName(String name) {
         // TODO
         throw new RuntimeException("Not implemented");
     }

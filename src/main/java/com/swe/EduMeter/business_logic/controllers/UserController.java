@@ -36,7 +36,7 @@ public class UserController {
     @Path("/profile")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserProfile() {
-        String dummy_hash = "dummy_hash";    // TODO: replace this with the authentication procedure.
+        String dummy_hash = "PROVA1";    // TODO: replace this with the authentication procedure.
         return userDAO.getUserByHash(dummy_hash)
                 .map(user -> Response.ok(user).build())
                 .orElseThrow(() -> new NotFoundException("User not found"));

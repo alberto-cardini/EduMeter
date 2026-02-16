@@ -43,8 +43,20 @@ public class InMemDegreeDAO implements DegreeDAO {
     }
 
     @Override
-    public void deleteDegreeByName(String name){
-        inMemStorage.values().removeIf(d -> d.getName().equals(name));
+    public boolean deleteDegreeByName(String name){
+        return inMemStorage.values().removeIf(d -> d.getName().equals(name));
+    }
+
+    @Override
+    public ArrayList<Degree> getAllDegreesBySchool(String school_name) {
+        ArrayList<Degree> degrees = Collections.list(inMemStorage.elements());
+        degrees.removeIf(d -> !d.getSchool().getName().equals(school_name));
+        return degrees;
+    }
+
+    @Override
+    public boolean deleteAllDegreesBySchool(String school_name) {
+        return inMemStorage.values().removeIf(d -> d.getSchool().getName().equals(school_name));
     }
 
 }

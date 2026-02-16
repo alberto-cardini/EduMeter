@@ -4,6 +4,7 @@ import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.orm.CourseDAO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,8 +38,8 @@ public class InMemCourseDAO implements CourseDAO {
     }
 
     @Override
-    public void deleteCourseByName(String name){
-        inMemStorage.values().removeIf(u -> u.getName().equals(name));
+    public boolean deleteCourseByName(String name){
+        return inMemStorage.values().removeIf(u -> u.getName().equals(name));
     }
 
     @Override
@@ -51,5 +52,24 @@ public class InMemCourseDAO implements CourseDAO {
     @Override
     public void updateCourse(int id, Course new_course){
         inMemStorage.replace(id, new_course);
+    }
+
+    @Override
+    public ArrayList<Course> getAllCoursesBySchool(String school_name){
+        ArrayList<Course> courses = Collections.list(inMemStorage.elements());
+        courses.removeIf(c -> !c.getDegree().getSchool().getName().equals(school_name));
+        return courses;
+    }
+
+    @Override
+    public ArrayList<Course> getAllCoursesByDegree(String degree_name){
+        ArrayList<Course> courses = Collections.list(inMemStorage.elements());
+        courses.removeIf(c -> !c.getDegree().getName().equals(degree_name));
+        return courses;
+    }
+
+    @Override
+    public boolean deleteAllCoursesByDegree(String degree_name){
+        return inMemStorage.values().removeIf(u -> u.getDegree().getName().equals(degree_name));
     }
 }

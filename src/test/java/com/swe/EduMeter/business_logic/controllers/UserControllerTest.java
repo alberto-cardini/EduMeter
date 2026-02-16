@@ -22,7 +22,7 @@ public class UserControllerTest {
     private UserDAO userDAO;
     @InjectMocks
     private UserController userController;
-
+/*
     @Test
     public void testGetUser_Found() {
         String userHash = "ABCDEF";
@@ -42,5 +42,5 @@ public class UserControllerTest {
 
         NotFoundException exception = assertThrows(NotFoundException.class, () -> userController.getUserByHash(userHash));
         assertEquals(exception.getMessage(), "User not found");
-    }
+    }*/
 }

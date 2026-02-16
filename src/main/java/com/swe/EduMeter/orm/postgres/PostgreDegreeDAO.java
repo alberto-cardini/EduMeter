@@ -39,7 +39,19 @@ public class PostgreDegreeDAO implements DegreeDAO {
     }
 
     @Override
-    public void deleteDegreeByName(String name) {
+    public boolean deleteDegreeByName(String name) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ArrayList<Degree> getAllDegreesBySchool(String school_name) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public boolean deleteAllDegreesBySchool(String school_name) {
         // TODO
         throw new RuntimeException("Not implemented");
     }

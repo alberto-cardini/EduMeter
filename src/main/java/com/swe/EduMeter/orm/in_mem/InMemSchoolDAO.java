@@ -45,8 +45,8 @@ public class InMemSchoolDAO implements SchoolDAO {
     }
 
     @Override
-    public void deleteSchoolByName(String name){
-        inMemStorage.values().removeIf(s -> s.getName().equals(name));
+    public boolean deleteSchoolByName(String name){
+        return inMemStorage.values().removeIf(s -> s.getName().equals(name));
     }
 
 }

@@ -11,7 +11,7 @@ public interface SchoolDAO {
     ArrayList<School> getAllSchools();
 
     void deleteSchoolById(int id);
-    void deleteSchoolByName(String name);
+    boolean deleteSchoolByName(String name);
 
     void addSchool(School school);
 }
