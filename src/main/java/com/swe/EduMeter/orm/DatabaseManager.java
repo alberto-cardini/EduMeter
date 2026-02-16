@@ -10,25 +10,33 @@ public class DatabaseManager {
 
     private DatabaseManager() {}
 
-    public static DatabaseManager getInstance() {
+    public static synchronized DatabaseManager getInstance() {
         if (instance == null)
             instance = new DatabaseManager();
         return instance;
     }
 
-    public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            String dbUrl = System.getenv("DB_URL");
-            String dbUser = System.getenv("DB_USER");
-            String dbPassword = System.getenv("DB_PASSWORD");
+    public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                String dbUrl = System.getenv("DB_URL");
+                String dbUser = System.getenv("DB_USER");
+                String dbPassword = System.getenv("DB_PASSWORD");
 
-            if (dbUrl == null || dbUser == null || dbPassword == null)
-                throw new SQLException("Variabili d'ambiente mancanti!");
+                if (dbUrl == null || dbUser == null || dbPassword == null) {
+                    throw new IllegalStateException("Environment variables (DB_URL, DB_USER, DB_PASSWORD) are missing.");
+                }
 
-            connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                Class.forName("org.postgresql.Driver");
+                connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+            }
+            return connection;
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("PostgreSQL JDBC Driver not found.", e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to establish database connection.", e);
         }
-
-        return connection;
     }
-
 }
