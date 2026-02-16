@@ -7,6 +7,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
+
 @Path("/admin")
 public class AdminController {
     private final AdminDAO adminDAO;
@@ -27,36 +29,29 @@ public class AdminController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllAdmins() {
-        return Response.ok(adminDAO.getAllAdmins()).build();
-    }
-/*
-    @GET
-    @Path("/{adminId}/users")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@PathParam("adminId") String adminId) {
-        return Response.ok(userDAO.getAllUsers()).build();
+    public ArrayList<Admin> getAllAdmins() {
+        return adminDAO.getAllAdmins();
     }
 
     @GET
-    @Path("/{adminId}/users?banned")
+    @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllBannedUsers(@QueryParam("banned") @DefaultValue("false") boolean banned,
-                                      @PathParam("adminId") String adminId) {
-        String admin_dummy_hash = "admin_dummy_hash";
-        return (banned) ? Response.ok(userDAO.getAllBannedUsers()).build() : Response.ok(userDAO.getAllUsers()).build();
+    public Admin getAdminById(@PathParam("admin_id") int admin_id) {
+        return adminDAO.getAdminById(admin_id).orElseThrow(() -> new NotFoundException("Admin not found"));
     }
 
     @POST
-    @Path("/{adminId}/users/{userHash}/ban")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response banUserByHash(@PathParam("userHash") String hash,
-                                  @PathParam("adminId") String adminId) {
-        String admin_dummy_hash = "admin_dummy_hash";
-        return userDAO.getUserByHash(hash)
-                .map(user -> {user.setBanned(true);
-                                    return Response.ok(user).build();})
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    public boolean createAdmin(Admin admin) {
+        return adminDAO.addAdmin(admin);
     }
-     */
+
+    @DELETE
+    @Path("/{admin_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public boolean deleteAdmin(@PathParam("admin_id") int admin_id) {
+        return adminDAO.getAdminById(admin_id)
+                .map(a -> {adminDAO.deleteAdminById(admin_id); return true;})
+                .orElseThrow(() -> new NotFoundException("Admin not found"));
+    }
 }

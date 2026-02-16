@@ -37,4 +37,10 @@ public class PostgreUserDAO implements UserDAO {
         // TODO
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public ArrayList<User> getUsersFilteredForBan(boolean banned) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
 }

@@ -10,5 +10,7 @@ public interface AdminDAO {
     Optional<Admin> getAdminByEmail(String email);
     ArrayList<Admin> getAllAdmins();
 
-    void addAdmin(Admin admin);
+    void deleteAdminById(int id);
+
+    boolean addAdmin(Admin admin);
 }

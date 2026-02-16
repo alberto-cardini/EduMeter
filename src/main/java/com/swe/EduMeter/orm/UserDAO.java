@@ -11,5 +11,9 @@ public interface UserDAO {
     ArrayList<User> getAllUsers();
     ArrayList<User> getAllBannedUsers();
 
+    ArrayList<User> getUsersFilteredForBan(boolean banned);
+
+    //boolean deleteUserById(int id);
+
     void addUser(User user);
 }

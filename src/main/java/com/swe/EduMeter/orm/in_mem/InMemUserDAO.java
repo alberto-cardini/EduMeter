@@ -1,9 +1,11 @@
 package com.swe.EduMeter.orm.in_mem;
 
+import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -48,5 +50,13 @@ public class InMemUserDAO implements UserDAO {
         user.setId(id);
         inMemStorage.put(id, user);
         id++;
+    }
+
+    @Override
+    public ArrayList<User> getUsersFilteredForBan(boolean banned) {
+        ArrayList<User> users = Collections.list(inMemStorage.elements());
+        if (banned) { users.removeIf(u -> !u.isBanned()); }
+        else { users.removeIf(u -> u.isBanned()); }
+        return users;
     }
 }

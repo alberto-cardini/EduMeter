@@ -27,8 +27,14 @@ public class PostgreAdminDAO implements AdminDAO {
     }
 
     @Override
-    public void addAdmin(Admin admin) {
+    public boolean addAdmin(Admin admin) {
         //TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void deleteAdminById(int id) {
+        // TODO
         throw new RuntimeException("Not implemented");
     }
 

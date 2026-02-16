@@ -37,9 +37,17 @@ public class InMemAdminDAO implements AdminDAO {
 
     // TODO: idk who should have the privileges to use this methods and have the ability to create admins.
     @Override
-    public void addAdmin(Admin admin) {
-        admin.setId(id);
-        inMemStorage.put(id, admin);
-        id++;
+    public boolean addAdmin(Admin admin) {
+        if(!getAdminByEmail(admin.getEmail()).isPresent()) {
+            admin.setId(id);
+            inMemStorage.put(id, admin);
+            id++;
+            return true;
+        }
+        return false;
     }
+
+    @Override
+    public void deleteAdminById(int id) { inMemStorage.remove(id); }
+
 }
