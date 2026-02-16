@@ -15,6 +15,8 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
  * TokenService is a singleton for Token management.
@@ -34,6 +36,18 @@ public class TokenService {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final Mac mac;
 
+    /* This shouldn't be used in production.
+     * Instead, it is advised to use a redis key store,
+     * which include key expiration.
+     *
+     * In that case, we would put every revoked token,
+     * making it expire when it should have.
+     *
+     * That is to prevent this ConcurrentHashSet to become
+     * too large without a scheduled cleaning.
+     */
+    private final Set<String> revokedTokens;
+
     public static synchronized TokenService getInstance() {
         if (instance == null) {
             instance = new TokenService();
@@ -43,6 +57,8 @@ public class TokenService {
     }
 
     public TokenService() {
+        revokedTokens = ConcurrentHashMap.newKeySet();
+
         String secret = System.getenv("SECRET");
         byte[] secretBytes = new byte[32];
 
@@ -61,6 +77,14 @@ public class TokenService {
             throw new RuntimeException("Bad algorithm or key");
         }
     }
+
+    /**
+     * Generate an encoded JWT Token.
+     *
+     * @param userHash User identification.
+     * @param isAdmin  Whether the user is an Admin or not.
+     * @return         Base64 encoded token.
+     */
     public String generateToken(String userHash, boolean isAdmin) {
         long expiresAt = Instant.now().plus(Duration.ofMinutes(TOKEN_EXPIRE_MINUTES)).toEpochMilli();
         Token token = new Token(userHash, expiresAt, isAdmin);
@@ -81,7 +105,17 @@ public class TokenService {
         }
     }
 
+    /**
+     * Decodes the encoded token, throwing errors if not valid.
+     *
+     * @param encodedToken Base64 encoded token
+     * @return             The instance of the Token object, if valid.
+     */
     public Token decodeToken(String encodedToken) {
+        if (revokedTokens.contains(encodedToken)) {
+            throw new NotAuthorizedException("Revoked token");
+        }
+
         String[] parts = encodedToken.split("\\.");
         if (parts.length != 2) {
             throw new NotAuthorizedException("Malformed token");
@@ -111,5 +145,16 @@ public class TokenService {
         } catch (JsonProcessingException e) {
             throw new NotAuthorizedException("Invalid token");
         }
+    }
+
+    /**
+     * Revokes a valid token.
+     * This method should be implemented with Redis
+     * (@see TokenService.revokedTokens).
+     *
+     * @param encodedToken The token to revoke.
+     */
+    public void revokeToken(String encodedToken) {
+        revokedTokens.add(encodedToken);
     }
 }
