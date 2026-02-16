@@ -10,3 +10,9 @@ Tests live under [`src/test`](./src/test) and they follow the same package struc
 That keeps the structure coherent and enables testing of package-private fields and methods.
 
 Unit tests are run by JUnit. They can be individually ran (per method or per class) directly from the IDE. A purposefully made run configuration may also run all unit tests at once (which is included in the repo).
+
+## Authentication
+
+The `/api/auth/login` endpoint currently accepts every kind of PIN sent, and creates an access token with the user email as the user hash, so it can be used for testing.
+
+Commits can be secured with `@AuthGuard`, which requires authentication and extracts user data in the request's SecurityContext.
