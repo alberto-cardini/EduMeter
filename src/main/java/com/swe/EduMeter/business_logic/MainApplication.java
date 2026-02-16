@@ -2,6 +2,7 @@ package com.swe.EduMeter.business_logic;
 
 import com.swe.EduMeter.orm.*;
 import com.swe.EduMeter.orm.in_mem.InMemDAOFactory;
+import com.swe.EduMeter.orm.postgres.PostgreDAOFactory;
 import jakarta.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -24,8 +25,7 @@ public class MainApplication extends ResourceConfig {
                     backendFactory = new InMemDAOFactory();
                 }
                 else {
-                    throw new RuntimeException("Real DB is not yet implemented, set the "+ IN_MEM_DB + " env var");
-                    //backendFactory = new PostgreDAOFactory();
+                    backendFactory = new PostgreDAOFactory();
                 }
 
                 bind(backendFactory.getUserDAO()).to(UserDAO.class);
