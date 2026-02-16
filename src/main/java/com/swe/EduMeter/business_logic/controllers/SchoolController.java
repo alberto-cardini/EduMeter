@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Path("/school")
 public class SchoolController {
@@ -28,7 +29,7 @@ public class SchoolController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ArrayList<School> getAllSchools() { return schoolDAO.getAllSchools(); }
+    public List<School> getAllSchools() { return schoolDAO.getAllSchools(); }
 
     @GET
     @Path("/{schoolName}")
