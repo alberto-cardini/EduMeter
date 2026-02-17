@@ -1,9 +1,9 @@
 package com.swe.EduMeter.model;
 
 public class User {
-    private int id;
+    private Integer id;
     private String hash;
-    private boolean banned;
+    private Boolean banned;
 
     public User(int id, String hash, boolean banned) {
         this.id = id;
@@ -11,7 +11,7 @@ public class User {
         this.banned = banned;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -27,7 +27,7 @@ public class User {
         this.hash = hash;
     }
 
-    public boolean isBanned() {
+    public Boolean isBanned() {
         return banned;
     }
 

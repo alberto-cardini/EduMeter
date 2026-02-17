@@ -1,7 +1,7 @@
 package com.swe.EduMeter.model;
 
 public class Admin {
-    private int id;
+    private Integer id;
     private String email;
 
     public Admin() {}
@@ -10,7 +10,7 @@ public class Admin {
         this.email = email;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

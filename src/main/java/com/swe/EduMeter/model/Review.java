@@ -3,7 +3,7 @@ package com.swe.EduMeter.model;
 import java.time.LocalDate;
 
 public class Review {
-    private int id;
+    private Integer id;
     private User creator;
     private Professor professor;
     private Course course;
@@ -11,13 +11,13 @@ public class Review {
     private School school;
     private String comment;
     private LocalDate date;
-    private int enjoyment;
-    private int difficulty;
-    private int up_vote;
+    private Integer enjoyment;
+    private Integer difficulty;
+    private Integer up_vote;
 
     public Review() {}
 
-    public int getId() { return id; }
+    public Integer getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public User getCreator() { return creator; }
@@ -41,7 +41,7 @@ public class Review {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
-    public int getEnjoyment() { return enjoyment; }
+    public Integer getEnjoyment() { return enjoyment; }
     public void setEnjoyment(int enjoyment) {
         if (enjoyment < 0 || enjoyment > 100) {
             this.enjoyment = 0;
@@ -50,7 +50,7 @@ public class Review {
         }
     }
 
-    public int getDifficulty() { return difficulty; }
+    public Integer getDifficulty() { return difficulty; }
     public void setDifficulty(int difficulty) {
         if (difficulty < 0 || difficulty > 100) {
             this.difficulty = 0;
@@ -59,7 +59,7 @@ public class Review {
         }
     }
 
-    public int getUp_vote() { return up_vote; }
+    public Integer getUp_vote() { return up_vote; }
     public void setUp_vote(int up_vote) { this.up_vote = up_vote; }
 
     public String toString() {

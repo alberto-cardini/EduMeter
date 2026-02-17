@@ -7,7 +7,7 @@ enum Report_Status{
 }
 
 public class Report {
-    private int id;
+    private Integer id;
     private User issuer;
     private Review review;
     private Report_Status status;
@@ -20,7 +20,7 @@ public class Report {
         this.review = review;
     }
 
-    public int getId() { return id; }
+    public Integer getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public User getIssuer() { return issuer; }

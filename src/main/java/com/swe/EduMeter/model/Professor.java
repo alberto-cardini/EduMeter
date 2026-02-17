@@ -1,7 +1,7 @@
 package com.swe.EduMeter.model;
 
 public class Professor {
-    private int id;
+    private Integer id;
     private String name;
     private String surname;
 

@@ -9,7 +9,7 @@ public class Degree {
     private String name;
     private Degree_Type type;
     private School school;
-    private int id;
+    private Integer id;
 
     public Degree() {}
 
@@ -23,7 +23,7 @@ public class Degree {
 
     public School getSchool() { return school; }
 
-    public int getId() { return id; }
+    public Integer getId() { return id; }
 
     public String getName() { return name; }
 

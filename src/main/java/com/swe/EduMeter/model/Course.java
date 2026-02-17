@@ -1,7 +1,7 @@
 package com.swe.EduMeter.model;
 
 public class Course {
-    private int id;
+    private Integer id;
     private String name;
     private Degree degree;
 
@@ -13,7 +13,7 @@ public class Course {
         this.degree = degree;
     }
 
-    public int getId() { return id; }
+    public Integer getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
