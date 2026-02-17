@@ -1,32 +1,29 @@
 package com.swe.EduMeter.orm.in_mem;
 
-import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class InMemUserDAO implements UserDAO {
     private final ConcurrentHashMap<Integer, User> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
     public InMemUserDAO() {
-        addUser(new User(0, "PROVA1", false));
-        addUser(new User(0, "PROVA2", false));
-        addUser(new User(0, "PROVA3", false));
+        add(new User(0, "PROVA1", false));
+        add(new User(0, "PROVA2", false));
+        add(new User(0, "PROVA3", false));
     }
 
     @Override
-    public Optional<User> getUserById(int id) {
+    public Optional<User> getById(int id) {
         return Optional.ofNullable(inMemStorage.get(id));
     }
 
     @Override
-    public Optional<User> getUserByHash(String hash) {
+    public Optional<User> getByHash(String hash) {
         return inMemStorage.values()
                 .stream()
                 .filter(u -> u.getHash().equals(hash))
@@ -34,29 +31,16 @@ public class InMemUserDAO implements UserDAO {
     }
 
     @Override
-    public ArrayList<User> getAllUsers() {
-        return new ArrayList<>(inMemStorage.values());
-    }
-
-    @Override
-    public ArrayList<User> getAllBannedUsers() {
-        return inMemStorage.values().stream()
-                .filter(User::isBanned) // Keep only banned users
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    @Override
-    public void addUser(User user) {
+    public void add(User user) {
         user.setId(id);
         inMemStorage.put(id, user);
         id++;
     }
 
     @Override
-    public ArrayList<User> getUsersFilteredForBan(boolean banned) {
-        ArrayList<User> users = Collections.list(inMemStorage.elements());
-        if (banned) { users.removeIf(u -> !u.isBanned()); }
-        else { users.removeIf(u -> u.isBanned()); }
-        return users;
+    public List<User> search(Boolean banned) {
+        return inMemStorage.values().stream()
+                .filter(u -> banned == null || u.isBanned().equals(banned))
+                .toList();
     }
 }

@@ -3,37 +3,43 @@ package com.swe.EduMeter.orm.postgres;
 import com.swe.EduMeter.model.Admin;
 import com.swe.EduMeter.orm.AdminDAO;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-public class PostgreAdminDAO implements AdminDAO {
+public class PostgreAdminDAO implements AdminDAO
+{
 
     @Override
-    public Optional<Admin> getAdminById(int id) {
+    public Optional<Admin> get(int id)
+    {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Optional<Admin> getAdminByEmail(String email) {
+    public Optional<Admin> getByEmail(String email)
+    {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public ArrayList<Admin> getAllAdmins() {
+    public List<Admin> getAll()
+    {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public boolean addAdmin(Admin admin) {
+    public boolean add(Admin admin)
+    {
         //TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public void deleteAdminById(int id) {
+    public void delete(int id)
+    {
         // TODO
         throw new RuntimeException("Not implemented");
     }

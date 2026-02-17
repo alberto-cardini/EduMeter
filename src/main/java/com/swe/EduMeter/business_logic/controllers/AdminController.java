@@ -5,53 +5,48 @@ import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Path("/admin")
 public class AdminController {
     private final AdminDAO adminDAO;
-    private final UserDAO userDAO;
-    private final SchoolDAO schoolDAO;
-    private final DegreeDAO degreeDAO;
-    private final CourseDAO courseDAO;
 
     @Inject
-    public AdminController(AdminDAO adminDAO, UserDAO userDAO, SchoolDAO schoolDAO, DegreeDAO degreeDAO, CourseDAO courseDAO) {
+    public AdminController(AdminDAO adminDAO)
+    {
         this.adminDAO = adminDAO;
-        this.userDAO = userDAO;
-        this.schoolDAO = schoolDAO;
-        this.degreeDAO = degreeDAO;
-        this.courseDAO = courseDAO;
     }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ArrayList<Admin> getAllAdmins() {
-        return adminDAO.getAllAdmins();
+    public List<Admin> getAll()
+    {
+        return adminDAO.getAll();
     }
 
     @GET
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Admin getAdminById(@PathParam("admin_id") int admin_id) {
-        return adminDAO.getAdminById(admin_id).orElseThrow(() -> new NotFoundException("Admin not found"));
+    public Admin getById(@PathParam("admin_id") int admin_id)
+    {
+        return adminDAO.get(admin_id).orElseThrow(() -> new NotFoundException("Admin not found"));
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public boolean createAdmin(Admin admin) {
-        return adminDAO.addAdmin(admin);
+    public boolean create(Admin admin)
+    {
+        return adminDAO.add(admin);
     }
 
     @DELETE
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public boolean deleteAdmin(@PathParam("admin_id") int admin_id) {
-        return adminDAO.getAdminById(admin_id)
-                .map(a -> {adminDAO.deleteAdminById(admin_id); return true;})
+    public boolean delete(@PathParam("admin_id") int admin_id)
+    {
+        return adminDAO.get(admin_id)
+                .map(a -> {adminDAO.delete(admin_id); return true;})
                 .orElseThrow(() -> new NotFoundException("Admin not found"));
     }
 }

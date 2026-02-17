@@ -2,44 +2,31 @@ package com.swe.EduMeter.orm.postgres;
 
 import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
-import com.swe.EduMeter.orm.DatabaseManager;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class PostgreUserDAO implements UserDAO {
     @Override
-    public Optional<User> getUserById(int id) {
+    public Optional<User> getById(int id) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Optional<User> getUserByHash(String hash) {
+    public Optional<User> getByHash(String hash) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public ArrayList<User> getAllUsers() {
+    public List<User> search(Boolean banned) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public ArrayList<User> getAllBannedUsers() {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void addUser(User user) {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ArrayList<User> getUsersFilteredForBan(boolean banned) {
+    public void add(User user) {
         // TODO
         throw new RuntimeException("Not implemented");
     }

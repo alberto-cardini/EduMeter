@@ -2,15 +2,13 @@ package com.swe.EduMeter.orm;
 
 import com.swe.EduMeter.model.Admin;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public interface AdminDAO {
-    Optional<Admin> getAdminById(int id);
-    Optional<Admin> getAdminByEmail(String email);
-    ArrayList<Admin> getAllAdmins();
-
-    void deleteAdminById(int id);
-
-    boolean addAdmin(Admin admin);
+    Optional<Admin> get(int id);
+    Optional<Admin> getByEmail(String email);
+    List<Admin> getAll();
+    void delete(int id);
+    boolean add(Admin admin);
 }
