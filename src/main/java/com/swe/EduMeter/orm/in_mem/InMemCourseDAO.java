@@ -3,10 +3,10 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.orm.CourseDAO;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemCourseDAO implements CourseDAO {
     private final ConcurrentHashMap<Integer, Course> inMemStorage = new ConcurrentHashMap<>();
@@ -15,61 +15,39 @@ public class InMemCourseDAO implements CourseDAO {
     public InMemCourseDAO() {}
 
     @Override
-    public Optional<Course> getCourseById(int id){
+    public int add(Course course){
+        course.setId(id);
+        inMemStorage.put(id, course);
+        id++;
+
+        return course.getId();
+    }
+
+    @Override
+    public Optional<Course> get(int id){
         return Optional.ofNullable(inMemStorage.get(id));
     }
 
     @Override
-    public Optional<Course> getCourseByName(String name){
-        return inMemStorage.values()
-                .stream()
-                .filter(u -> u.getName().equals(name))
-                .findAny();
+    public void update(Course course){
+        inMemStorage.replace(course.getId(), course);
     }
 
     @Override
-    public ArrayList<Course> getAllCourses(){
-        return new ArrayList<>(inMemStorage.values());
-    }
-
-    @Override
-    public void deleteCourseById(int id){
+    public void delete(int id){
         inMemStorage.remove(id);
     }
 
     @Override
-    public boolean deleteCourseByName(String name){
-        return inMemStorage.values().removeIf(u -> u.getName().equals(name));
-    }
-
-    @Override
-    public void addCourse(Course course){
-        course.setId(id);
-        inMemStorage.put(id, course);
-        id++;
-    }
-
-    @Override
-    public void updateCourse(int id, Course new_course){
-        inMemStorage.replace(id, new_course);
-    }
-
-    @Override
-    public ArrayList<Course> getAllCoursesBySchool(String school_name){
-        ArrayList<Course> courses = Collections.list(inMemStorage.elements());
-        courses.removeIf(c -> !c.getDegree().getSchool().getName().equals(school_name));
-        return courses;
-    }
-
-    @Override
-    public ArrayList<Course> getAllCoursesByDegree(String degree_name){
-        ArrayList<Course> courses = Collections.list(inMemStorage.elements());
-        courses.removeIf(c -> !c.getDegree().getName().equals(degree_name));
-        return courses;
-    }
-
-    @Override
-    public boolean deleteAllCoursesByDegree(String degree_name){
-        return inMemStorage.values().removeIf(u -> u.getDegree().getName().equals(degree_name));
+    public List<Course> search(String pattern, Integer schoolId, Integer courseId){
+        return inMemStorage.values()
+                .stream()
+                // filter by pattern (if pattern exists)
+                .filter(c -> pattern == null || c.getName().toLowerCase().contains(pattern.toLowerCase()))
+                // filter by school (if schoolId exists)
+                .filter(c -> schoolId == null || c.getDegree().getSchool().getId().equals(schoolId))
+                // filter by course (if courseId exists)
+                .filter(c -> courseId == null || c.getDegree().getId().equals(courseId))
+                .collect(Collectors.toList());
     }
 }

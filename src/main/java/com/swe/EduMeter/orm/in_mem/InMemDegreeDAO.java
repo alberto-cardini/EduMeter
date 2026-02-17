@@ -1,12 +1,14 @@
 package com.swe.EduMeter.orm.in_mem;
 
+import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.orm.CourseDAO;
 import com.swe.EduMeter.orm.DegreeDAO;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemDegreeDAO implements DegreeDAO {
     private final ConcurrentHashMap<Integer, Degree> inMemStorage = new ConcurrentHashMap<>();
@@ -15,48 +17,48 @@ public class InMemDegreeDAO implements DegreeDAO {
     public InMemDegreeDAO() {}
 
     @Override
-    public Optional<Degree> getDegreeById(int id) {
+    public int add(Degree degree) {
+        degree.setId(id);
+        inMemStorage.put(id, degree);
+        id++;
+
+        return degree.getId();
+    }
+
+    @Override
+    public Optional<Degree> get(int id) {
         return Optional.ofNullable(inMemStorage.get(id));
     }
 
     @Override
-    public Optional<Degree> getDegreeByName(String name) {
+    public void update(Degree degree) {
+        inMemStorage.replace(degree.getId(), degree);
+    }
+
+    @Override
+    public void delete(int id){
+        inMemStorage.remove(id);
+
+        CourseDAO courseDAO = new InMemDAOFactory().getCourseDAO();
+
+        // InMemDAOFactory returns references to static DAOs. This is
+        // useful to replicate DB behaviours, like cascade deletion.
+        List<Course> courses = courseDAO.search(null, null, id);
+
+        for (Course c: courses) {
+            courseDAO.delete(c.getId());
+        }
+    }
+
+    @Override
+    public List<Degree> search(String pattern, Integer schoolId){
         return inMemStorage.values()
                 .stream()
-                .filter(u -> u.getName().equals(name))
-                .findAny();
-    }
-
-    @Override
-    public ArrayList<Degree> getAllDegrees() { return Collections.list(inMemStorage.elements()); }
-
-    @Override
-    public void addDegree(Degree degree) {
-        degree.setId(id);
-        inMemStorage.put(id, degree);
-        id++;
-    }
-
-    @Override
-    public void deleteDegreeById(int id){
-        inMemStorage.remove(id);
-    }
-
-    @Override
-    public boolean deleteDegreeByName(String name){
-        return inMemStorage.values().removeIf(d -> d.getName().equals(name));
-    }
-
-    @Override
-    public ArrayList<Degree> getAllDegreesBySchool(String school_name) {
-        ArrayList<Degree> degrees = Collections.list(inMemStorage.elements());
-        degrees.removeIf(d -> !d.getSchool().getName().equals(school_name));
-        return degrees;
-    }
-
-    @Override
-    public boolean deleteAllDegreesBySchool(String school_name) {
-        return inMemStorage.values().removeIf(d -> d.getSchool().getName().equals(school_name));
+                // filter by pattern (if pattern exists)
+                .filter(d -> pattern == null || d.getName().toLowerCase().contains(pattern.toLowerCase()))
+                // filter by school (if schoolId exists)
+                .filter(d -> schoolId == null || d.getSchool().getId().equals(schoolId))
+                .collect(Collectors.toList());
     }
 
 }

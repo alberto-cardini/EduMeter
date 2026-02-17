@@ -4,11 +4,11 @@ import com.swe.EduMeter.orm.*;
 
 public class InMemDAOFactory implements DAOFactory {
 
-    private final UserDAO userDAO = new InMemUserDAO();
-    private final AdminDAO adminDAO = new InMemAdminDAO();
-    private final SchoolDAO schoolDAO = new InMemSchoolDAO();
-    private final DegreeDAO degreeDAO = new InMemDegreeDAO();
-    private final CourseDAO courseDAO = new InMemCourseDAO();
+    private static final UserDAO userDAO = new InMemUserDAO();
+    private static final AdminDAO adminDAO = new InMemAdminDAO();
+    private static final SchoolDAO schoolDAO = new InMemSchoolDAO();
+    private static final DegreeDAO degreeDAO = new InMemDegreeDAO();
+    private static final CourseDAO courseDAO = new InMemCourseDAO();
 
     @Override
     public UserDAO getUserDAO() { return userDAO; }

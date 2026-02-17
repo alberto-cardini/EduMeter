@@ -1,52 +1,64 @@
 package com.swe.EduMeter.orm.in_mem;
 
+import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.orm.DegreeDAO;
 import com.swe.EduMeter.orm.SchoolDAO;
 import com.swe.EduMeter.model.School;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemSchoolDAO implements SchoolDAO {
     private final ConcurrentHashMap<Integer, School> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
     public InMemSchoolDAO() {
-        addSchool(new School(0, "school-of-engineering"));
-        addSchool(new School(0, "school-of-law"));
-        addSchool(new School(0, "medical-school"));
+        add(new School(0, "school-of-engineering"));
+        add(new School(0, "school-of-law"));
+        add(new School(0, "medical-school"));
     }
 
     @Override
-    public Optional<School> getSchoolById(int id) {
+    public int add(School school) {
+        school.setId(id);
+        inMemStorage.put(id, school);
+        id++;
+
+        return school.getId();
+    }
+    @Override
+    public Optional<School> get(int id) {
         return Optional.ofNullable(inMemStorage.get(id));
     }
 
     @Override
-    public Optional<School> getSchoolByName(String name) {
+    public void update(School school) {
+        inMemStorage.put(school.getId(), school);
+    }
+
+    @Override
+    public void delete(int id){
+        inMemStorage.remove(id);
+
+        DegreeDAO degreeDAO = new InMemDAOFactory().getDegreeDAO();
+
+        // InMemDAOFactory returns references to static DAOs. This is
+        // useful to replicate DB behaviours, like cascade deletion.
+        List<Degree> degrees = degreeDAO.search(null, id);
+
+        for (Degree d: degrees) {
+            degreeDAO.delete(d.getId());
+        }
+    }
+
+    @Override
+    public List<School> search(String pattern) {
         return inMemStorage.values()
                 .stream()
-                .filter(u -> u.getName().equals(name))
-                .findAny();
+                // filter by pattern (if pattern exists)
+                .filter(s -> pattern == null || s.getName().toLowerCase().contains(pattern.toLowerCase()))
+                .collect(Collectors.toList());
     }
-
-    @Override
-    public ArrayList<School> getAllSchools() { return Collections.list(inMemStorage.elements()); }
-
-    @Override
-    public void addSchool(School school) {
-        school.setId(id);
-        inMemStorage.put(id, school);
-        id++;
-    }
-
-    @Override
-    public void deleteSchoolById(int id){
-        inMemStorage.remove(id);
-    }
-
-    @Override
-    public boolean deleteSchoolByName(String name){
-        return inMemStorage.values().removeIf(s -> s.getName().equals(name));
-    }
-
 }
