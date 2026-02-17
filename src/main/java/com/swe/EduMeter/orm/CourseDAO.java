@@ -5,20 +5,26 @@ import com.swe.EduMeter.model.Degree;
 import com.swe.EduMeter.model.School;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public interface CourseDAO {
-    Optional<Course> getCourseById(int id);
-    Optional<Course> getCourseByName(String name);
-    ArrayList<Course> getAllCourses();
-    ArrayList<Course> getAllCoursesBySchool(String school_name);
-    ArrayList<Course> getAllCoursesByDegree(String degree_name);
+    int add(Course course);
+    Optional<Course> get(int id);
+    void update(Course course);
+    void delete(int id);
 
-    void updateCourse(int id, Course new_course);
-
-    void deleteCourseById(int id);
-    boolean deleteCourseByName(String name);
-    boolean deleteAllCoursesByDegree(String degree_name);
-
-    void addCourse(Course course);
+    /**
+     * @param pattern  The pattern to look for. A null
+     *                 does not apply a name filter.
+     * @param schoolId The school to filter for. A null
+     *                 schoolId looks for courses of
+     *                 every school.
+     * @param degreeId The degree to filter for. A null
+     *                 degreeId looks for courses of
+     *                 every degree.
+     *
+     * @return        List of degrees
+     */
+    List<Course> search(String pattern, Integer schoolId, Integer degreeId);
 }

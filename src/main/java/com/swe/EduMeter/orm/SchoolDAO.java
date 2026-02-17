@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SchoolDAO {
-    Optional<School> getSchoolById(int id);
-    Optional<School> getSchoolByName(String name);
-    List<School> getAllSchools();
+    int add(School school);
+    Optional<School> get(int id);
+    void update(School school);
+    void delete(int id);
 
-    void deleteSchoolById(int id);
-    boolean deleteSchoolByName(String name);
-
-    void addSchool(School school);
+    /**
+     * @param pattern The pattern to look for. A null
+     *                pattern returns all schools.
+     *
+     * @return        List of schools
+     */
+    List<School> search(String pattern);
 }
