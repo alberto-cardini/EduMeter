@@ -15,74 +15,67 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
     }
 
     @Override
-    public Optional<School> getSchoolById(int id) {
+    public int add(School school) {
+        String query = "INSERT INTO School (name) VALUES (?) RETURNING id;";
+        List<Object> params = List.of(school.getName());
+
+        try {
+            return insertQuery(query, params);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error", e);
+        }
+    }
+
+    @Override
+    public Optional<School> get(int id) {
         String query = "SELECT * FROM School WHERE id = ?";
         List<Object> params = List.of(id);
 
         try {
-            return runQuery(query, params).stream().findFirst();
+            return selectQuery(query, params).stream().findFirst();
         } catch (SQLException e) {
             throw new RuntimeException("Database error", e);
         }
     }
 
     @Override
-    public Optional<School> getSchoolByName(String name) {
-        String query = "SELECT * FROM School WHERE name = ?";
-        List<Object> params = List.of(name);
+    public void update(School school) {
+        String query = "UPDATE School SET name = ? WHERE id = ?";
+        List<Object> params = List.of(school.getName(), school.getId());
 
         try {
-            return runQuery(query, params).stream().findFirst();
+            updateQuery(query, params);
         } catch (SQLException e) {
             throw new RuntimeException("Database error", e);
         }
-
     }
 
     @Override
-    public List<School> getAllSchools() {
-        String query = "SELECT * FROM School";
-
-        try {
-            return runQuery(query);
-        }catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
-        }
-    }
-
-    @Override
-    public void addSchool(School school) {
-        String query = "INSERT INTO School (name) VALUES (?)";
-        List<Object> params = List.of(school.getName());
-
-        try {
-            runUpdate(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
-        }
-
-    }
-
-    @Override
-    public void deleteSchoolById(int id) {
+    public void delete(int id) {
         String query = "DELETE FROM School WHERE id = ?";
         List<Object> params = List.of(id);
 
         try {
-            runUpdate(query, params);
+            updateQuery(query, params);
         } catch (SQLException e) {
             throw new RuntimeException("Database error", e);
         }
     }
 
     @Override
-    public boolean deleteSchoolByName(String name) {
-        String query = "DELETE FROM School WHERE name = ?";
-        List<Object> params = List.of(name);
-
+    public List<School> search(String pattern) {
         try {
-            runUpdate(query, params);
-            return true;
+            if (pattern == null) {
+                String query = "SELECT * FROM School";
+                return selectQuery(query);
+            }
+            else{
+                String query = "SELECT * FROM School WHERE LOWER(name) LIKE ?";
+                List<Object> params = List.of("%"+pattern.toLowerCase()+"%");
+
+                return selectQuery(query, params);
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Database error", e);
         }

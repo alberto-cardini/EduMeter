@@ -29,12 +29,12 @@ public abstract class PostgreDAO<T> {
     // never with direct user input.
     //
     // The connection is not closed as it's managed by the DatabaseManager.
-    protected List<T> runQuery(String query, List<Object> params) throws SQLException {
+    protected List<T> selectQuery(String query, List<Object> params) throws SQLException {
         Connection conn = DatabaseManager.getInstance().getConnection();
 
         PreparedStatement stmt = conn.prepareStatement(query);
-        setParams(stmt, params);
         stmt.closeOnCompletion();
+        setParams(stmt, params);
 
         try (ResultSet rs = stmt.executeQuery()) {
             List<T> results = new ArrayList<>();
@@ -45,12 +45,12 @@ public abstract class PostgreDAO<T> {
         }
     }
 
-    protected List<T> runQuery(String query) throws SQLException {
-        return  runQuery(query, List.of());
+    protected List<T> selectQuery(String query) throws SQLException {
+        return  selectQuery(query, List.of());
     }
 
-    //Executes INSERT, DELETE, UPDATE queries.
-    protected void runUpdate(String query, List<Object> params) throws SQLException {
+    //Executes DELETE, UPDATE queries.
+    protected void updateQuery(String query, List<Object> params) throws SQLException {
         Connection conn = DatabaseManager.getInstance().getConnection();
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -60,7 +60,18 @@ public abstract class PostgreDAO<T> {
         }
     }
 
-    protected void runUpdate(String query) throws SQLException {
-        runUpdate(query, List.of());
+    protected int insertQuery(String query, List<Object> params) throws SQLException {
+        Connection conn = DatabaseManager.getInstance().getConnection();
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.closeOnCompletion();
+        setParams(stmt, params);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
     }
 }
