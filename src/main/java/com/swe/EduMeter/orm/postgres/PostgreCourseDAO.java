@@ -4,67 +4,51 @@ import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.orm.CourseDAO;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-public class PostgreCourseDAO /*implements CourseDAO*/ {
-/*
+public class PostgreCourseDAO implements CourseDAO {
+
     @Override
-    public Optional<Course> getCourseById(int id) {
+    public int add(Course course) {
         // TODO
         throw new RuntimeException("Not implemented");
-    }
+    };
 
     @Override
-    public Optional<Course> getCourseByName(String name) {
+    public Optional<Course> get(int id) {
         // TODO
         throw new RuntimeException("Not implemented");
-    }
+    };
 
     @Override
-    public ArrayList<Course> getAllCourses() {
+    public void update(Course course) {
         // TODO
         throw new RuntimeException("Not implemented");
-    }
+    };
 
     @Override
-    public void addCourse(Course course) {
+    public void delete(int id) {
         // TODO
         throw new RuntimeException("Not implemented");
-    }
+    };
 
+    /**
+     * @param pattern  The pattern to look for. A null
+     *                 does not apply a name filter.
+     * @param schoolId The school to filter for. A null
+     *                 schoolId looks for courses of
+     *                 every school.
+     * @param degreeId The degree to filter for. A null
+     *                 degreeId looks for courses of
+     *                 every degree.
+     *
+     * @return        List of degrees
+     */
     @Override
-    public void deleteCourseById(int id) {
+    public List<Course> search(String pattern, Integer schoolId, Integer degreeId) {
         // TODO
         throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean deleteCourseByName(String name) {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void updateCourse(int id, Course new_course) {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ArrayList<Course> getAllCoursesBySchool(String school_name) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ArrayList<Course> getAllCoursesByDegree(String degree_name) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean deleteAllCoursesByDegree(String degree_name) {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
-    */
+    };
 
 }

@@ -10,10 +10,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class InMemDegreeDAO /*implements DegreeDAO*/ {
+public class InMemDegreeDAO implements DegreeDAO {
     private final ConcurrentHashMap<Integer, Degree> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
-/*
+
     public InMemDegreeDAO() {}
 
     @Override
@@ -60,5 +60,5 @@ public class InMemDegreeDAO /*implements DegreeDAO*/ {
                 .filter(d -> schoolId == null || d.getSchool().getId().equals(schoolId))
                 .collect(Collectors.toList());
     }
-*/
+
 }

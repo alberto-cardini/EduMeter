@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class PostgreSchoolDAO /*extends PostgreDAO<School> implements SchoolDAO*/ {
+public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
 
-    /*
+
     @Override
     protected School mapRowToObject(ResultSet rs) throws SQLException {
         return new School(rs.getInt("id"), rs.getString("name"));
@@ -81,5 +81,5 @@ public class PostgreSchoolDAO /*extends PostgreDAO<School> implements SchoolDAO*
             throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
-    */
+
 }
