@@ -4,7 +4,6 @@ import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.Report;
 import com.swe.EduMeter.orm.ReportDAO;
-import com.swe.EduMeter.orm.ReviewDAO;
 import com.swe.EduMeter.orm.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -15,55 +14,50 @@ import jakarta.ws.rs.core.SecurityContext;
 import java.util.List;
 
 @Path("/report")
-public class ReportController
-{
+public class ReportController {
     private final ReportDAO reportDAO;
-    private final ReviewDAO reviewDAO;
     private final UserDAO userDAO;
 
     @Inject
-    public ReportController(ReportDAO reportDAO,
-                            ReviewDAO reviewDAO,
-                            UserDAO userDAO)
-    {
+    public ReportController(ReportDAO reportDAO, UserDAO userDAO) {
         this.reportDAO = reportDAO;
-        this.reviewDAO = reviewDAO;
         this.userDAO = userDAO;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public List<Report> getAll()
-    {
+    public List<Report> getAll() {
         return reportDAO.getAll();
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{report_id}")
+    @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public Report get(@PathParam("report_id") int report_id)
-    {
-        return reportDAO.get(report_id).orElseThrow(() -> new NotFoundException("Report not found"));
+    public Report get(@PathParam("report_id") int reportId) {
+        return reportDAO.get(reportId).orElseThrow(() -> new NotFoundException("Report not found"));
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuthGuard
-    public int create(@Context SecurityContext securityContext,
-                      @QueryParam("review_id") int review_id) {
+    public CreateResponse create(@Context SecurityContext securityContext,
+                      Report report) {
         String userHash = securityContext.getUserPrincipal().getName();
-        return reportDAO.create(new Report(null, userHash, review_id ));
+        report.setIssuerHash(userHash);
+
+        return new CreateResponse(reportDAO.add(report));
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{report_id}")
     @AdminGuard
-    public void acceptReport(@PathParam("report_id") int report_id,
+    public void acceptReport(@PathParam("report_id") int reportId,
                              @QueryParam("decision") Boolean decision) {
-        reportDAO.get(report_id)
+        reportDAO.get(reportId)
                 .map(report -> {
                     return userDAO.get(report.getIssuerHash())
                             .map(user -> {
@@ -75,4 +69,5 @@ public class ReportController
                 .orElseThrow(() -> new NotFoundException("Report not found"));
     }
 
+    private record CreateResponse(int id) {}
 }
