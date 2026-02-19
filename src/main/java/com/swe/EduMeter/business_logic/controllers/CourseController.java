@@ -22,8 +22,8 @@ public class CourseController
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Course> search(@QueryParam("school_id") int school_id,
-                               @QueryParam("degree_id") int degree_id,
+    public List<Course> search(@QueryParam("school_id") Integer school_id,
+                               @QueryParam("degree_id") Integer degree_id,
                                @QueryParam("course_name") String course_name)
     {
         return courseDAO.search(course_name, school_id, degree_id);
@@ -41,7 +41,7 @@ public class CourseController
     accepted JSON:
     * {
     *    "name" : "string",
-    *    "degree_id" : "int"
+    *    "degreeId" : "int"
     * }
 */
 
