@@ -38,7 +38,7 @@ public class UserController
     {
         String user_hash = sc.getUserPrincipal().getName();
         System.out.println(user_hash);
-        return userDAO.getByHash(user_hash).orElseThrow(() -> new NotFoundException("User not found"));
+        return userDAO.get(user_hash).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @POST
@@ -47,7 +47,7 @@ public class UserController
     @AdminGuard
     public Boolean ban(@PathParam("user_hash") String user_hash)
     {
-        return userDAO.getByHash(user_hash)
+        return userDAO.get(user_hash)
                 .map(user -> {user.setBanned(true); return true;})
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
