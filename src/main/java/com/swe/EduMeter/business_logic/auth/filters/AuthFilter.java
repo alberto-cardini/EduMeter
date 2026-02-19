@@ -1,6 +1,6 @@
 package com.swe.EduMeter.business_logic.auth.filters;
 
-import com.swe.EduMeter.business_logic.auth.TokenService;
+import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.Token;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -27,7 +27,7 @@ public class AuthFilter implements ContainerRequestFilter {
         // Extract the <token> from the value part of the header
         String tokenString = authHeader.substring("Bearer ".length()).trim();
 
-        Token token = TokenService.getInstance().decodeToken(tokenString);
+        Token token = CryptoService.getInstance().decodeToken(tokenString);
 
         SecurityContext securityContext = requestContext.getSecurityContext();
         requestContext.setSecurityContext(new SecurityContext() {

@@ -8,34 +8,28 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemUserDAO implements UserDAO {
-    private final ConcurrentHashMap<Integer, User> inMemStorage = new ConcurrentHashMap<>();
-    private int id = 0;
+    private final ConcurrentHashMap<String, User> inMemStorage = new ConcurrentHashMap<>();
 
     public InMemUserDAO() {
-        add(new User(0, "PROVA1", false));
-        add(new User(0, "PROVA2", false));
-        add(new User(0, "PROVA3", false));
-        add(new User(0, "email", false));
-    }
-
-    @Override
-    public Optional<User> getById(int id) {
-        return Optional.ofNullable(inMemStorage.get(id));
-    }
-
-    @Override
-    public Optional<User> getByHash(String hash) {
-        return inMemStorage.values()
-                .stream()
-                .filter(u -> u.getHash().equals(hash))
-                .findAny();
+        add(new User("PROVA1", false));
+        add(new User("PROVA2", false));
+        add(new User("PROVA3", false));
+        add(new User("email", false));
     }
 
     @Override
     public void add(User user) {
-        user.setId(id);
-        inMemStorage.put(id, user);
-        id++;
+        inMemStorage.put(user.getHash(), user);
+    }
+
+    @Override
+    public Optional<User> get(String hash) {
+        return Optional.ofNullable(inMemStorage.get(hash));
+    }
+
+    @Override
+    public void update(User user) {
+        inMemStorage.replace(user.getHash(), user);
     }
 
     @Override

@@ -8,13 +8,19 @@ import java.util.Optional;
 
 public class PostgreUserDAO implements UserDAO {
     @Override
-    public Optional<User> getById(int id) {
+    public void add(User user) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Optional<User> getByHash(String hash) {
+    public Optional<User> get(String hash) {
+        // TODO
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void update(User user) {
         // TODO
         throw new RuntimeException("Not implemented");
     }
@@ -25,9 +31,4 @@ public class PostgreUserDAO implements UserDAO {
         throw new RuntimeException("Not implemented");
     }
 
-    @Override
-    public void add(User user) {
-        // TODO
-        throw new RuntimeException("Not implemented");
-    }
 }

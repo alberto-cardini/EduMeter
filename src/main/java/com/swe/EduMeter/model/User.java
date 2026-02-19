@@ -1,22 +1,12 @@
 package com.swe.EduMeter.model;
 
 public class User {
-    private Integer id;
     private String hash;
     private Boolean banned;
 
-    public User(int id, String hash, boolean banned) {
-        this.id = id;
+    public User(String hash, boolean banned) {
         this.hash = hash;
         this.banned = banned;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getHash() {
@@ -38,8 +28,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", hash='" + hash + '\'' +
+                "hash='" + hash + '\'' +
                 ", banned=" + banned +
                 '}';
     }

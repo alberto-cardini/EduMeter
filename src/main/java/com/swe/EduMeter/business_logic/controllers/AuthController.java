@@ -1,6 +1,6 @@
 package com.swe.EduMeter.business_logic.controllers;
 
-import com.swe.EduMeter.business_logic.auth.TokenService;
+import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.ServerResponse;
 import jakarta.ws.rs.*;
@@ -48,7 +48,7 @@ public class AuthController {
         }
 
         // TODO: add check
-        String encodedToken =  TokenService.getInstance().generateToken("email", false);
+        String encodedToken =  CryptoService.getInstance().generateToken("email", false);
         return new LoginResponse(encodedToken);
     }
 
@@ -61,7 +61,7 @@ public class AuthController {
         // If @AuthGuard was successful, the token will be present.
         String token = bearer.substring("Bearer ".length());
 
-        TokenService.getInstance().revokeToken(token);
+        CryptoService.getInstance().revokeToken(token);
 
         return new ServerResponse("Token revoked");
     }

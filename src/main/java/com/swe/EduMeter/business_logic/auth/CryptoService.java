@@ -14,24 +14,27 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
- * TokenService is a singleton for Token management.
+ * CryptoService is a singleton for security related management.
  * It requires the SECRET environment variable to be set,
- * which is then used to compute Token signatures.
+ * which is then used to compute secure hashes. If the
+ * variable is not set, it generates a random secret; this
+ * invalidates key upon every deploy.
  *
  * It is based around the concept of JWTs
  * https://it.wikipedia.org/wiki/JSON_Web_Token
  *
  * In this implementation the header is omitted.
  */
-public class TokenService {
+public class CryptoService {
     private static final long TOKEN_EXPIRE_MINUTES = 30;
     private static final String HMAC_ALGORITHM = "HmacSHA256";
-    private static TokenService instance = null;
+    private static CryptoService instance = null;
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final Mac mac;
@@ -48,15 +51,15 @@ public class TokenService {
      */
     private final Set<String> revokedTokens;
 
-    public static synchronized TokenService getInstance() {
+    public static synchronized CryptoService getInstance() {
         if (instance == null) {
-            instance = new TokenService();
+            instance = new CryptoService();
         }
 
         return instance;
     }
 
-    public TokenService() {
+    private CryptoService() {
         revokedTokens = ConcurrentHashMap.newKeySet();
 
         String secret = System.getenv("SECRET");
@@ -81,12 +84,14 @@ public class TokenService {
     /**
      * Generate an encoded JWT Token.
      *
-     * @param userHash User identification.
-     * @param isAdmin  Whether the user is an Admin or not.
-     * @return         Base64 encoded token.
+     * @param userEmail User email, used to obtain the id.
+     * @param isAdmin   Whether the user is an Admin or not.
+     * @return          Base64 encoded token.
      */
-    public String generateToken(String userHash, boolean isAdmin) {
+    public String generateToken(String userEmail, boolean isAdmin) {
         long expiresAt = Instant.now().plus(Duration.ofMinutes(TOKEN_EXPIRE_MINUTES)).toEpochMilli();
+        String userHash = this.getUserId(userEmail);
+
         Token token = new Token(userHash, expiresAt, isAdmin);
 
         try {
@@ -156,5 +161,17 @@ public class TokenService {
      */
     public void revokeToken(String encodedToken) {
         revokedTokens.add(encodedToken);
+    }
+
+    public String getUserId(String email) {
+        byte[] fullHash = mac.doFinal(email.trim().toLowerCase().getBytes(StandardCharsets.UTF_8));
+        // We use a 16bit version of the HMAC-SHA256 to have slimmer keys
+        // for the DB, but still maintain a good collision resilience.
+        byte[] truncatedHash = Arrays.copyOf(fullHash, 16);
+
+        String encodedHash = Base64.getUrlEncoder().withoutPadding().encodeToString(truncatedHash);
+        assert(encodedHash.length() == 22);
+
+        return encodedHash;
     }
 }
