@@ -39,15 +39,9 @@ public class CourseController
 
 /*
     accepted JSON:
-            * {
+    * {
     *    "name" : "string",
-    *    "degree" : {
-    *                  "name" : "degree-name",
-    *                  "type" : Bachelor/Master,
-    *                  "school" : {
-    *                                "name" : "school name",
-    *                             }
-    *               }
+    *    "degree_id" : "int"
     * }
 */
 

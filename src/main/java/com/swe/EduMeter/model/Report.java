@@ -2,31 +2,31 @@ package com.swe.EduMeter.model;
 
 public class Report {
     private Integer id;
-    private User issuer;
-    private Review review;
+    private String issuer_hash;
+    private Integer review_id;
 
     public Report() {}
 
-    public Report(User issuer,
-                  Review review)
+    public Report(String issuer_hash,
+                  Integer review_id)
     {
-        this.issuer = issuer;
-        this.review = review;
+        this.issuer_hash = issuer_hash;
+        this.review_id = review_id;
     }
 
     public Integer getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public User getIssuer() { return issuer; }
-    public void setIssuer(User issuer) { this.issuer = issuer; }
+    public String getIssuer() { return issuer_hash; }
+    public void setIssuer(String issuer_hash) { this.issuer_hash = issuer_hash; }
 
-    public Review getReview() { return review; }
-    public void setReview(Review review) { this.review = review; }
+    public Integer getReview() { return review_id; }
+    public void setReview(Integer review_id) { this.review_id = review_id; }
 
     public String toString()
     {
-        return "Report { issuer:" + issuer.toString()
-                + ", review:" + review.toString()
+        return "Report { issuer:" + issuer_hash
+                + ", review:" + review_id
                 + "}";
     }
 }

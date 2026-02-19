@@ -36,7 +36,6 @@ public class DegreeController
         return degreeDAO.get(degree_id).orElseThrow(() -> new NotFoundException("Degree not found"));
     }
 
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
