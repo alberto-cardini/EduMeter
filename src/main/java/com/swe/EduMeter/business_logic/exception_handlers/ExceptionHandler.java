@@ -1,5 +1,6 @@
 package com.swe.EduMeter.business_logic.exception_handlers;
 
+import com.swe.EduMeter.model.response.ApiError;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -38,14 +39,15 @@ public class ExceptionHandler implements ExceptionMapper<Throwable> {
         if (exception instanceof WebApplicationException webEx) {
             return Response
                     .status(webEx.getResponse().getStatus())
-                    .entity(Map.of("error", webEx.getMessage()))
                     .type(MediaType.APPLICATION_JSON)
+                    .entity(new ApiError(webEx.getMessage()))
                     .build();
         }
 
         return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(Map.of("error", exception.getMessage()))
+                .type(MediaType.APPLICATION_JSON)
+                .entity(new ApiError(exception.getMessage()))
                 .build();
     }
 }

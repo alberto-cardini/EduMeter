@@ -1,20 +1,20 @@
 package com.swe.EduMeter.business_logic.exception_handlers;
 
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import jakarta.ws.rs.BadRequestException;
+import com.swe.EduMeter.model.response.ApiError;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
-import java.util.Map;
-
 @Provider
-public class JsonMappingExceptionHandler implements ExceptionMapper<UnrecognizedPropertyException> {
+public class UnrecognizedPropertyExceptionHandler implements ExceptionMapper<UnrecognizedPropertyException> {
     @Override
     public Response toResponse(UnrecognizedPropertyException exception) {
         return Response
                 .status(Response.Status.BAD_REQUEST)
-                .entity(Map.of("error", "Unrecognized field '" + exception.getPropertyName() + "'"))
+                .type(MediaType.APPLICATION_JSON)
+                .entity(new ApiError("Unrecognized field '" + exception.getPropertyName() + "'"))
                 .build();
     }
 }

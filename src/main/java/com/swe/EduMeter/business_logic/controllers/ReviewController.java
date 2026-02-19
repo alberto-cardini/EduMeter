@@ -3,6 +3,7 @@ package com.swe.EduMeter.business_logic.controllers;
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.*;
+import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.ReviewDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -60,7 +61,7 @@ public class ReviewController {
                 "Pubblicata!" : "In attesa di moderazione.";
 
         return Response.status(Response.Status.CREATED)
-                .entity(new ServerResponse(msg)).build();
+                .entity(new ApiOk(msg)).build();
     }
 
     @POST
@@ -70,7 +71,7 @@ public class ReviewController {
     public Response upvote(@PathParam("id") int id) {
         // Incrementa il contatore up_vote
         if (reviewDAO.incrementVote(id)) {
-            return Response.ok(new ServerResponse("Voto registrato.")).build();
+            return Response.ok(new ApiOk("Voto registrato.")).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -97,7 +98,7 @@ public class ReviewController {
         validatedReview.setStatus(ReviewStatus.ACCEPTED);
 
         if (reviewDAO.update(validatedReview)) {
-            return Response.ok(new ServerResponse("Recensione approvata e pubblicata.")).build();
+            return Response.ok(new ApiOk("Recensione approvata e pubblicata.")).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -109,7 +110,7 @@ public class ReviewController {
     public Response reject(@PathParam("id") int id) {
         // L'admin rifiuta la recensione (può essere eliminata o marcata REJECTED)
         if (reviewDAO.updateStatus(id, ReviewStatus.REJECTED)) {
-            return Response.ok(new ServerResponse("Recensione rifiutata.")).build();
+            return Response.ok(new ApiOk("Recensione rifiutata.")).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -120,7 +121,7 @@ public class ReviewController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") int id) {
         if (reviewDAO.delete(id)) {
-            return Response.ok(new ServerResponse("Recensione eliminata.")).build();
+            return Response.ok(new ApiOk("Recensione eliminata.")).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }

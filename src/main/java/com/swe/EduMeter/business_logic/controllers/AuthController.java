@@ -2,7 +2,7 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
-import com.swe.EduMeter.model.ServerResponse;
+import com.swe.EduMeter.model.response.ApiOk;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -15,7 +15,7 @@ public class AuthController {
     @Path("/sendPin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ServerResponse sendPin(SendPinBody body) {
+    public ApiOk sendPin(SendPinBody body) {
         if (body.email() == null) {
             throw new BadRequestException("Missing field 'email'");
         }
@@ -23,7 +23,7 @@ public class AuthController {
         for (String domain: WHITELISTED_DOMAINS) {
             if (body.email().endsWith("@" + domain)) {
                 // TODO: send pin
-                return new ServerResponse("Pin sent");
+                return new ApiOk("Pin sent");
             }
         }
 
@@ -57,13 +57,13 @@ public class AuthController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuthGuard
-    public ServerResponse logout(@HeaderParam("Authorization") String bearer) {
+    public ApiOk logout(@HeaderParam("Authorization") String bearer) {
         // If @AuthGuard was successful, the token will be present.
         String token = bearer.substring("Bearer ".length());
 
         CryptoService.getInstance().revokeToken(token);
 
-        return new ServerResponse("Token revoked");
+        return new ApiOk("Token revoked");
     }
 
     private record SendPinBody(String email) {}
