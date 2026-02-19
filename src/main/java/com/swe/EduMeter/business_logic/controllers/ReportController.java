@@ -52,14 +52,9 @@ public class ReportController
     @Produces(MediaType.APPLICATION_JSON)
     @AuthGuard
     public int create(@Context SecurityContext securityContext,
-                      @QueryParam("review_id") int review_id)
-    {
-        return reportDAO.create(new Report(
-                userDAO.getByHash(securityContext.getUserPrincipal().getName())
-                        .orElseThrow(() -> new NotFoundException("User not found")),
-                reviewDAO.get(review_id)
-                        .orElseThrow(() -> new NotFoundException("Review not found"))
-                ));
+                      @QueryParam("review_id") int review_id) {
+        String userHash = securityContext.getUserPrincipal().getName();
+        return reportDAO.create(new Report(null, userHash, review_id ));
     }
 
     @DELETE
@@ -67,11 +62,10 @@ public class ReportController
     @Path("/{report_id}")
     @AdminGuard
     public void acceptReport(@PathParam("report_id") int report_id,
-                                @QueryParam("decision") Boolean decision)
-    {
+                             @QueryParam("decision") Boolean decision) {
         reportDAO.get(report_id)
                 .map(report -> {
-                    return userDAO.getById(report.getIssuer().getId())
+                    return userDAO.get(report.getIssuerHash())
                             .map(user -> {
                                 if (decision) user.setBanned(true);
                                 return null;
