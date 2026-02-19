@@ -4,6 +4,21 @@ The project is built using [`jax-rs`](https://jakarta.ee/specifications/restful-
 
 A web server which loads `WAR`s is needed (like [Tomcat](https://tomcat.apache.org/)). For local development, you'll need to setup your editor to automatically rebuild and redeploy the `WAR` file to your local installation of Tomcat.
 
+## Database configuration
+EduMeter supports two modes of operation: In-Memory and Persistent PostgreSQL.
+The application uses the `IN_MEM_DB` environment variable to determine which storage engine to initialize.
+Setting `IN_MEM_DB` to any non-null value will activate the in-memory mode, while leaving it null or unset will configure the application to connect to the database.
+
+### PostgreSQL Setup
+
+To use the persistent database, you must manually create a PostgreSQL database on your system. The application will automatically initialize the schema (tables) upon connection.
+
+You must also set the following environment variables for the connection to succeed:
+
+- `DB_URL`: The JDBC connection string (e.g., `jdbc:postgresql://localhost:5432/edumeter`)
+- `DB_USER`: Your database username
+- `DB_PASSWORD`: Your database password
+
 ## Running tests
 
 Tests live under [`src/test`](./src/test) and they follow the same package structure as [`src/java`](./src/java).
