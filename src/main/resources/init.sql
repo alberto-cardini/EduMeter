@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS Professor (
 CREATE TABLE IF NOT EXISTS Degree (
                                     id SERIAL PRIMARY KEY,
                                     name VARCHAR(255) NOT NULL,
-                                    type VARCHAR(50),
+                                    type VARCHAR(20) CHECK (type IN ('Bachelor', 'Master')),
                                     school_id INT NOT NULL,
                                     FOREIGN KEY (school_id) REFERENCES School(id) ON DELETE CASCADE
 );

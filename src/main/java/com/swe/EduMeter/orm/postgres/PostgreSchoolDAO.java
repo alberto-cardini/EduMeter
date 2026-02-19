@@ -16,14 +16,14 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
 
     @Override
     public int add(School school) {
-        String query = "INSERT INTO School (name) VALUES (?) RETURNING id;";
+        String query = "INSERT INTO School (name) VALUES (?) RETURNING id";
         List<Object> params = List.of(school.getName());
 
         try {
             return insertQuery(query, params);
 
         } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 
@@ -35,7 +35,7 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
         try {
             return selectQuery(query, params).stream().findFirst();
         } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 
@@ -47,7 +47,7 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
         try {
             updateQuery(query, params);
         } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 
@@ -59,7 +59,7 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
         try {
             updateQuery(query, params);
         } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 
@@ -69,15 +69,14 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
             if (pattern == null) {
                 String query = "SELECT * FROM School";
                 return selectQuery(query);
-            }
-            else{
+            } else {
                 String query = "SELECT * FROM School WHERE LOWER(name) LIKE ?";
-                List<Object> params = List.of("%"+pattern.toLowerCase()+"%");
+                List<Object> params = List.of("%" + pattern.toLowerCase() + "%");
 
                 return selectQuery(query, params);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Database error", e);
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 }

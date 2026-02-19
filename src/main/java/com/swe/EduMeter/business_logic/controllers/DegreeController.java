@@ -21,7 +21,7 @@ public class DegreeController
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Degree> search(@QueryParam("school_id") int id,
+    public List<Degree> search(@QueryParam("school_id") Integer id,
                                @QueryParam("degree_name") String name)
     {
         return degreeDAO.search(name, id);
