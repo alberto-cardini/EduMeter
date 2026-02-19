@@ -159,7 +159,8 @@
 						    & date          & \textit{date} \\
 						    & rating        & \textit{int} \\
 						    & difficulty    & \textit{int} \\
-				\textbf{FK} & teaching\_id  & \textit{int} \\
+				\textbf{FK} & course\_id    & \textit{int} \\
+				\textbf{FK} & professor\_id & \textit{int} \\ 
 				\textbf{FK} & user\_id      & \textit{int} \\
 			\end{tabular}
 		}{}
@@ -167,7 +168,7 @@
 		\umlclass[below = 1cm of Published Review]{Teaching}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK FK} & \textbf{course\_id}    & \textit{int} \\
-				\textbf{PK FK} & \textbf{professor\_id} & \textit{varchar} \\
+				\textbf{PK FK} & \textbf{professor\_id} & \textit{int} \\
 			\end{tabular}
 		}{}
 
