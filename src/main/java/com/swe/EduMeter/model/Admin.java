@@ -5,7 +5,7 @@ public class Admin {
     private String email;
 
     public Admin() {}
-    public Admin(int id, String email) {
+    public Admin(Integer id, String email) {
         this.id = id;
         this.email = email;
     }

@@ -14,9 +14,9 @@ public class InMemAdminDAO implements AdminDAO
     private int id = 0;
 
     public InMemAdminDAO() {
-        add(new Admin(0, "alberto.cardini@edu.unifi.it"));
-        add(new Admin(0, "lorenzo.bellina@edu.unifi.it"));
-        add(new Admin(0, "carolina.cecchi@edu.unifi.it"));
+        add(new Admin(null, "alberto.cardini@edu.unifi.it"));
+        add(new Admin(null, "lorenzo.bellina@edu.unifi.it"));
+        add(new Admin(null, "carolina.cecchi@edu.unifi.it"));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class InMemAdminDAO implements AdminDAO
     {
         return inMemStorage.values()
                 .stream()
-                .filter(u -> u.getEmail().equals(email))
+                .filter(u -> u.getEmail().toLowerCase().equals(email.toLowerCase()))
                 .findAny();
     }
 

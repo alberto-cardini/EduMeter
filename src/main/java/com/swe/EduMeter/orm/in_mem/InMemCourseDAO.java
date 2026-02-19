@@ -1,7 +1,9 @@
 package com.swe.EduMeter.orm.in_mem;
 
 import com.swe.EduMeter.model.Course;
+import com.swe.EduMeter.model.Degree;
 import com.swe.EduMeter.orm.CourseDAO;
+import com.swe.EduMeter.orm.DegreeDAO;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,15 +41,23 @@ public class InMemCourseDAO implements CourseDAO {
     }
 
     @Override
-    public List<Course> search(String pattern, Integer schoolId, Integer courseId){
+    public List<Course> search(String pattern, Integer schoolId, Integer degreeId) {
         return inMemStorage.values()
                 .stream()
                 // filter by pattern (if pattern exists)
                 .filter(c -> pattern == null || c.getName().toLowerCase().contains(pattern.toLowerCase()))
                 // filter by school (if schoolId exists)
-                .filter(c -> schoolId == null || c.getDegree().getSchool().getId().equals(schoolId))
+                .filter(c -> {
+                    if (schoolId == null) return false;
+
+                    DegreeDAO degreeDAO = new InMemDAOFactory().getDegreeDAO();
+                    Degree d = degreeDAO.get(c.getDegreeId())
+                                        .orElseThrow(() -> new RuntimeException("Invalid degreeId of: " + c));
+
+                    return d.getSchoolId() == schoolId;
+                })
                 // filter by course (if courseId exists)
-                .filter(c -> courseId == null || c.getDegree().getId().equals(courseId))
+                .filter(c -> degreeId == null || c.getDegreeId() == degreeId)
                 .collect(Collectors.toList());
     }
 }

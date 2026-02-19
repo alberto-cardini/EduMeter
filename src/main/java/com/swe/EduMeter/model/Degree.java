@@ -1,27 +1,23 @@
 package com.swe.EduMeter.model;
 
 public class Degree {
+    private Integer id;
     private String name;
     private Degree.Type type;
-    private Integer school_id;
-    private Integer id;
+    private int schoolId;
 
     public Degree() {}
 
-    public Degree(String name,
-                  Degree.Type type,
-                  Integer school_id,
-                  int id)
-    {
+    public Degree(Integer id, String name, Degree.Type type, int schoolId) {
+        this.id = id;
         this.name = name;
         this.type = type;
-        this.school_id = school_id;
-        this.id = id;
+        this.schoolId = schoolId;
     }
 
     public Degree.Type getType() { return type; }
 
-    public Integer getSchool() { return school_id; }
+    public int getSchoolId() { return schoolId; }
 
     public Integer getId() { return id; }
 
@@ -29,13 +25,20 @@ public class Degree {
 
     public void setType(Degree.Type type) { this.type = type; }
 
-    public void setSchool(int school_id) { this.school_id = school_id; }
+    public void setSchoolId(int schoolId) { this.schoolId = schoolId; }
 
     public void setId(int id) { this.id = id; }
 
     public void setName(String name) { this.name = name; }
 
-    public String toString() { return "Degree{ type=" + type + ", school=" + school_id + "}"; }
+    public String toString() {
+        return "Degree{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", schoolId=" + schoolId +
+                "}";
+    }
 
     public enum Type{
         Bachelor,

@@ -3,14 +3,14 @@ package com.swe.EduMeter.model;
 public class Course {
     private Integer id;
     private String name;
-    private Integer degree_id;
+    private int degreeId;
 
     public Course() {}
 
-    public Course(int id, String name, int degree_id) {
+    public Course(Integer id, String name, int degreeId) {
         this.id = id;
         this.name = name;
-        this.degree_id = degree_id;
+        this.degreeId = degreeId;
     }
 
     public Integer getId() { return id; }
@@ -19,14 +19,14 @@ public class Course {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Integer getDegree() { return degree_id; }
-    public void setDegree(Integer degree_id) { this.degree_id = degree_id; }
+    public int getDegreeId() { return degreeId; }
+    public void setDegree(int degreeId) { this.degreeId = degreeId; }
 
-    public String toString()
-    {
-        return "Degree {id: " + id
-                + ", name: " + name
-                + ", degree: " + degree_id
-                + "}";
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", degreeId=" + degreeId +
+                "}";
     }
 }

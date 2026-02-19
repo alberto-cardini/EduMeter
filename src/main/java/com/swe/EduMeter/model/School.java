@@ -9,7 +9,7 @@ public class School {
     // needed in order to let jersey-media-json-jackson map the JSON on a new School Entity.
     public School() {}
 
-    public School(int id, String name) {
+    public School(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

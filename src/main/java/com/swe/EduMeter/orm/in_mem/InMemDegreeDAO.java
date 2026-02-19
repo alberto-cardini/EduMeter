@@ -51,13 +51,13 @@ public class InMemDegreeDAO implements DegreeDAO {
     }
 
     @Override
-    public List<Degree> search(String pattern, Integer schoolId){
+    public List<Degree> search(String pattern, Integer schoolId) {
         return inMemStorage.values()
                 .stream()
                 // filter by pattern (if pattern exists)
                 .filter(d -> pattern == null || d.getName().toLowerCase().contains(pattern.toLowerCase()))
                 // filter by school (if schoolId exists)
-                .filter(d -> schoolId == null || d.getSchool().getId().equals(schoolId))
+                .filter(d -> schoolId == null || d.getSchoolId() == schoolId)
                 .collect(Collectors.toList());
     }
 
