@@ -1,5 +1,6 @@
 package com.swe.EduMeter.business_logic.controllers;
 
+import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.Degree;
 import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
@@ -28,7 +29,7 @@ public class DegreeController
     }
 
     @GET
-    @Path("/id={degree_id}")
+    @Path("/{degree_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Degree getDegree(@PathParam("degree_id") int degree_id)
     {
@@ -38,6 +39,7 @@ public class DegreeController
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public int create(Degree new_degree)
     {
         return degreeDAO.add(new_degree);
@@ -46,6 +48,7 @@ public class DegreeController
     @DELETE
     @Path("/{degree_id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public Degree delete(@PathParam("degree_id") int degree_id)
     {
         return degreeDAO.get(degree_id)

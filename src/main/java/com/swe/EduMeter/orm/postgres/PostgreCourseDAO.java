@@ -6,8 +6,8 @@ import com.swe.EduMeter.orm.CourseDAO;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class PostgreCourseDAO implements CourseDAO {
-
+public class PostgreCourseDAO /*implements CourseDAO*/ {
+/*
     @Override
     public Optional<Course> getCourseById(int id) {
         // TODO
@@ -65,4 +65,6 @@ public class PostgreCourseDAO implements CourseDAO {
         // TODO
         throw new RuntimeException("Not implemented");
     }
+    */
+
 }

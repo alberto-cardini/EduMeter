@@ -1,5 +1,6 @@
 package com.swe.EduMeter.business_logic.controllers;
 
+import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.School;
 import com.swe.EduMeter.orm.SchoolDAO;
 import jakarta.inject.Inject;
@@ -26,7 +27,7 @@ public class SchoolController
     }
 
     @GET
-    @Path("/id={school_id}")
+    @Path("/{school_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public School get(@PathParam("school_id") int id)
     {
@@ -39,14 +40,17 @@ public class SchoolController
     // }
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public int create(School new_school)
     {
         return schoolDAO.add(new_school);
     }
 
     @DELETE
-    @Path("/id={school_id}")
+    @Path("/{school_id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public School delete(@PathParam("school_id") int id)
     {
         // the first getSchoolById(Id) is needed in order to find if
@@ -57,5 +61,4 @@ public class SchoolController
                     return school;})
                 .orElseThrow(() -> new NotFoundException("School not found"));
     }
-
 }

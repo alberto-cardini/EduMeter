@@ -1,10 +1,14 @@
 package com.swe.EduMeter.business_logic.controllers;
 
+import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
+import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.User;
 import com.swe.EduMeter.orm.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
 
 import java.util.List;
 
@@ -20,22 +24,27 @@ public class UserController
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public List<User> search(@QueryParam("banned") Boolean banned)
     {
         return userDAO.search(banned);
     }
 
     @GET
-    @Path("/{user_hash}")
+    @Path("/profile")
     @Produces(MediaType.APPLICATION_JSON)
-    public User getByHash(@PathParam("user_hash") String user_hash)
+    @AuthGuard
+    public User getByHash(@Context SecurityContext sc)
     {
+        String user_hash = sc.getUserPrincipal().getName();
+        System.out.println(user_hash);
         return userDAO.getByHash(user_hash).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @POST
     @Path("/{user_hash}/ban")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public Boolean ban(@PathParam("user_hash") String user_hash)
     {
         return userDAO.getByHash(user_hash)

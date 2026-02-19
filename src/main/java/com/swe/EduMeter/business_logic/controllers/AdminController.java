@@ -1,5 +1,6 @@
 package com.swe.EduMeter.business_logic.controllers;
 
+import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.*;
 import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
@@ -20,6 +21,7 @@ public class AdminController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public List<Admin> getAll()
     {
         return adminDAO.getAll();
@@ -28,6 +30,7 @@ public class AdminController {
     @GET
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public Admin getById(@PathParam("admin_id") int admin_id)
     {
         return adminDAO.get(admin_id).orElseThrow(() -> new NotFoundException("Admin not found"));
@@ -35,6 +38,7 @@ public class AdminController {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public boolean create(Admin admin)
     {
         return adminDAO.add(admin);
@@ -43,6 +47,7 @@ public class AdminController {
     @DELETE
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
     public boolean delete(@PathParam("admin_id") int admin_id)
     {
         return adminDAO.get(admin_id)

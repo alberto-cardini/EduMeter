@@ -15,6 +15,7 @@ public class InMemUserDAO implements UserDAO {
         add(new User(0, "PROVA1", false));
         add(new User(0, "PROVA2", false));
         add(new User(0, "PROVA3", false));
+        add(new User(0, "email", false));
     }
 
     @Override

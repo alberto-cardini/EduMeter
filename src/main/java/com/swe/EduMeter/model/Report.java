@@ -1,21 +1,15 @@
 package com.swe.EduMeter.model;
 
-enum Report_Status{
-    Accepted,
-    Rejected,
-    Pending,
-}
-
 public class Report {
     private Integer id;
     private User issuer;
     private Review review;
-    private Report_Status status;
 
     public Report() {}
 
-    public Report(int id, User issuer, Review review, Report_Status status) {
-        this.id = id;
+    public Report(User issuer,
+                  Review review)
+    {
         this.issuer = issuer;
         this.review = review;
     }
@@ -29,11 +23,10 @@ public class Report {
     public Review getReview() { return review; }
     public void setReview(Review review) { this.review = review; }
 
-    public Report_Status getStatus() { return status; }
-    public void setStatus(Report_Status status) { this.status = status; }
-
-    public String toString() { return "Report { issuer:" + issuer.toString()
-                                                         + ", review:" + review.toString()
-                                                         + ", status:" + status.toString()
-                                                         + "}"; }
+    public String toString()
+    {
+        return "Report { issuer:" + issuer.toString()
+                + ", review:" + review.toString()
+                + "}";
+    }
 }
