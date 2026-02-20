@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProfDAO {
-    Integer add(Professor prof);
+    int add(Professor prof);
     Optional<Professor> get(int id);
     void update(Professor prof);
     void delete(int id);
@@ -17,5 +17,4 @@ public interface ProfDAO {
      * @return        List of professors
      */
     List<Professor> search(String pattern);
-
 }

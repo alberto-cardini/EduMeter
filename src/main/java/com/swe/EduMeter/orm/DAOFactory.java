@@ -9,4 +9,5 @@ public interface DAOFactory {
     CourseDAO getCourseDAO();
     ProfDAO getProfDAO();
     ReportDAO getReportDAO();
+    TeachingDAO getTeachingDAO();
 }

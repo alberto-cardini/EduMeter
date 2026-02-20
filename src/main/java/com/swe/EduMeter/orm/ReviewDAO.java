@@ -16,9 +16,9 @@ public interface ReviewDAO {
 
     void update(Review review);
 
-    void updateStatus(int id, ReviewStatus status);
+    void publish(Review review);
 
-    void incrementVote(int id);
+    void toggleUpVote(int id, String userHash);
 
     void delete(int id);
 }
