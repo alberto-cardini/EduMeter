@@ -6,22 +6,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewDAO {
-    Optional<Review> get(int id);
+    Optional<Review> get(int id, ReviewStatus status);
 
-    // Recupera le recensioni PENDING (dalla tabella Drafted)
-    List<Review> getAllPending();
+    List<Review> list(ReviewStatus status);
 
-    // Ricerca tra le recensioni ACCEPTED (dalla tabella Published)
     List<Review> search(Integer school_id, Integer degree_id, Integer course_id, Integer professor_id);
 
-    int create(Review review);
+    int add(Review review);
 
-    // Usato dall'admin per "trasferire" una recensione da Drafted a Published
-    boolean update(Review review);
+    void update(Review review);
 
-    boolean updateStatus(int id, ReviewStatus status);
+    void updateStatus(int id, ReviewStatus status);
 
-    boolean incrementVote(int id);
+    void incrementVote(int id);
 
-    boolean delete(int id);
+    void delete(int id);
 }

@@ -1,4 +1,53 @@
 package com.swe.EduMeter.orm.in_mem;
 
-public class InMemProfDAO {
+import com.swe.EduMeter.model.Professor;
+import com.swe.EduMeter.orm.ProfDAO;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+public class InMemProfDAO implements ProfDAO {
+    private final ConcurrentHashMap<Integer, Professor> inMemStorage = new ConcurrentHashMap<>();
+    private int id = 0;
+
+    public InMemProfDAO() {
+        add(new Professor(null, "Alberto", "Cardini"));
+        add(new Professor(null, "Lorenzo", "Bellina"));
+        add(new Professor(null, "Carolina", "Cecchi"));
+        add(new Professor(null, "Marco", "Bertini"));
+        add(new Professor(null, "Fabio", "Corradi"));
+        add(new Professor(null, "Alessandro", "Piva"));
+    }
+
+    @Override
+    public Integer add(Professor prof) {
+        prof.setId(id);
+        inMemStorage.put(id++, prof);
+        return prof.getId();
+    }
+
+    @Override
+    public Optional<Professor> get(int id) {
+        return Optional.ofNullable(inMemStorage.get(id));
+    }
+
+    @Override
+    public void update(Professor prof) {
+        inMemStorage.replace(prof.getId(), prof);
+    }
+
+    @Override
+    public void delete(int id) {
+        inMemStorage.remove(id);
+    }
+
+    @Override
+    public List<Professor> search(String pattern) {
+        return inMemStorage.values()
+                .stream()
+                .filter(p -> pattern == null || p.getName().toLowerCase().contains(pattern)) // TODO: add search on the surname
+                .collect(Collectors.toList());
+    }
 }

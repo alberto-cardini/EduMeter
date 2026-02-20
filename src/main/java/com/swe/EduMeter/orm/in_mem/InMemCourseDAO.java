@@ -14,14 +14,23 @@ public class InMemCourseDAO implements CourseDAO {
     private final ConcurrentHashMap<Integer, Course> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
-    public InMemCourseDAO() {}
+    public InMemCourseDAO() {
+        add(new Course(null, "algorithms-and-data-structures", 0));
+        add(new Course(null, "statistics", 0));
+        add(new Course(null, "diritto-privato", 1));
+        add(new Course(null, "diritto-penale", 1));
+        add(new Course(null, "anatomy", 2));
+        add(new Course(null, "neurology", 2));
+    }
 
     @Override
-    public int add(Course course){
+    public Integer add(Course course){
+        new InMemDAOFactory()
+                .getDegreeDAO()
+                .get(course.getDegreeId())
+                .orElseThrow(() -> new RuntimeException("Invalid degreeId in the course init JSON"));
         course.setId(id);
-        inMemStorage.put(id, course);
-        id++;
-
+        inMemStorage.put(id++, course);
         return course.getId();
     }
 
@@ -48,7 +57,7 @@ public class InMemCourseDAO implements CourseDAO {
                 .filter(c -> pattern == null || c.getName().toLowerCase().contains(pattern.toLowerCase()))
                 // filter by school (if schoolId exists)
                 .filter(c -> {
-                    if (schoolId == null) return false;
+                    if (schoolId == null) return true;
 
                     DegreeDAO degreeDAO = new InMemDAOFactory().getDegreeDAO();
                     Degree d = degreeDAO.get(c.getDegreeId())

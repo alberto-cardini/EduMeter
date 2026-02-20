@@ -26,7 +26,7 @@ public class ReportController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @AdminGuard
+    //@AdminGuard
     public List<Report> getAll() {
         return reportDAO.getAll();
     }
@@ -34,7 +34,7 @@ public class ReportController {
     @GET
     @Path("/{report_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    @AdminGuard
+    //@AdminGuard
     public Report get(@PathParam("report_id") int reportId) {
         return reportDAO.get(reportId).orElseThrow(() -> new NotFoundException("Report not found"));
     }
@@ -42,7 +42,7 @@ public class ReportController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuthGuard
+    //@AuthGuard
     public CreateResponse create(@Context SecurityContext securityContext,
                       Report report) {
         String userHash = securityContext.getUserPrincipal().getName();
@@ -54,7 +54,8 @@ public class ReportController {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{report_id}")
-    @AdminGuard
+    //@AdminGuard
+    // TODO: if report is accepted than the review is deleted and the user is banned conditionally. delete report and review.
     public void acceptReport(@PathParam("report_id") int reportId,
                              @QueryParam("decision") Boolean decision) {
         reportDAO.get(reportId)

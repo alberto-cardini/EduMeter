@@ -13,6 +13,9 @@ public class PostgreDAOFactory implements DAOFactory {
 
     private final UserDAO userDAO = new PostgreUserDAO();
     private final AdminDAO adminDAO = new PostgreAdminDAO();
+    private final ReviewDAO reviewDAO = new PostgreReviewDAO();
+    private final ReportDAO reportDAO = new PostgreReportDAO();
+    private final ProfDAO profDAO = new PostgreProfDAO();
     private final SchoolDAO schoolDAO = new PostgreSchoolDAO();
     private final DegreeDAO degreeDAO = new PostgreDegreeDAO();
     private final CourseDAO courseDAO = new PostgreCourseDAO();
@@ -49,6 +52,15 @@ public class PostgreDAOFactory implements DAOFactory {
 
     @Override
     public AdminDAO getAdminDAO() {return adminDAO;}
+
+    @Override
+    public ReviewDAO getReviewDAO() {return reviewDAO;}
+
+    @Override
+    public ReportDAO getReportDAO() {return reportDAO;}
+
+    @Override
+    public ProfDAO getProfDAO() {return profDAO;}
 
     @Override
     public SchoolDAO getSchoolDAO() {return schoolDAO;}

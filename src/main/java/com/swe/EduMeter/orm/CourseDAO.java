@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseDAO {
-    int add(Course course);
+    Integer add(Course course);
     Optional<Course> get(int id);
     void update(Course course);
     void delete(int id);

@@ -3,7 +3,6 @@ package com.swe.EduMeter.business_logic.controllers;
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.*;
-import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.ReviewDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -21,31 +20,30 @@ public class ReviewController {
         this.reviewDAO = reviewDAO;
     }
 
-    // --- ENDPOINT PUBBLICI / STUDENTE ---
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Review> search(@QueryParam("school_id") Integer school_id,
-                               @QueryParam("degree_id") Integer degree_id,
-                               @QueryParam("course_id") Integer course_id,
-                               @QueryParam("professor_id") Integer prof_id) {
-        // Restituisce solo le recensioni con stato ACCEPTED
-        return reviewDAO.search(school_id, degree_id, course_id, prof_id);
+    public List<Review> search(@QueryParam("school_id") Integer schoolId,
+                               @QueryParam("degree_id") Integer degreeId,
+                               @QueryParam("course_id") Integer courseId,
+                               @QueryParam("professor_id") Integer profId){
+        return reviewDAO.search(schoolId, degreeId, courseId, profId);
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/{review_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Review getById(@PathParam("id") int id) {
-        return reviewDAO.get(id)
-                .orElseThrow(() -> new NotFoundException("Recensione non trovata."));
+    public Review getById(@PathParam("review_id") int id)
+    {
+        return reviewDAO.get(id, ReviewStatus.ACCEPTED).orElseThrow(() -> new NotFoundException("Review not found"));
     }
 
     @POST
-    @AuthGuard
+    //@AuthGuard
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(Review review, @Context SecurityContext sc) {
+    public Integer create(Review review, @Context SecurityContext sc)
+    {
+        review.setCreator(sc.getUserPrincipal().getName());
         review.setDate(LocalDate.now());
         review.setUp_vote(0);
 
@@ -56,73 +54,56 @@ public class ReviewController {
             review.setStatus(ReviewStatus.PENDING);
         }
 
-        int id = reviewDAO.create(review);
-        String msg = (review.getStatus() == ReviewStatus.ACCEPTED) ?
-                "Pubblicata!" : "In attesa di moderazione.";
-
-        return Response.status(Response.Status.CREATED)
-                .entity(new ApiOk(msg)).build();
+        return reviewDAO.add(review);
     }
 
     @POST
-    @Path("/{id}/vote")
-    @AuthGuard
+    @Path("/{review_id}/vote")
+    //@AuthGuard
     @Produces(MediaType.APPLICATION_JSON)
-    public Response upvote(@PathParam("id") int id) {
-        // Incrementa il contatore up_vote
-        if (reviewDAO.incrementVote(id)) {
-            return Response.ok(new ApiOk("Voto registrato.")).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+    public Boolean upvote(@PathParam("review_id") int id)
+    {
+        return reviewDAO.get(id, ReviewStatus.ACCEPTED)
+                .map(review -> reviewDAO.incrementVote(id))
+                .orElseThrow(() -> new NotFoundException("Review not found"));
     }
-
-    // --- ENDPOINT DI GESTIONE (ADMIN) ---
 
     @GET
     @Path("/pending")
-    @AdminGuard
+    //@AdminGuard
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Review> getPending() {
-        // Recupera tutte le recensioni con campi varchar da validare
-        return reviewDAO.getAllPending();
+    public List<Review> getPending()
+    {
+        return reviewDAO.list(ReviewStatus.PENDING);
     }
 
     @PUT
-    @Path("/{id}/approve")
-    @AdminGuard
+    @Path("/{review_id}/approve")
+    //@AdminGuard
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response approve(@PathParam("id") int id, Review validatedReview) {
-        // L'admin può correggere i dati e mappare i "raw fields" su ID reali
+    public Boolean approve(@PathParam("review_id") int id, Review validatedReview)
+    {
         validatedReview.setId(id);
         validatedReview.setStatus(ReviewStatus.ACCEPTED);
-
-        if (reviewDAO.update(validatedReview)) {
-            return Response.ok(new ApiOk("Recensione approvata e pubblicata.")).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return reviewDAO.update(validatedReview);
     }
 
     @PUT
-    @Path("/{id}/reject")
-    @AdminGuard
+    @Path("/{review_id}/reject")
+    //@AdminGuard
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reject(@PathParam("id") int id) {
-        // L'admin rifiuta la recensione (può essere eliminata o marcata REJECTED)
-        if (reviewDAO.updateStatus(id, ReviewStatus.REJECTED)) {
-            return Response.ok(new ApiOk("Recensione rifiutata.")).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+    public Boolean reject(@PathParam("review_id") int id)
+    {
+        return reviewDAO.delete(id);
     }
 
     @DELETE
-    @Path("/{id}")
-    @AdminGuard
+    @Path("/{review_id}")
+    //@AdminGuard
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@PathParam("id") int id) {
-        if (reviewDAO.delete(id)) {
-            return Response.ok(new ApiOk("Recensione eliminata.")).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+    public Boolean delete(@PathParam("review_id") int id)
+    {
+        return reviewDAO.delete(id);
     }
 }

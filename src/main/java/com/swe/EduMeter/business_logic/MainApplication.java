@@ -30,6 +30,9 @@ public class MainApplication extends ResourceConfig {
 
                 bind(backendFactory.getUserDAO()).to(UserDAO.class);
                 bind(backendFactory.getAdminDAO()).to(AdminDAO.class);
+                bind(backendFactory.getProfDAO()).to(ProfDAO.class);
+                bind(backendFactory.getReportDAO()).to(ReportDAO.class);
+                bind(backendFactory.getReviewDAO()).to(ReviewDAO.class);
                 bind(backendFactory.getSchoolDAO()).to(SchoolDAO.class);
                 bind(backendFactory.getDegreeDAO()).to(DegreeDAO.class);
                 bind(backendFactory.getCourseDAO()).to(CourseDAO.class);

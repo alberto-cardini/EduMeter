@@ -2,8 +2,10 @@ package com.swe.EduMeter.orm.in_mem;
 
 import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.model.School;
 import com.swe.EduMeter.orm.CourseDAO;
 import com.swe.EduMeter.orm.DegreeDAO;
+import com.swe.EduMeter.orm.SchoolDAO;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,14 +16,20 @@ public class InMemDegreeDAO implements DegreeDAO {
     private final ConcurrentHashMap<Integer, Degree> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
-    public InMemDegreeDAO() {}
+    public InMemDegreeDAO() {
+        add(new Degree(null, "computer-engineering", Degree.Type.Bachelor, 0));
+        add(new Degree(null, "law", Degree.Type.Bachelor, 1));
+        add(new Degree(null, "medicine", Degree.Type.Master, 2));
+    }
 
     @Override
     public int add(Degree degree) {
+        new InMemDAOFactory()
+                .getSchoolDAO()
+                .get(degree.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("Invalid schoolId in the degree init JSON"));
         degree.setId(id);
-        inMemStorage.put(id, degree);
-        id++;
-
+        inMemStorage.put(id++, degree);
         return degree.getId();
     }
 

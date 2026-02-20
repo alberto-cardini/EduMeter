@@ -3,11 +3,11 @@ package com.swe.EduMeter.model;
 import java.time.LocalDate;
 
 public class Review {
-    private Integer id;
-    private Integer creator_id;
+    private Integer id = 0;
+    private String creatorHash;
 
-    private Integer professor_id;
-    private Integer course_id;
+    private Integer professorId;
+    private Integer courseId;
 
     private String rawProfessor;
     private String rawCourse;
@@ -18,13 +18,31 @@ public class Review {
     private LocalDate date;
     private int enjoyment;
     private int difficulty;
-    private Integer up_vote;
+    private Integer upVote = 0;
     private ReviewStatus status;
 
     public Review() {}
 
+    public Review(String creatorHash,
+                  Integer professorId,
+                  Integer courseId,
+                  String comment,
+                  LocalDate date,
+                  int enjoyment,
+                  int difficulty,
+                  ReviewStatus status) {
+        this.creatorHash = creatorHash;
+        this.professorId = professorId;
+        this.courseId = courseId;
+        this.comment = comment;
+        this.date = date;
+        this.enjoyment = enjoyment;
+        this.difficulty = difficulty;
+        this.status = status;
+    }
+
     public boolean isFullyStructured() {
-        return  course_id != null && professor_id != null &&
+        return  courseId != null && professorId != null &&
                 rawSchool == null && rawDegree == null &&
                 rawCourse == null && rawProfessor == null;
     }
@@ -44,14 +62,14 @@ public class Review {
     public Integer getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public Integer getCreator() { return creator_id; }
-    public void setCreator(Integer creator_id) { this.creator_id = creator_id; }
+    public String getCreator() { return creatorHash; }
+    public void setCreator(String creatorHash) { this.creatorHash = creatorHash; }
 
-    public Integer getProfessor() { return professor_id; }
-    public void setProfessor(Integer professor_id) { this.professor_id = professor_id; }
+    public Integer getProfessor() { return professorId; }
+    public void setProfessor(Integer professorId) { this.professorId = professorId; }
 
-    public Integer getCourse() { return course_id; }
-    public void setCourse(Integer course_id) { this.course_id = course_id; }
+    public Integer getCourse() { return courseId; }
+    public void setCourse(Integer course_id) { this.courseId = course_id; }
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
@@ -77,8 +95,8 @@ public class Review {
         }
     }
 
-    public Integer getUp_vote() { return up_vote; }
-    public void setUp_vote(int up_vote) { this.up_vote = up_vote; }
+    public Integer getUp_vote() { return upVote; }
+    public void setUp_vote(int up_vote) { this.upVote = up_vote; }
 
     public ReviewStatus getStatus() { return status; }
     public void setStatus(ReviewStatus status) { this.status = status; }
@@ -86,13 +104,13 @@ public class Review {
     public String toString() {
         return "Review { " +
                 "id:" + id +
-                ", creator id: " + creator_id +
-                ", professor id: " + professor_id +
-                ", course id: " + course_id +
+                ", creator id: " + creatorHash +
+                ", professor id: " + professorId +
+                ", course id: " + courseId +
                 ", comment: " + comment +
                 ", date: " + date +
                 ", enjoyment: " + enjoyment +
                 ", difficulty: " + difficulty +
-                ", up_vote: " + up_vote +
+                ", up_vote: " + upVote +
                 "}"; }
 }

@@ -1,3 +1,3 @@
 package com.swe.EduMeter.model;
 
-public enum ReviewStatus { PENDING, ACCEPTED, REJECTED }
+public enum ReviewStatus { PENDING, ACCEPTED }

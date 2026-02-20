@@ -23,7 +23,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
     }
 
     @Override
-    public int add(Course course) {
+    public Integer add(Course course) {
         String query = "INSERT INTO Course (name, degree_id) VALUES (?, ?) RETURNING id";
         List<Object> params = List.of(course.getName(), course.getDegreeId());
 
