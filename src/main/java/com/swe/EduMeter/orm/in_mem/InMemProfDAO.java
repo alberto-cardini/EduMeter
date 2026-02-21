@@ -22,7 +22,7 @@ public class InMemProfDAO implements ProfDAO {
     }
 
     @Override
-    public Integer add(Professor prof) {
+    public int add(Professor prof) {
         prof.setId(id);
         inMemStorage.put(id++, prof);
         return prof.getId();
@@ -47,7 +47,25 @@ public class InMemProfDAO implements ProfDAO {
     public List<Professor> search(String pattern) {
         return inMemStorage.values()
                 .stream()
-                .filter(p -> pattern == null || p.getName().toLowerCase().contains(pattern)) // TODO: add search on the surname
+                .filter(p -> {
+                    if (pattern == null) return true;
+
+                    String[] patterns = pattern.toLowerCase().split(" ");
+
+                    // Pattern matches the name
+                    if (p.getName().toLowerCase().contains(patterns[0])) {
+                        // Pattern matches only the name or even the surname matches
+                        return patterns.length <= 1 || p.getSurname().toLowerCase().contains(patterns[1]);
+                    }
+
+                    // Pattern matches the surname
+                    if (p.getSurname().toLowerCase().contains(patterns[0])) {
+                        // Pattern matches only the surname or even the name matches
+                        return patterns.length <= 1 || p.getName().toLowerCase().contains(patterns[1]);
+                    }
+
+                    return false;
+                })
                 .collect(Collectors.toList());
     }
 }

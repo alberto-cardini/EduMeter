@@ -13,12 +13,14 @@ public class PostgreDAOFactory implements DAOFactory {
 
     private final UserDAO userDAO = new PostgreUserDAO();
     private final AdminDAO adminDAO = new PostgreAdminDAO();
-    private final ReviewDAO reviewDAO = new PostgreReviewDAO();
+    private final PublishedReviewDAO publishedReviewDAO = new PostgrePublishedReviewDAO();
+    private final DraftReviewDAO draftReviewDAO = new PostgreDraftReviewDAO();
     private final ReportDAO reportDAO = new PostgreReportDAO();
     private final ProfDAO profDAO = new PostgreProfDAO();
     private final SchoolDAO schoolDAO = new PostgreSchoolDAO();
     private final DegreeDAO degreeDAO = new PostgreDegreeDAO();
     private final CourseDAO courseDAO = new PostgreCourseDAO();
+    private final TeachingDAO teachingDAO = new PostgreTeachingDAO();
 
     public PostgreDAOFactory() {
         initDatabase();
@@ -51,23 +53,47 @@ public class PostgreDAOFactory implements DAOFactory {
     }
 
     @Override
-    public AdminDAO getAdminDAO() {return adminDAO;}
+    public AdminDAO getAdminDAO() {
+        return adminDAO;
+    }
 
     @Override
-    public ReviewDAO getReviewDAO() {return reviewDAO;}
+    public PublishedReviewDAO getPublishedReviewDAO() {
+        return publishedReviewDAO;
+    }
 
     @Override
-    public ReportDAO getReportDAO() {return reportDAO;}
+    public DraftReviewDAO getDraftReviewDAO() {
+        return draftReviewDAO;
+    }
 
     @Override
-    public ProfDAO getProfDAO() {return profDAO;}
+    public ReportDAO getReportDAO() {
+        return reportDAO;
+    }
 
     @Override
-    public SchoolDAO getSchoolDAO() {return schoolDAO;}
+    public ProfDAO getProfDAO() {
+        return profDAO;
+    }
 
     @Override
-    public DegreeDAO getDegreeDAO() {return degreeDAO;}
+    public SchoolDAO getSchoolDAO() {
+        return schoolDAO;
+    }
 
     @Override
-    public CourseDAO getCourseDAO() {return courseDAO;}
+    public DegreeDAO getDegreeDAO() {
+        return degreeDAO;
+    }
+
+    @Override
+    public CourseDAO getCourseDAO() {
+        return courseDAO;
+    }
+
+    @Override
+    public TeachingDAO getTeachingDAO() {
+        return teachingDAO;
+    }
 }

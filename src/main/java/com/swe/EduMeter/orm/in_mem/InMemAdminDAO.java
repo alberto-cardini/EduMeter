@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemAdminDAO implements AdminDAO
-{
+public class InMemAdminDAO implements AdminDAO {
     private final ConcurrentHashMap<Integer, Admin> inMemStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
@@ -20,44 +19,33 @@ public class InMemAdminDAO implements AdminDAO
     }
 
     @Override
-    public Optional<Admin> get(int id)
-    {
+    public Optional<Admin> get(int id) {
         return Optional.ofNullable(inMemStorage.get(id));
     }
 
     @Override
-    public Optional<Admin> getByEmail(String email)
-    {
+    public Optional<Admin> getByEmail(String email) {
         return inMemStorage.values()
                 .stream()
-                .filter(u -> u.getEmail().toLowerCase().equals(email.toLowerCase()))
+                .filter(u -> u.getEmail().equalsIgnoreCase(email))
                 .findAny();
     }
 
     @Override
-    public List<Admin> getAll()
-    {
+    public List<Admin> getAll() {
         return new ArrayList<>(inMemStorage.values());
     }
 
-    // TODO: idk who should have the privileges to use this methods and have the ability to create admins.
     @Override
-    public boolean add(Admin admin)
-    {
-        if(!getByEmail(admin.getEmail()).isPresent())
-        {
-            admin.setId(id);
-            inMemStorage.put(id, admin);
-            id++;
-            return true;
-        }
-        return false;
+    public int add(Admin admin) {
+        admin.setId(id);
+        inMemStorage.put(id, admin);
+
+        return id++;
     }
 
     @Override
-    public void delete(int id)
-    {
+    public void delete(int id) {
         inMemStorage.remove(id);
     }
-
 }

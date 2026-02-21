@@ -1,9 +1,7 @@
 package com.swe.EduMeter.business_logic.controllers;
 
-import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
-import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.*;
-import com.swe.EduMeter.orm.ReviewDAO;
+import com.swe.EduMeter.orm.PublishedReviewDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -13,10 +11,10 @@ import java.util.List;
 @Path("/review")
 public class ReviewController {
 
-    private final ReviewDAO reviewDAO;
+    private final PublishedReviewDAO reviewDAO;
 
     @Inject
-    public ReviewController(ReviewDAO reviewDAO) {
+    public ReviewController(PublishedReviewDAO reviewDAO) {
         this.reviewDAO = reviewDAO;
     }
 
@@ -43,7 +41,7 @@ public class ReviewController {
     @Produces(MediaType.APPLICATION_JSON)
     public Integer create(Review review, @Context SecurityContext sc)
     {
-        review.setCreator(sc.getUserPrincipal().getName());
+        review.setCreatorHash(sc.getUserPrincipal().getName());
         review.setDate(LocalDate.now());
         review.setUp_vote(0);
 

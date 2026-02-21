@@ -1,13 +1,13 @@
-package com.swe.EduMeter.orm.postgres;
+/*package com.swe.EduMeter.orm.postgres;
 
 import com.swe.EduMeter.model.Review;
 import com.swe.EduMeter.model.ReviewStatus;
-import com.swe.EduMeter.orm.ReviewDAO;
+import com.swe.EduMeter.orm.PublishedReviewDAO;
 
 import java.util.List;
 import java.util.Optional;
 
-public class PostgreReviewDAO implements ReviewDAO {
+public class PostgreReviewDAO implements PublishedReviewDAO {
 
     @Override
     public Optional<Review> get(int id, ReviewStatus status) {
@@ -50,3 +50,4 @@ public class PostgreReviewDAO implements ReviewDAO {
     }
 
 }
+*/

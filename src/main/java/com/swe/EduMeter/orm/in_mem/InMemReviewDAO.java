@@ -1,20 +1,22 @@
-package com.swe.EduMeter.orm.in_mem;
+/*package com.swe.EduMeter.orm.in_mem;
 
-import com.swe.EduMeter.model.*;
+import com.swe.EduMeter.model.Course;
+import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.model.Review;
+import com.swe.EduMeter.model.ReviewStatus;
 import com.swe.EduMeter.orm.CourseDAO;
 import com.swe.EduMeter.orm.DegreeDAO;
-import com.swe.EduMeter.orm.ReviewDAO;
-import com.swe.EduMeter.orm.SchoolDAO;
+import com.swe.EduMeter.orm.PublishedReviewDAO;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class InMemReviewDAO implements ReviewDAO {
+public class InMemReviewDAO implements PublishedReviewDAO {
     private final ConcurrentHashMap<Integer, Review> inMemStoragePub = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Review> inMemStorageDraft = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<User, Review> inMemStorageUpvote = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Review, Set<String>> inMemStorageUpvote = new ConcurrentHashMap<>();
     private int id = 0;
 
     public InMemReviewDAO() {
@@ -91,11 +93,7 @@ public class InMemReviewDAO implements ReviewDAO {
     }
 
     @Override
-    public void updateStatus(int id, ReviewStatus status) {
-    }
-
-    @Override
-    public void incrementVote(int id) {
+    public void toggleUpVote(int id, String userHash) {
     }
 
     @Override
@@ -106,4 +104,10 @@ public class InMemReviewDAO implements ReviewDAO {
     public void update(Review review) {
     }
 
+    @Override
+    public void publish(Review review) {
+
+    }
+
 }
+*/

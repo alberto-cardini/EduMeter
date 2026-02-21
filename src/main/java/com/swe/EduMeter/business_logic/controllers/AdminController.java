@@ -2,6 +2,8 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.*;
+import com.swe.EduMeter.model.response.ApiObjectCreated;
+import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -14,16 +16,14 @@ public class AdminController {
     private final AdminDAO adminDAO;
 
     @Inject
-    public AdminController(AdminDAO adminDAO)
-    {
+    public AdminController(AdminDAO adminDAO) {
         this.adminDAO = adminDAO;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public List<Admin> getAll()
-    {
+    public List<Admin> getAll() {
         return adminDAO.getAll();
     }
 
@@ -31,27 +31,28 @@ public class AdminController {
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public Admin getById(@PathParam("admin_id") int admin_id)
-    {
-        return adminDAO.get(admin_id).orElseThrow(() -> new NotFoundException("Admin not found"));
+    public Admin get(@PathParam("admin_id") int id) {
+        return adminDAO.get(id).orElseThrow(() -> new NotFoundException("Admin not found"));
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public boolean create(Admin admin)
-    {
-        return adminDAO.add(admin);
+    public ApiObjectCreated create(Admin admin) {
+        int adminId =  adminDAO.add(admin);
+
+        return new ApiObjectCreated(adminId, "Admin created");
     }
 
     @DELETE
     @Path("/{admin_id}")
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public boolean delete(@PathParam("admin_id") int admin_id)
-    {
-        return adminDAO.get(admin_id)
-                .map(a -> {adminDAO.delete(admin_id); return true;})
-                .orElseThrow(() -> new NotFoundException("Admin not found"));
+    public ApiOk delete(@PathParam("admin_id") int id) {
+        this.get(id);
+        adminDAO.delete(id);
+
+        return new ApiOk("Admin deleted");
     }
 }

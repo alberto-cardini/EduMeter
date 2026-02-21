@@ -9,7 +9,7 @@ import java.util.Optional;
 public class PostgreProfDAO implements ProfDAO {
 
     @Override
-    public Integer add(Professor prof) {
+    public int add(Professor prof) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
