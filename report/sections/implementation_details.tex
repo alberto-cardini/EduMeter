@@ -220,20 +220,72 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 \subsubsection{Resource Controllers}
 
 \subsubsection{Exception Handlers}
+The \textbf{Exception Handlers} package is a fundamental component of the \textit{EduMeter} architecture, responsible for ensuring system robustness and providing a consistent interface for error reporting.
+
+\paragraph{\textbf{Standardized Error Reporting.}}
+To prevent the leakage of sensitive internal state and to provide a predictable API for client-side consumption, this package intercepts all application-level exceptions and translates them into a standardized JSON format: \texttt{\{"error":"description of the issue"\}}. This mechanism ensures that the backend never returns default HTML error pages.
+
+\paragraph{\textbf{Specialized Exception Mappers.}}
+The package utilizes the Jakarta \texttt{ExceptionMapper} interface to provide in-depth control over different error scenarios:
+
+\begin{itemize}
+	\item \textbf{Global Exception Handler}: Acts as a universal safety net for any \texttt{Throwable} not caught by more specific mappers. It preserves the HTTP status codes for \texttt{WebApplicationExceptions} while mapping all other unforeseen errors to HTTP 500 (Internal Server Error).
+	\item \textbf{JSON Validation Mappers}: Specialized mappers such as \texttt{JsonParseExceptionHandler} and \texttt{UnrecognizedPropertyExceptionHandler} handle errors related to request payloads. These mappers return HTTP 400 (Bad Request), providing specific feedback when a client sends malformed JSON or invalid data fields.
+\end{itemize}
+
+The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, this allows specialized handlers to capture precise issues, such as malformed data or unrecognized fields, and provide detailed feedback with an HTTP 400 status. If no specific mapper is found, the system falls back to a global Throwable handler that serves as a safety net, ensuring that even unforeseen internal errors are caught and translated into a standardized JSON response rather than exposing raw system details.
+
+\paragraph{\textbf{Approach Advantages.}}
+Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
+\begin{itemize}
+	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
+	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
+	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
+	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
+\end{itemize}
 
 \begin{figure}
 	\centering
-	\begin{tikzpicture}[scale=0.7, transform shape]
-		\begin{umlpackage}{exception\_handlers}
-			\umlclass{ExceptionHandler}
+	\begin{tikzpicture}[scale=0.6, transform shape]
+		
+		% --- LIVELLO 1: INTERFACCE (In alto, disposte a quadrato/griglia per risparmiare spazio) ---
+		\umlclass[x=-4, y=6]{ExceptionMapper<Throwable>}{}{}
+		\umlclass[x=5, y=6]{ExceptionMapper<InvalidFormat>}{}{}
+		
+		\umlclass[x=-4, y=-5]{ExceptionMapper<JsonParseException>}{}{}
+		\umlclass[x=6, y=-5]{ExceptionMapper<UnrecognizedPropertyException>}{}{}
+		
+		% --- LIVELLO 2: PACKAGE CON GLI HANDLER (Sotto i rispettivi Mapper) ---
+		\begin{umlpackage}[x=0.5, y=-8]{exceptionHandlers}
+			
+			% Gli handler sono posizionati esattamente sotto i loro mapper
+			\umlclass[x=-4.5, y=10]{ExceptionHandler}
 			{}
-			{
-				\begin{tabular}{@{} l l @{}}
-					+ ToResponde(Throwable) & : Responce
-				\end{tabular}
-			}
+			{+ toResponse(Throwable) : Response}
+			
+			\umlclass[x=4.5, y=10]{InvalidFormatExceptionHandler}
+			{}
+			{+ toResponse(Throwable) : Response}
+			
+			\umlclass[x=-4.5, y=7]{JsonParseExceptionHandler}
+			{}
+			{+ toResponse(Throwable) : Response}
+			
+			\umlclass[x=4.5, y=7]{UnrecognizedPropertyExceptionHandler}
+			{}
+			{+ toResponse(Throwable) : Response}
+			
+			% --- RELAZIONI (Linee dritte e pulite) ---
+			\umlinherit[geometry=|-|, anchor1=30, anchor2=-50]{ExceptionHandler}{ExceptionMapper<Throwable>}
+			\umlinherit{InvalidFormatExceptionHandler}{ExceptionMapper<InvalidFormat>}
+			\umlinherit{JsonParseExceptionHandler}{ExceptionMapper<JsonParseException>}
+			\umlinherit[geometry=|-|]{UnrecognizedPropertyExceptionHandler}{ExceptionMapper<UnrecognizedPropertyException>}
+			
 		\end{umlpackage}
+		
 	\end{tikzpicture}
+	\label{UML-exceptin-handling}
+	\caption{UML class diagram of the exception handling package}
 \end{figure}
 
 \subsection{Object-Relation Mapper (ORM)}
