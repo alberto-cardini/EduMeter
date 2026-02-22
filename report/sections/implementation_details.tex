@@ -1,6 +1,10 @@
 \section{Implementation Details}
 
+This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}).
+
 \subsection{Domain Model}
+
+The domain model is that part of the projects that concerns the entity representation in the code base. Each class in responsible for maintaining its own data consistency and display a practical and fast collection of methods to the client in order to interact with it safely.  
 
 \begin{figure}
 	\centering
@@ -9,24 +13,24 @@
 		% first column (from left to right)
 		\umlclass[width=5cm]{User}{
 			\begin{tabular}{@{} l l @{}}
-				-- id       		& : string \\ % it is the hash related to the user.
-				-- banned   		& : bool 
+				-- hash       		& : String \\ % it is the hash related to the user.
+				-- banned   		& : Boolean 
 			\end{tabular}
 		}{}
 		
 		\umlclass[below=3cm of User, width=5cm]{Admin}{
 			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- email    & : string
+				-- id       & : Integer \\
+				-- email    & : String
 			\end{tabular}
 		}{}
 		
 		\umlclass[below=3cm of Admin, width=5cm]{Report}{
 			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- issuer   & : User \\
+				-- id       & : Integer \\
+				-- issuerId & : Integer \\
 				-- status   & : ReportStatus \\
-				-- review   & : Review
+				-- reviewId & : Integer
 			\end{tabular}
 		}{}
 		
@@ -37,17 +41,16 @@
 		% second column
 		\umlclass[right=3cm of User, width=6cm]{Review}{
 			\begin{tabular}{@{} l l @{}}
-				-- id          & : int       \\
-				-- course      & : Course    \\
-				-- degree      & : Degree    \\
-				-- school      & : School    \\ 
-				-- comment     & : string    \\
+				-- id          & : Integer   \\
+				-- creatorHash & : String    \\
+				-- courseId    & : Intger    \\
+				-- professorId & : Integer	 \\
 				-- date        & : LocalDate \\
-				-- enjoyment   & : int       \\
-				-- difficulty  & : int       \\
-				-- up-votes    & : int       \\
-				-- professor   & : Professor \\
-				-- creator     & : User
+				-- enjoyment   & : Integer   \\
+				-- difficulty  & : Integer   \\
+				-- comment     & : String    \\
+				-- up-votes    & : Integer   \\
+				-- status      & : ReviewStatus \\
 			\end{tabular}
 		}{
 			\begin{tabular}{@{} l l @{}}
@@ -106,11 +109,140 @@
 		\umluniassoc{Report}{ReportStatus}
 		
 	\end{tikzpicture}
+	\caption{UML class diagram}
+	\label{UML-domain-model}
 \end{figure}
+
+\clearpage
 
 \subsection{Business Logic}
 
+This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. 
+
+
+%\subsubsection{Authentication Service}
+%In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). 
+
+%One of EduMeter's core features is the complete anonymity of its users. This means that both users and admins cannot gather personal information about another user. To achieve this goal the system cipher the student's sensitive data with a robust encoding algorithm called \texttt{HmacSHA256}. Inside the application, users are identified through their personal hash-code, calculated composing their personal institutional email (asked during the login phase), a value called \texttt{Secret} and a
+
+%The \texttt{auth} package implements everything needed by the authentication service procedures. The package is composed by 2 sub-packages, \texttt{annotations} and \texttt{filters}, and 2 stand-alone classes, \texttt{CryptoServices} and \texttt{Token}. 
+
+\subsubsection{Authentication and Authorization Service}
+In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control without the need for server-side session state. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided.
+
+\paragraph{Declarative Security and Name Binding.}
+To secure REST endpoints, the system utilizes a declarative approach through custom annotations, making the code lighter and less repetitive, avoiding boiler plate control sequences. We have created 2 annotations:
+\begin{itemize}
+	\item \textbf{@AuthGuard}: Applied to resources requiring standard user authentication (e.g up-voting reviews and creating reviews).
+	\item \textbf{@AdminGuard}: Applied to resources restricted to moderators (e.g. draft review and validation, report solving and behavioral countermeasures).
+	\item \textbf{Name Binding}: Both annotations utilize the \texttt{@NameBinding} meta-annotation, allowing the JAX-RS runtime to dynamically associate specific filters with annotated resource methods.
+\end{itemize}
+
+\paragraph{Request Filtering and Context Injection.}
+The security workflow is managed by two primary providers that intercept incoming traffic:
+\begin{itemize}
+	\item \textbf{AuthFilter}: This component intercepts requests marked with \texttt{@AuthGuard}. It extracts the \texttt{Bearer} token (a digital "entry pass" that identifies a user and their permissions automatically, allowing the system to verify them without needing to check a database every time) from the \texttt{Authorization} header and initiates validation through the \texttt{CryptoService}. Upon successful verification, it injects a custom \texttt{SecurityContext} into the request, establishing the user principal and defining roles such as \texttt{ADMIN} or \texttt{BASE}.
+	\item \textbf{AdminFilter}: This filter extends \texttt{AuthFilter} to handle \texttt{@AdminGuard} requirements. It first executes the base authentication logic via \texttt{super.filter()} and then performs a secondary check to ensure the authenticated principal possesses the \texttt{ADMIN} role. Failure to meet this requirement results in a \texttt{ForbiddenException} (HTTP 403).
+\end{itemize}
+
+\paragraph{The Cryptographic Engine (CryptoService).}
+The \texttt{CryptoService} serves as a singleton utility responsible for the platform's cryptographic operations.
+\begin{itemize}
+	\item \textbf{JWT Custom Design}: The service implements a simplified version of the JSON Web Token (JWT) concept. To reduce overhead, the standard JWT header is omitted, resulting in a two-part token (instead of three-part) consisting of a Base64-encoded JSON payload and an HMAC-SHA256 signature.
+	\item \textbf{Signature Verification}: Tokens are signed using the \texttt{HmacSHA256} algorithm and a server-side secret. Validation uses \texttt{MessageDigest.isEqual} to compare signatures, providing protection against timing attacks.
+	\item \textbf{User Anonymization}: One of the core EduMeter's features is complete user anonymity, user's sensitive information are never visible to other users nor admins and are never stored directly into the DB. To protect privacy while maintaining database efficiency, the service generates a \texttt{userHash}. This is achieved by computing a 16-byte truncated version of an HMAC-SHA256 hash of the user's email, resulting in a unique 22-character Base64 identifier.
+\end{itemize}
+
+\paragraph{Token Lifecycle and Security Constraints.}
+\begin{itemize}
+	\item \textbf{Expiration}: Tokens are generated with a strict 30-minute validity window.
+	\item \textbf{Revocation}: A \texttt{revokedTokens} set is maintained to handle logout events or compromised tokens. While currently implemented using a \texttt{ConcurrentHashMap}, the service is designed for future migration to a Redis-based key store for persistent, distributed revocation management.
+	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
+\end{itemize}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.7, transform shape]
+		\umlclass[type= Jakarta interface, x=10, y=3]{ContainerRequestFilter}{}{}
+		
+		\begin{umlpackage}[y=-2]{auth}
+			\begin{umlpackage}{annotations}
+				\umlclass[type=@interface]{AuthGuard}{}{}
+				\umlclass[right=2cm of AuthGuard, type=@interface]{AdminGuard}{}{}
+			\end{umlpackage}
+			
+			\begin{umlpackage}[x=13, y=0]{filters}
+				\umlclass{AuthFilter}{}{
+					+ filter(...) : void
+				}
+				\umlclass[right=2cm of AuthFilter]{AdminFilter}{}{
+					+ filter(...) : void
+				}
+			\end{umlpackage}
+			
+			\umlclass[x=12, y=-6, type = Singleton]{CryptoService}{
+				\begin{tabular}{@{} l l @{}}
+					-- static final TOKEN\_EXPIRE\_MINUTES & : long \\
+					-- static final HMAC\_ALGO & : String           \\
+					-- static instance & : CryptoSerice             \\
+					-- final jsonMapper & : ObjectMapper            \\
+					-- final mac & : Mac                            \\
+					-- final revokedTokens & : Set<String>
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					-- CryptoService() & : CryptoService            \\
+					+ static sync getInstance() & : CryptoService   \\
+					+ generateToken(String, boolean) & : String     \\
+					+ decodeToken(String) & : Token                 \\
+					+ revokeToken(String) & : void                  \\
+					+ getUserId(String) & : String 
+				\end{tabular}         
+			}
+			
+			\umlclass[x=2, y=-6,type=record]{Token}{
+				\begin{tabular}{@{} l l @{}}
+					+ userHash & : String \\
+					+ expiresAt & : long \\
+					+ isAdmin & : boolean 
+				\end{tabular}
+			}{}
+		\end{umlpackage}
+		
+		\umlinherit[anchor1=west, anchor2=east]{AdminFilter}{AuthFilter}
+		\umldep[anchor1=west, anchor2=east, stereo=use]{CryptoService}{Token}
+		\umlimpl[geometry=-|]{AuthFilter}{ContainerRequestFilter}
+	\end{tikzpicture}
+	\caption{UML class diagram of the authentication package}
+	\label{UML-auth}
+\end{figure}
+
+\subsubsection{Resource Controllers}
+
+\subsubsection{Exception Handlers}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.7, transform shape]
+		\begin{umlpackage}{exception\_handlers}
+			\umlclass{ExceptionHandler}
+			{}
+			{
+				\begin{tabular}{@{} l l @{}}
+					+ ToResponde(Throwable) & : Responce
+				\end{tabular}
+			}
+		\end{umlpackage}
+	\end{tikzpicture}
+\end{figure}
+
 \subsection{Object-Relation Mapper (ORM)}
+
+\subsubsection{DAO Interfaces}
+
+\subsubsection{In Memory Storage}
+
+\subsubsection{Postgre Remote Storage}
 
 \subsection{Database}
 

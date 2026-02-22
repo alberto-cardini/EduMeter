@@ -12,7 +12,7 @@ At some point in their academic journey, every student faces the challenge of se
 	
 \end{itemize}
 
-The solutions to all these problems is \textbf{EduMeter}, a platform made for students by students. 
+\noindent The solutions to all these problems is \textbf{EduMeter}, a platform made for students by students. 
 
 \subsection{Statement}
 
@@ -73,37 +73,40 @@ To ensure consistency and data integrity, each review follows a standardized str
 
 \subsection{System architecture and tools}
 
-EduMeter is split between frontend and backend.
+EduMeter is a web application divided into two distinct parts that rely on several industrial-grade libraries to ensure scalability, security, and modularity:
 
 % ? An SMTP server is required for authentication, which consists of an OTP (One Time Pin) being sent to the address that has an allowed domain (e.g. @edu.unifit.it). Once logged in, the backend provides a JWT (JSON Web Token), which is meant to identify the user in subsequent comunications.
 
 % ?It is important to note that the User Identifier (userID) is obtained through hashing the email chained to a secret key. This garantuees the anoniminity of students, but still allows to ban certain userIDs that have been flagged for unfair conduct.
 
-The backend handles the bulk of the application logic, connects to the PostgreSQL database and also to the SMTP server. The backend is written in Java, and has a RESTful HTTP interface to communicate with the client. The code structure of the backend has 3 main packges:
+\paragraph{\textbf{Backend.}}
+This part is responsible for managing the core application logic, interfacing with a PostgreSQL database and auxiliary servers for external services, such as SMTP. Developed in Java, it exposes a RESTful HTTP API to facilitate client-side communication. The codebase is organized into three primary packages to ensure modularity and separation of concerns:
 
 \begin{itemize}
-	\item \textbf{Business Logic}: contains all the main logic of the application, including the REST endpoints, the authentication managaer and the SMTP extension.
-	\item \textbf{Domain Model}: defines the entities involved in the program.
-	\item \textbf{DAO}: manages entities through Data Access Objects (DAOs), providing a clean abstraction between the business logic and the underlying database.
+	\item \textbf{Business Logic}: Contains the application’s functional requirements, including \textbf{REST} endpoints, and \textbf{authentication management}. While the physical SMTP server is not yet integrated, the system includes a fully defined \textbf{SMTP Interface}. This abstraction decouples the business logic from the specific mail provider, allowing a concrete SMTP implementation to be "swapped in" with zero modifications to the core application code. This ensures the system remains extensible and easily testable using mock mail services. To ensure data security, \textbf{HMAC} is utilized as a robust mechanism for verifying and securing sensitive user and administrator information.
+	\item \textbf{Domain Model}: Defines the system's core entities. Following the principle of encapsulation, each entity is responsible for maintaining its own internal state and data consistency.
+	\item \textbf{DAO (Data Access Object)}: Abstracts the persistence layer from the business logic. This package manages entity lifecycle and database interactions. Additionally, an \textbf{in-memory storage system} is implemented to provide a lightweight testing environment that remains independent of the production database.
 \end{itemize}
 
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[thick, font=\sffamily]
 
-		\begin{umlactor}{User}\end{umlactor}
-	\begin{umlpackage}[x=2.5]{Business Logic}
-		\begin{umlpackage}{auth}
-		\end{umlpackage}
-		\begin{umlpackage}[x=3]{controllers}
-		\end{umlpackage}
+	\begin{umlpackage}[x=2.5, y=-1]{Business Logic}
+		\begin{umlpackage} {auth} \end{umlpackage}
+		\begin{umlpackage}[x=3] {controllers} \end{umlpackage}
+		\begin{umlpackage}[x=2,y=-3] {exception} \end{umlpackage}
 	\end{umlpackage}
-	\begin{umlpackage}[x=3, y=-4]{Domain Model}\end{umlpackage}
-	\begin{umlpackage}[x=8, y=-4]{ORM}\end{umlpackage}
+	\begin{umlpackage}[x=12, y=-4]{Domain Model}\end{umlpackage}
+	\begin{umlpackage}[x=9.5]{ORM}
+		\begin{umlpackage} {Postgre} \end{umlpackage}
+		\begin{umlpackage}[x=3] {InMem} \end{umlpackage}
+		\begin{umlpackage}[x=6.5] {DAO interface} \end{umlpackage}
+	\end{umlpackage}
 
-	\umlimport[geometry=|-|]{Business Logic}{Domain Model}
-	\umlimport[geometry=-|]{Business Logic}{ORM}
-	\umlimport[geometry=--]{ORM}{Domain Model}
+	\umlimport[geometry=|-, anchor1=east, anchor2=west]{Business Logic}{Domain Model}
+	\umlimport[geometry=-|, anchor2=-160]{Business Logic}{ORM}
+	\umlimport[geometry=|-, anchor1 = -157, anchor2=170]{ORM}{Domain Model}
 
 	% DB node
 	\node[cylinder, 
@@ -113,31 +116,31 @@ The backend handles the bulk of the application logic, connects to the PostgreSQ
 		minimum width=2cm, 
 		aspect=0.25, 
 		fill=gray!10, 
-		align=center] (db) at (8, -8) {PostgreSQL\\Database};
+		align=center] (db) at (16, -4) {PostgreSQL\\Database};
 
-	\draw[<->, >=latex, line width=1pt] (ORM) -- (db) 
-		node[midway, right] {JDBC};
+	\draw[<->, >=latex, line width=1pt] (db.north) -- (db.north |- ORM.south)
+	node[midway, right] {JDBC};
 
 	\end{tikzpicture}
 	\caption{Package diagram}
 
 \end{figure}
 
+\paragraph{\textbf{Frontend.}} This component represents the user-facing interface of the platform, specifically tailored for the student body. While the full implementation of the frontend was considered out of scope for the current phase of the project, a comprehensive set of mock-ups is provided in section \ref{mock-ups} to illustrate the intended final product. The interface design prioritizes a seamless UX; every element has been created to guide the user intuitively through the processes of browsing and publishing reviews. 
 
-\noindent Libraries used:
+\paragraph{\textbf{Libraries.}} 
 
 \begin{itemize}
-	\item jax-rs for REST API.
+	\item JAX-RS for REST API.
 	\item JDBC for database connectivity.
 	\item Glassfish for Jakarta EE open source implementation.
-	\item JUnit for testing.
-	\item Apache Commons Net for SMTP support.
+	\item Mockito for testing.
 \end{itemize}
 
 \noindent Developed using:
 
 \begin{itemize}
 	\item Intellij Idea as the main IDE.
-	\item Postman / Insomnia as a REST testing client.
-	\item AI models (...)
+	\item Insomnia as a REST testing client.
+	\item AI models to automate boring repetitive coding.
 \end{itemize}

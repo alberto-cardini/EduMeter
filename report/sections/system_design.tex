@@ -1,10 +1,10 @@
 \section{System Design}
-
+The following section provides a detailed analysis of the primary actions available to each actor within the platform. To ensure technical clarity, each use case is illustrated through a state diagram, an in-depth descriptive table, and, where applicable, a mock-up representing the interface presented to the end-user.
 
 \subsection{Use Case Diagram}
-The presented diagram covers the entirety of actions that the different kinds of entities can perform in EduMeter. The specific interactions with the system are covered extensively in the use case templates in section \ref{use-case-templates}.
+The presented diagram covers the entirety of actions that the different kinds of actors can perform in EduMeter. The specific interactions with the system are covered extensively in the use case templates in section \ref{use-case-templates}.
 
-\vspace{1em}
+\vspace{3em}
 	
 	\begin{tikzpicture}
 		
@@ -49,12 +49,24 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\draw [tikzuml dependency style] (ban-user)      --					   node[left]  {$\ll \text{extends} \gg$} (manage-report);
 	\end{tikzpicture}
 	
+\vspace{2em}
 
 \subsection{Use Case Template} \label{use-case-templates}
 
+To ensure a standardized analysis, each use case is detailed across seven core fields, providing a comprehensive overview of the system's behavioral requirements:
 
+\begin{itemize}
+	\item{\textbf{Level}}: Indicates the scope of the use case (e.g., Summary, User-goal, or Sub-function). 
+	\item{\textbf{Description}}: A concise summary of the specific action or goal the use case intends to achieve.
+	\item{\textbf{Actors}}: Identifies the entities interacting with the process. In \textit{EduMeter}, these are categorized as: \textbf{Guest}, \textbf{Student}, or \textbf{Admin}.
+	\item{\textbf{Pre-conditions}}: The specific system states or constraints that must be satisfied before the use case can be triggered.
+	\item{\textbf{Steps}}: A sequence of atomic steps that transition the system from the initial pre-conditions to the intended goal state.
+	\item{\textbf{Post-conditions}}: The guaranteed state of the platform following the successful execution of all flow steps.
+	\item{\textbf{Alternative Flows}}: Defined branches or exception-handling steps performed if a primary step fails or encounters an undesired result.
+\end{itemize} 
 
 \subsubsection{Guest Templates}
+\vspace{1em}
 \begin{usecasetable}{1}{Browse Review}
 	\begin{tabularx}{\textwidth}{l|X}
 		\textbf{Level} & User Goal \\
@@ -78,7 +90,6 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
-
 
 \subsubsection{Student Templates}
 
@@ -245,7 +256,10 @@ The presented diagram covers the entirety of actions that the different kinds of
 	\end{tabularx}
 \end{usecasetable}
 
-\subsection{Mock-ups}
+\subsection{Mock-ups} \label{mock-ups}
+As stated in the introduction, the frontend is not yet fully developed. These mock-ups aim to convey the overall platform appearance and to create a reference for an easy and stress-free user experience future development. 
+
+\vspace{2em}
 
 \begin{figure}[htbp]
 	\centering
@@ -327,11 +341,17 @@ The presented diagram covers the entirety of actions that the different kinds of
 	\caption{Form for the review composition.}
 \end{figure}
 
-\subsection{Navigation Diagram}
-
-\subsection{Class Diagram}
+\clearpage
 
 \subsection{Relational Model}
+
+\textbf{EduMeter}'s schema is architected to ensure strict traceability between users and their contributions while maintaining a hierarchical organization of academic data including Schools, Degrees, and Courses. The E-R model (Figure 3) is organized into three functional clusters:
+
+\begin{itemize}
+	\item \textbf{User and Moderation}: The \textbf{User} entity serves as the central actor. To facilitate platform safety, an \texttt{isBanned} attribute allows for administrative control. Users are linked to \textbf{Reports} via a \texttt{Files} relationship, enabling a transparent moderation history.
+	\item \textbf{Review Lifecycle}: The model employs a \textbf{generalization} to distinguish between \textbf{Drafted} and \textbf{Published} reviews. This allows the system to store incomplete metadata (e.g., school and course names) separately from the finalized reviews that are linked to the verified academic hierarchy.
+	\item \textbf{Academic Hierarchy}: A nested structure ensures data integrity: a \textbf{School} offers \textbf{Degrees}, which contain \textbf{Courses}. \textbf{Professors} are linked to these courses via the \textbf{Teaches} relationship, providing the necessary context for published feedback and allowing a loyal representation of the real-world's 1:1 relationship.
+\end{itemize}
 
 \begin{figure}[H]
 	\centering
@@ -355,7 +375,7 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\node[relationship](writes)[right = of user]{Writes} edge node[above] {1} (user);
 		
 		% Relazione Up-voted posizionata tra Writes e About
-		\node[relationship](upvoted)[below = 0.5cm of writes]{Up-voted};
+		\node[relationship](upvoted)[below = 0.5cm of writes]{Upvote};
 		\draw[-] (user) -- node[below left] {1} (upvoted);
 		
 		\node[relationship](about)[right = of report]{About} edge node[above] {0..n} (report);
