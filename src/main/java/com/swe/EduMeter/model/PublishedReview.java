@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class PublishedReview extends Review {
     private Integer teachingId;
+    private boolean upvotedByUser;
 
     private int upvotes = 0;
 
@@ -32,11 +33,20 @@ public class PublishedReview extends Review {
         this.upvotes = upvotes;
     }
 
+    public boolean isUpvotedByUser() {
+        return upvotedByUser;
+    }
+
+    public void setIsUpvotedByUser(boolean upvotedByUser) {
+        this.upvotedByUser = upvotedByUser;
+    }
+
     @Override
     public String toString() {
         return "PublishedReview{" +
                 "teachingId=" + teachingId +
                 ", upvotes=" + upvotes +
+                ", upvotedByUser=" + upvotedByUser +
                 "} " + super.toString();
     }
 }

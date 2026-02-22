@@ -5,15 +5,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PublishedReviewDAO {
-    Optional<PublishedReview> get(int id);
+    Optional<PublishedReview> get(int id, String userHash);
 
-    List<PublishedReview> search(Integer schoolId, Integer degreeId, Integer courseId, Integer professorId);
+    List<PublishedReview> search(Integer schoolId, Integer degreeId,
+                                 Integer courseId, Integer professorId,
+                                 String userHash);
 
     int add(PublishedReview review);
 
     void update(PublishedReview review);
 
-    void toggleUpVote(int id, String userHash);
+    void toggleUpvote(int id, String userHash);
 
     void delete(int id);
 }

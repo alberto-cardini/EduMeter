@@ -2,6 +2,7 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
+import com.swe.EduMeter.business_logic.auth.filters.AuthFilter;
 import com.swe.EduMeter.model.PublishedReview;
 import com.swe.EduMeter.model.response.ApiObjectCreated;
 import com.swe.EduMeter.model.response.ApiOk;
@@ -17,6 +18,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
@@ -37,17 +39,37 @@ public class PublishedReviewController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<PublishedReview> search(@QueryParam("school_id") Integer schoolId,
-                               @QueryParam("degree_id") Integer degreeId,
-                               @QueryParam("course_id") Integer courseId,
-                               @QueryParam("professor_id") Integer profId){
-        return publishedReviewDAO.search(schoolId, degreeId, courseId, profId);
+                                        @QueryParam("degree_id") Integer degreeId,
+                                        @QueryParam("course_id") Integer courseId,
+                                        @QueryParam("professor_id") Integer profId,
+                                        @Context ContainerRequestContext ctx) {
+        AuthFilter filter = new AuthFilter();
+
+        try {
+            filter.filter(ctx);
+            String userHash = ctx.getSecurityContext().getUserPrincipal().getName();
+
+            return publishedReviewDAO.search(schoolId, degreeId, courseId, profId, userHash);
+        } catch (Exception ignored) {}
+
+        return publishedReviewDAO.search(schoolId, degreeId, courseId, profId, null);
     }
 
     @GET
     @Path("/{review_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public PublishedReview get(@PathParam("review_id") int id) {
-        return publishedReviewDAO.get(id).orElseThrow(() -> new NotFoundException("Review not found"));
+    public PublishedReview get(@PathParam("review_id") int id,
+                               @Context ContainerRequestContext ctx) {
+        AuthFilter filter = new AuthFilter();
+
+        try {
+            filter.filter(ctx);
+            String userHash = ctx.getSecurityContext().getUserPrincipal().getName();
+
+            return publishedReviewDAO.get(id, userHash).orElseThrow(() -> new NotFoundException("Review not found"));
+        } catch (Exception ignored) {}
+
+        return publishedReviewDAO.get(id, null).orElseThrow(() -> new NotFoundException("Review not found"));
     }
 
     @POST
@@ -69,14 +91,14 @@ public class PublishedReviewController {
     @AuthGuard
     @Produces(MediaType.APPLICATION_JSON)
     public ApiOk toggleVote(@PathParam("review_id") int id,
-                        @Context SecurityContext securityContext) {
+                            @Context ContainerRequestContext ctx) {
         // Finds if the review with such id exists or not,
         // by calling the GET endpoint. If it does, then it
         // toggles the upvote for the current user.
-        this.get(id);
+        this.get(id, ctx);
 
-        String userHash = securityContext.getUserPrincipal().getName();
-        publishedReviewDAO.toggleUpVote(id, userHash);
+        String userHash = ctx.getSecurityContext().getUserPrincipal().getName();
+        publishedReviewDAO.toggleUpvote(id, userHash);
 
         return new ApiOk("Vote toggled");
     }
@@ -86,11 +108,12 @@ public class PublishedReviewController {
     @Path("/{review_id}")
     @AdminGuard
     @Produces(MediaType.APPLICATION_JSON)
-    public ApiOk delete(@PathParam("review_id") int id) {
+    public ApiOk delete(@PathParam("review_id") int id,
+                        @Context ContainerRequestContext ctx) {
         // Finds if the review with such id exists or not,
         // by calling the GET endpoint. If it does, then it
         // is deleted.
-        this.get(id);
+        this.get(id, ctx);
         publishedReviewDAO.delete(id);
 
         return new ApiOk("Review deleted");
@@ -100,11 +123,12 @@ public class PublishedReviewController {
     @AdminGuard
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApiOk update(PublishedReview review) {
+    public ApiOk update(PublishedReview review,
+                        @Context ContainerRequestContext ctx) {
         // Finds if the review with such id exists or not,
         // by calling the GET endpoint. If it does, then it
         // is updated.
-        this.get(review.getId());
+        this.get(review.getId(), ctx);
         publishedReviewDAO.update(review);
 
         return new ApiOk("Review updated");

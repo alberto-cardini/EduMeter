@@ -3,6 +3,8 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.model.Teaching;
 import com.swe.EduMeter.orm.TeachingDAO;
 
+import java.util.Optional;
+
 public class InMemTeachingDAO implements TeachingDAO {
     @Override
     public int add(Teaching teaching) {
@@ -10,7 +12,7 @@ public class InMemTeachingDAO implements TeachingDAO {
     }
 
     @Override
-    public Teaching get(int id) {
+    public Optional<Teaching> get(int id) {
         throw new RuntimeException("Not implemented!");
     }
 

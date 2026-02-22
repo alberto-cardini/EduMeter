@@ -8,12 +8,14 @@ import java.util.Optional;
 
 public class PostgrePublishedReviewDAO implements PublishedReviewDAO {
     @Override
-    public Optional<PublishedReview> get(int id) {
+    public Optional<PublishedReview> get(int id, String userHash) {
         throw new RuntimeException("Not implemented!");
     }
 
     @Override
-    public List<PublishedReview> search(Integer schoolId, Integer degreeId, Integer courseId, Integer professorId) {
+    public List<PublishedReview> search(Integer schoolId, Integer degreeId,
+                                        Integer courseId, Integer professorId,
+                                        String userHash) {
         throw new RuntimeException("Not implemented!");
     }
 
@@ -28,7 +30,7 @@ public class PostgrePublishedReviewDAO implements PublishedReviewDAO {
     }
 
     @Override
-    public void toggleUpVote(int id, String userHash) {
+    public void toggleUpvote(int id, String userHash) {
         throw new RuntimeException("Not implemented!");
     }
 
