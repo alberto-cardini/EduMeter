@@ -1,7 +1,9 @@
 package com.swe.EduMeter.orm.in_mem;
 
 import com.swe.EduMeter.model.Professor;
+import com.swe.EduMeter.model.Teaching;
 import com.swe.EduMeter.orm.ProfDAO;
+import com.swe.EduMeter.orm.TeachingDAO;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,10 +47,24 @@ public class InMemProfDAO implements ProfDAO {
 
     @Override
     public List<Professor> search(String pattern, Integer courseId) {
-        // TODO use courseId
+        final List<Integer> allowProfessors;
+
+        if (courseId != null) {
+            TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
+
+            // Get distinct professors which teach the course
+            allowProfessors = teachingDAO.getByCourse(courseId)
+                                          .stream()
+                                          .map(Teaching::getProfId)
+                                          .distinct()
+                                          .collect(Collectors.toList());
+        } else {
+            allowProfessors = null;
+        }
 
         return inMemStorage.values()
                 .stream()
+                .filter(p -> allowProfessors == null || allowProfessors.contains(p.getId()))
                 .filter(p -> {
                     if (pattern == null) return true;
 

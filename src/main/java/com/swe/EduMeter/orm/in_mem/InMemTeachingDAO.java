@@ -3,8 +3,10 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.model.Teaching;
 import com.swe.EduMeter.orm.TeachingDAO;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemTeachingDAO implements TeachingDAO {
     private final ConcurrentHashMap<Integer, Teaching> inMemTeachingStorage = new ConcurrentHashMap<>();
@@ -25,5 +27,21 @@ public class InMemTeachingDAO implements TeachingDAO {
     @Override
     public void delete(int id) {
         inMemTeachingStorage.remove(id);
+    }
+
+    @Override
+    public List<Teaching> getByCourse(int id) {
+        return inMemTeachingStorage.values()
+               .stream()
+               .filter(t -> t.getCourseId().equals(id))
+               .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Teaching> getByProf(int id) {
+        return inMemTeachingStorage.values()
+                .stream()
+                .filter(t -> t.getProfId().equals(id))
+                .collect(Collectors.toList());
     }
 }
