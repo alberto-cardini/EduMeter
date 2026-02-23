@@ -11,5 +11,5 @@ public interface DAOFactory {
     TeachingDAO getTeachingDAO();
     PublishedReviewDAO getPublishedReviewDAO();
     DraftReviewDAO getDraftReviewDAO();
-    PinDAO getPinDAO();
+    PinChallengeDAO getPinDAO();
 }

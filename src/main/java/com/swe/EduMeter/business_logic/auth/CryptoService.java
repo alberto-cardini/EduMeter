@@ -84,13 +84,12 @@ public class CryptoService {
     /**
      * Generate an encoded JWT Token.
      *
-     * @param userEmail User email, used to obtain the id.
+     * @param userHash  The user identifier.
      * @param isAdmin   Whether the user is an Admin or not.
      * @return          Base64 encoded token.
      */
-    public String generateToken(String userEmail, boolean isAdmin) {
+    public String generateToken(String userHash, boolean isAdmin) {
         long expiresAt = Instant.now().plus(Duration.ofMinutes(TOKEN_EXPIRE_MINUTES)).toEpochMilli();
-        String userHash = this.getUserId(userEmail);
 
         Token token = new Token(userHash, expiresAt, isAdmin);
 

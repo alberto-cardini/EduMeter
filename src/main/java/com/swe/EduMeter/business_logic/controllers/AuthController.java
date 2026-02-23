@@ -2,10 +2,10 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
-import com.swe.EduMeter.model.Pin;
+import com.swe.EduMeter.model.PinChallenge;
 import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.AdminDAO;
-import com.swe.EduMeter.orm.PinDAO;
+import com.swe.EduMeter.orm.PinChallengeDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -25,14 +25,14 @@ import java.time.Instant;
 
 @Path("/auth")
 public class AuthController {
-    public static final String[]  WHITELISTED_DOMAINS = { "edu.unifi.it" };
+    public static final String[] WHITELISTED_DOMAINS = { "edu.unifi.it" };
     public static final int PIN_EXPIRATION_MIN = 10;
-    private final PinDAO pinDAO;
+    private final PinChallengeDAO pinDAO;
     private final AdminDAO adminDAO;
 
     @Inject
-    public AuthController(PinDAO pinDAO, AdminDAO adminDAO) {
-        this.pinDAO = pinDAO;
+    public AuthController(PinChallengeDAO pinChallengeDAO, AdminDAO adminDAO) {
+        this.pinDAO = pinChallengeDAO;
         this.adminDAO = adminDAO;
     }
 
@@ -40,7 +40,7 @@ public class AuthController {
     @Path("/sendPin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ApiOk sendPin(@QueryParam("admin") boolean isAdmin,
+    public SendPinResponse sendPin(@QueryParam("admin") boolean isAdmin,
                          SendPinBody body) {
         if (body.email() == null) {
             throw new BadRequestException("Missing field 'email'");
@@ -53,12 +53,12 @@ public class AuthController {
             String veryRandomPin = "1234";
             String userHash = CryptoService.getInstance().getUserId(body.email());
             Instant expiresAt = Instant.now().plus(Duration.ofMinutes(PIN_EXPIRATION_MIN));
-            Pin pin = new Pin(null, veryRandomPin, userHash, expiresAt, true);
+            PinChallenge pinChallenge = new PinChallenge(null, veryRandomPin, userHash, expiresAt, true);
 
-            pinDAO.add(pin);
-            // TODO: send pin
+            int challengeId = pinDAO.add(pinChallenge);
+            // SHOULD send pin via email
 
-            return new ApiOk("Pin sent");
+            return new SendPinResponse(challengeId);
         }
 
         for (String domain: WHITELISTED_DOMAINS) {
@@ -66,23 +66,18 @@ public class AuthController {
                 String veryRandomPin = "1234";
                 String userHash = CryptoService.getInstance().getUserId(body.email());
                 Instant expiresAt = Instant.now().plus(Duration.ofMinutes(PIN_EXPIRATION_MIN));
-                Pin pin = new Pin(null, veryRandomPin, userHash, expiresAt, false);
+                PinChallenge pinChallenge = new PinChallenge(null, veryRandomPin, userHash, expiresAt, false);
 
-                pinDAO.add(pin);
-                // TODO: send pin
+                int challengeId = pinDAO.add(pinChallenge);
+                // SHOULD send pin via email
 
-                return new ApiOk("Pin sent");
+                return new SendPinResponse(challengeId);
             }
         }
 
         throw new ForbiddenException("Invalid email domain");
     }
 
-    /*
-     * MOCK METHOD, which can be used for testing and whatnot.
-     * It always returns a valid token, despite the PIN sent.
-     * The userhash is the same as the received email.
-     */
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -92,16 +87,20 @@ public class AuthController {
         if (body.pin() == null) {
             throw new BadRequestException("Missing field 'pin'");
         }
-        if (body.email() == null) {
-            throw new BadRequestException("Missing field 'email'");
+        if (body.challengeId() == null) {
+            throw new BadRequestException("Missing field 'challengeId'");
         }
 
-        String userHash = CryptoService.getInstance().getUserId(body.email());
-        Pin expectedPin = pinDAO.get(userHash, isAdmin)
-                                .orElseThrow(() -> new NotFoundException("Invalid or expired Pin"));
+        PinChallenge pinChallenge = pinDAO.get(body.challengeId())
+                                .orElseThrow(() -> new NotFoundException("Invalid challengeId"));
 
-        if (expectedPin.getPin().equals(body.pin())) {
-            String encodedToken =  CryptoService.getInstance().generateToken(body.email(), isAdmin);
+        if (pinChallenge.getExpiresAt().isAfter(Instant.now())) {
+            throw new NotAuthorizedException("Pin challenge expired");
+        }
+
+        if (pinChallenge.getPin().equals(body.pin())) {
+            String userHash = pinChallenge.getUserHash();
+            String encodedToken = CryptoService.getInstance().generateToken(userHash, isAdmin);
             return new LoginResponse(encodedToken);
         }
 
@@ -123,6 +122,7 @@ public class AuthController {
     }
 
     private record SendPinBody(String email) {}
-    private record LoginBody(String email, String pin) {}
+    private record SendPinResponse(int challengeId) {}
+    private record LoginBody(Integer challengeId, String pin) {}
     private record LoginResponse(String token) {}
 }

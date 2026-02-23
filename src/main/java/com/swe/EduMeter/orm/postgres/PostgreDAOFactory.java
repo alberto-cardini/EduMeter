@@ -21,7 +21,7 @@ public class PostgreDAOFactory implements DAOFactory {
     private final DegreeDAO degreeDAO = new PostgreDegreeDAO();
     private final CourseDAO courseDAO = new PostgreCourseDAO();
     private final TeachingDAO teachingDAO = new PostgreTeachingDAO();
-    private final PinDAO pinDAO = new PostgrePinDAO();
+    private final PinChallengeDAO pinChallengeDAO = new PostgrePinChallengeDAO();
 
     public PostgreDAOFactory() {
         initDatabase();
@@ -99,5 +99,5 @@ public class PostgreDAOFactory implements DAOFactory {
     }
 
     @Override
-    public PinDAO getPinDAO() { return pinDAO; }
+    public PinChallengeDAO getPinDAO() { return pinChallengeDAO; }
 }

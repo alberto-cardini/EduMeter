@@ -14,7 +14,7 @@ public class InMemDAOFactory implements DAOFactory {
     private static final TeachingDAO teachingDAO = new InMemTeachingDAO();
     private static final PublishedReviewDAO publishedReviewDAO = new InMemPublishedReviewDAO();
     private static final DraftReviewDAO draftReviewDAO = new InMemDraftReviewDAO();
-    private static final PinDAO pinDAO = new InMemPinDAO();
+    private static final PinChallengeDAO PIN_CHALLENGE_DAO = new InMemPinChallengeDAO();
 
     @Override
     public UserDAO getUserDAO() { return userDAO; }
@@ -47,5 +47,5 @@ public class InMemDAOFactory implements DAOFactory {
     public DraftReviewDAO getDraftReviewDAO() { return draftReviewDAO; }
 
     @Override
-    public PinDAO getPinDAO() { return pinDAO; }
+    public PinChallengeDAO getPinDAO() { return PIN_CHALLENGE_DAO; }
 }

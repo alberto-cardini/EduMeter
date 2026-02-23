@@ -1,16 +1,15 @@
 package com.swe.EduMeter.model;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
-public class Pin {
+public class PinChallenge {
     private Integer id;
     private String pin;
     private String userHash;
     private Instant expiresAt;
     private boolean admin;
 
-    public Pin(Integer id, String pin, String userHash, Instant expiresAt, boolean admin) {
+    public PinChallenge(Integer id, String pin, String userHash, Instant expiresAt, boolean admin) {
         this.id = id;
         this.pin = pin;
         this.userHash = userHash;

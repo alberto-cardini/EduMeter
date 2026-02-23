@@ -1,18 +1,18 @@
 package com.swe.EduMeter.orm.postgres;
 
-import com.swe.EduMeter.model.Pin;
-import com.swe.EduMeter.orm.PinDAO;
+import com.swe.EduMeter.model.PinChallenge;
+import com.swe.EduMeter.orm.PinChallengeDAO;
 
 import java.util.Optional;
 
-public class PostgrePinDAO implements PinDAO {
+public class PostgrePinChallengeDAO implements PinChallengeDAO {
     @Override
-    public Optional<Pin> get(String userHash, boolean isAdmin) {
+    public Optional<PinChallenge> get(Integer id) {
         throw new RuntimeException("Not implemented!");
     }
 
     @Override
-    public void add(Pin pin) {
+    public int add(PinChallenge pinChallenge) {
         throw new RuntimeException("Not implemented!");
     }
 
