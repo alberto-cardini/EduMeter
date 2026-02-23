@@ -3,6 +3,7 @@ package com.swe.EduMeter.business_logic.controllers;
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.Teaching;
+import com.swe.EduMeter.model.response.ApiObjectCreated;
 import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
@@ -48,8 +49,8 @@ public class CourseController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public CreateResponse create(Course newCourse) {
-        return new CreateResponse(courseDAO.add(newCourse));
+    public ApiObjectCreated create(Course newCourse) {
+        return new ApiObjectCreated(courseDAO.add(newCourse), "Course created");
     }
 
     @DELETE
@@ -90,6 +91,4 @@ public class CourseController {
     public List<Teaching> listTeachings(@PathParam("course_id") int courseId) {
         return teachingDAO.getByCourse(courseId);
     }
-
-    private record CreateResponse(int id) {}
 }

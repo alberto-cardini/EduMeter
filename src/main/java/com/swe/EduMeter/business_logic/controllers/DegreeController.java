@@ -36,7 +36,7 @@ public class DegreeController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public CreateResponse create(Degree newDegree) {
         return new CreateResponse(degreeDAO.add(newDegree));
     }
@@ -44,7 +44,7 @@ public class DegreeController {
     @DELETE
     @Path("/{degree_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public ApiOk delete(@PathParam("degree_id") int id) {
         // Finds if the degree with such id exists or not,
         // by calling the GET endpoint. If it does, then it
@@ -58,7 +58,7 @@ public class DegreeController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public ApiOk update(Degree degree) {
         if (degree.getId() == null) {
             throw new BadRequestException("Id must be set");

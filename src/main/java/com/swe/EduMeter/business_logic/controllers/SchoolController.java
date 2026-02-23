@@ -39,7 +39,7 @@ public class SchoolController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public CreateResponse create(School newSchool) {
         return new CreateResponse(schoolDAO.add(newSchool));
     }
@@ -47,7 +47,7 @@ public class SchoolController {
     @DELETE
     @Path("/{school_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public ApiOk delete(@PathParam("school_id") int id) {
         // Finds if the school with such id exists or not,
         // by calling the GET endpoint. If it does, then it
@@ -61,7 +61,7 @@ public class SchoolController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public ApiOk update(School school) {
         if (school.getId() == null) {
             throw new BadRequestException("Id must be set");
