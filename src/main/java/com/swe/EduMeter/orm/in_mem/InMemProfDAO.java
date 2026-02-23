@@ -44,7 +44,9 @@ public class InMemProfDAO implements ProfDAO {
     }
 
     @Override
-    public List<Professor> search(String pattern) {
+    public List<Professor> search(String pattern, Integer courseId) {
+        // TODO use courseId
+
         return inMemStorage.values()
                 .stream()
                 .filter(p -> {

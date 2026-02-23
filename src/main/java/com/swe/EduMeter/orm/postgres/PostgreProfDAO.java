@@ -29,7 +29,7 @@ public class PostgreProfDAO implements ProfDAO {
     }
 
     @Override
-    public List<Professor> search(String pattern) {
+    public List<Professor> search(String pattern, Integer courseId) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
