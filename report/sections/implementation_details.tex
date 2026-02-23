@@ -219,6 +219,120 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 
 \subsubsection{Resource Controllers}
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.6, transform shape]
+		\begin{umlpackage}{controllers}
+			\umlclass{AdminController}{
+				- adminDAO : AdminDAO \\
+			}{
+			    \begin{tabular}{@{} l l @{}}
+			    	+ getAll() & : List<Admin> \\
+			    	+ get(int) & : Admin \\
+			    	+ create(Admin) & : ApiObjectCreated \\
+			    	+ delete(int) & : ApiOK 
+			    \end{tabular}
+				
+			}
+			
+			\umlclass[right=0.7cm of AdminController]{UserController}{
+				+ userDAO : UserDAO \\
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ search(Boolean) & : List<User> \\
+					+ getByHash(SecurityContext) & : User \\
+					+ ban(String) & : Boolean \\
+				\end{tabular}
+			}
+			
+			\umlclass[right=0.7cm of UserController]{AuthController}{
+				\begin{tabular}{@{} l l @{}}
+					+ \underline{WHITELISTED\_DOMAINS} & : String \\
+					+ \underline{PIN\_EXPIRATION\_MIN} & : int \\
+					-- pinDAO & : PinDAO \\
+					-- adminDAO & : AdminDAO \\
+					-- record SendPinBody(String) & \\
+					-- record LoginBody(String, String) & \\
+					-- record LoginResponse(String) & 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ sendPin(boolean, SendPinBody) & : ApiOK \\
+					+ login(boolean, LoginBody) & : LogicResponse \\
+					+ logout(String) & : ApiOK
+				\end{tabular}
+			}
+			
+			\umlclass[x=2, y=-11]{ReportController}{
+				\begin{tabular}{@{} l l @{}}
+					-- reportDAO & : ReportDAO \\
+					-- userDAO & : UserDAO
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getAll() & : List<Report> \\
+					+ get(int) & : Report \\
+					+ create(SecurityContext, Report) & : CreateResponse \\
+					+ acceptReport(int,Boolean) & : void
+				\end{tabular}
+			}
+			
+			\umlclass[x=0.5, y=-6]{DegreeController}{
+				-- degreeDAO : DegreeDAO
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ search(String, Integer) & : List<Degree> \\
+					+ get(int) & : Degree \\
+					+ create(Degree) & : CreateResponse \\
+					+ delete(int) & : ApiOK \\
+					+ update(Degree) & : ApiOK
+				\end{tabular}
+			}
+			
+			\umlclass[right=0.5cm of DegreeController,y=-3]{SchoolController}{
+				-- schoolDAO : SchoolDAO
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ search(String) & : List<School> \\
+					+ get(int) & : School \\
+					+ create(School) & : CreateResponse \\
+					+ delete(int) & : ApiOK \\
+					+ update(School) & : ApiOK
+				\end{tabular}
+			}
+			
+			\umlclass[right=0.5cm of SchoolController, y=-3]{CourseController}{
+				-- courselDAO : courseDAO
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ search(String, Integer, Integer) & : List<Course> \\
+					+ get(int) & : Course \\
+					+ create(Course) & : CreateResponse \\
+					+ delete(int) & : ApiOK \\
+					+ update(Course) & : ApiOK
+				\end{tabular}
+			}
+			
+			\umlclass[right=0.5cm of ReportController]{ProfessorController}{
+				
+			}{
+				
+			}
+			
+			\umlclass[x=3,y=-15]{PublishedReviewController}{
+				+ publishedReviewDAO : 
+			}{
+			
+			}
+			
+			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftedReviewController}{}{}
+			
+		\end{umlpackage}
+	\end{tikzpicture}
+	\caption{UML class diagram of the resource controllers package}
+	\label{UML-controllers}
+\end{figure}
+
 \subsubsection{Exception Handlers}
 The \textbf{Exception Handlers} package is a fundamental component of the \textit{EduMeter} architecture, responsible for ensuring system robustness and providing a consistent interface for error reporting.
 
@@ -246,7 +360,7 @@ Implementing multiple specialized mappers instead of a single general safety net
 
 \begin{figure}
 	\centering
-	\begin{tikzpicture}[scale=0.6, transform shape]
+	\begin{tikzpicture}[scale=0.7, transform shape]
 		
 		% --- LIVELLO 1: INTERFACCE (In alto, disposte a quadrato/griglia per risparmiare spazio) ---
 		\umlclass[x=-4, y=6]{ExceptionMapper<Throwable>}{}{}
