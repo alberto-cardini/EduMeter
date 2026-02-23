@@ -3,8 +3,9 @@ package com.swe.EduMeter.business_logic.controllers;
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.Report;
+import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.orm.PublishedReviewDAO;
 import com.swe.EduMeter.orm.ReportDAO;
-import com.swe.EduMeter.orm.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -16,17 +17,17 @@ import java.util.List;
 @Path("/report")
 public class ReportController {
     private final ReportDAO reportDAO;
-    private final UserDAO userDAO;
+    private final PublishedReviewDAO reviewDAO;
 
     @Inject
-    public ReportController(ReportDAO reportDAO, UserDAO userDAO) {
+    public ReportController(ReportDAO reportDAO, PublishedReviewDAO reviewDAO) {
         this.reportDAO = reportDAO;
-        this.userDAO = userDAO;
+        this.reviewDAO = reviewDAO;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public List<Report> getAll() {
         return reportDAO.getAll();
     }
@@ -34,7 +35,7 @@ public class ReportController {
     @GET
     @Path("/{report_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    //@AdminGuard
+    @AdminGuard
     public Report get(@PathParam("report_id") int reportId) {
         return reportDAO.get(reportId).orElseThrow(() -> new NotFoundException("Report not found"));
     }
@@ -42,9 +43,9 @@ public class ReportController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    //@AuthGuard
+    @AuthGuard
     public CreateResponse create(@Context SecurityContext securityContext,
-                      Report report) {
+                                Report report) {
         String userHash = securityContext.getUserPrincipal().getName();
         report.setIssuerHash(userHash);
 
@@ -54,20 +55,26 @@ public class ReportController {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{report_id}")
-    //@AdminGuard
-    // TODO: if report is accepted than the review is deleted and the user is banned conditionally. delete report and review.
-    public void acceptReport(@PathParam("report_id") int reportId,
-                             @QueryParam("decision") Boolean decision) {
-        reportDAO.get(reportId)
-                .map(report -> {
-                    return userDAO.get(report.getIssuerHash())
-                            .map(user -> {
-                                if (decision) user.setBanned(true);
-                                return null;
-                            })
-                            .orElseThrow(() -> new NotFoundException("User not found"));
-                })
-                .orElseThrow(() -> new NotFoundException("Report not found"));
+    @AdminGuard
+    public ApiOk delete(@PathParam("report_id") int reportId) {
+        this.get(reportId);
+
+        reportDAO.delete(reportId);
+
+        return new ApiOk("Report deleted");
+    }
+
+    @POST
+    @Path("/{report_id}/approve")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
+    public ApiOk acceptReport(@PathParam("report_id") int reportId) {
+        Report r = this.get(reportId);
+        this.delete(reportId);
+
+        reviewDAO.delete(r.getReviewId());
+
+        return new ApiOk("Report approved");
     }
 
     private record CreateResponse(int id) {}
