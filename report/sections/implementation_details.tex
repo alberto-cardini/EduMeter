@@ -115,17 +115,205 @@ The domain model is that part of the projects that concerns the entity represent
 
 \clearpage
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.7, transform shape]
+		\begin{umlpackage}{model}
+			\umlclass[x=10, type=abstract]{Review}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- creatorHash & : String \\
+					-- comment & : String \\
+					-- date & : LocalDate \\
+					-- enjoyment & : int \\
+					-- difficulty & : int 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getters & ... \\
+					+ setters & ... 
+				\end{tabular}
+			}
+			
+			\umlclass[x=6, y=-7]{DraftedReview}{
+				\begin{tabular}{@{} l l @{}}
+					-- rawSchool & : String \\
+					-- rawDegree & : String \\
+					-- rawCourse & : String \\
+					-- rawProfessor & : String 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getters & ... \\
+					+ setters & ... 
+				\end{tabular}
+			}
+			
+			\umlclass[right=2cm of DraftedReview, y=-7]{PublishedReview}{
+				\begin{tabular}{@{} l l @{}}
+					-- teachingId &: String \\
+					-- upvotedByUser &: boolean \\
+					-- upvotes &: int 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getters & ... \\
+					+ setters & ...
+				\end{tabular}
+			}
+			
+			\umlclass[left=5cm of Review]{Admin}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- email & : String  
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Admin]{User}{
+				\begin{tabular}{@{} l l @{}}
+					-- hash & : String \\
+					-- banned & : Boolean  
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of User]{Report}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- comment & : String \\
+					-- date & : LocalDate \\
+					-- issuerHash & : String \\
+					-- reviewId & : int   
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Report]{Pin}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- pin & : String \\
+					-- userHash & : String \\
+					-- expiresAt & : Instant \\
+					-- admin & : boolean   
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Pin, type=record]{Token}{
+				\begin{tabular}{@{} l l @{}}
+					-- userHash & : String \\
+					-- expiresAt & : Instant \\
+					-- isAdmin & : boolean   
+				\end{tabular}
+			}{}
+			
+			\umlclass[right=5cm of Review]{School}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- name & : String 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of School]{Degree}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- name & : String \\
+					-- type & : Type \\
+					-- schoolId & : int 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Degree]{Course}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- name & : String \\
+					-- degreeId & : int 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Course]{Professor}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- name & : String \\
+					-- surname & : String 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\umlclass[below=1cm of Professor]{Teaching}{
+				\begin{tabular}{@{} l l @{}}
+					-- id & : Integer \\
+					-- profId & : Integer \\
+					-- courseId & : Integer 
+				\end{tabular}
+			}{
+				\begin{tabular}{@{} l l @{}}
+					+ getter & ... \\
+					+ setter & ...
+				\end{tabular}
+			}
+			
+			\begin{umlpackage}[x=8, y=-14]{response}
+				\umlclass[type=record]{ApiError}{
+					-- error : String
+				}{}
+				\umlclass[type=record, right=1cm of ApiError]{ApiObjectCreated}{
+					\begin{tabular}{@{} l l @{}}
+						-- message & : string \\
+						-- id & : int 
+					\end{tabular}
+				}{}
+				\umlclass[type=record, below=1cm of ApiError]{ApiOk}{
+					-- message : String
+				}{}
+			\end{umlpackage}
+			
+		\end{umlpackage}
+		
+		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{DraftedReview}{Review}
+		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{PublishedReview}{Review}
+	\end{tikzpicture}
+\end{figure}
+
 \subsection{Business Logic}
 
 This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. 
-
-
-%\subsubsection{Authentication Service}
-%In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). 
-
-%One of EduMeter's core features is the complete anonymity of its users. This means that both users and admins cannot gather personal information about another user. To achieve this goal the system cipher the student's sensitive data with a robust encoding algorithm called \texttt{HmacSHA256}. Inside the application, users are identified through their personal hash-code, calculated composing their personal institutional email (asked during the login phase), a value called \texttt{Secret} and a
-
-%The \texttt{auth} package implements everything needed by the authentication service procedures. The package is composed by 2 sub-packages, \texttt{annotations} and \texttt{filters}, and 2 stand-alone classes, \texttt{CryptoServices} and \texttt{Token}. 
 
 \subsubsection{Authentication and Authorization Service}
 In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control without the need for server-side session state. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided.
@@ -319,13 +507,24 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				
 			}
 			
-			\umlclass[x=3,y=-15]{PublishedReviewController}{
-				+ publishedReviewDAO : 
+			\umlclass[x=3,y=-16]{PublishedReviewController}{
+				+ publishedReviewDAO : PublishedReviewDAO
 			}{
-			
+				\begin{tabular}{@{} l l @{}}
+					+ search(Integer, ..., Integer, ContainerRequestContext) & : List<T> \\
+					+ get(int, ContainerRequestContext) & : PublishedReview \\
+					+ publish(PublishedReview, SecurityContext) & : ApiObjectCreated \\
+					+ toggleVote(int, ContainerRequestContext) & : ApiOk \\
+					+ delete(int, ContainerRequestContext) & : ApiOk \\
+					+ update(PublishedReview, ContainerRequestContext) & : ApiOk \\
+				\end{tabular}
 			}
 			
-			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftedReviewController}{}{}
+			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftedReviewController}{
+				
+			}{
+				
+			}
 			
 		\end{umlpackage}
 	\end{tikzpicture}
@@ -349,30 +548,18 @@ The package utilizes the Jakarta \texttt{ExceptionMapper} interface to provide i
 
 The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, this allows specialized handlers to capture precise issues, such as malformed data or unrecognized fields, and provide detailed feedback with an HTTP 400 status. If no specific mapper is found, the system falls back to a global Throwable handler that serves as a safety net, ensuring that even unforeseen internal errors are caught and translated into a standardized JSON response rather than exposing raw system details.
 
-\paragraph{\textbf{Approach Advantages.}}
-Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
-\begin{itemize}
-	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
-	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
-	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
-	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
-\end{itemize}
-
 \begin{figure}
 	\centering
-	\begin{tikzpicture}[scale=0.7, transform shape]
+	\begin{tikzpicture}[scale=0.8, transform shape]
 		
-		% --- LIVELLO 1: INTERFACCE (In alto, disposte a quadrato/griglia per risparmiare spazio) ---
 		\umlclass[x=-4, y=6]{ExceptionMapper<Throwable>}{}{}
 		\umlclass[x=5, y=6]{ExceptionMapper<InvalidFormat>}{}{}
 		
 		\umlclass[x=-4, y=-5]{ExceptionMapper<JsonParseException>}{}{}
 		\umlclass[x=6, y=-5]{ExceptionMapper<UnrecognizedPropertyException>}{}{}
 		
-		% --- LIVELLO 2: PACKAGE CON GLI HANDLER (Sotto i rispettivi Mapper) ---
 		\begin{umlpackage}[x=0.5, y=-8]{exceptionHandlers}
 			
-			% Gli handler sono posizionati esattamente sotto i loro mapper
 			\umlclass[x=-4.5, y=10]{ExceptionHandler}
 			{}
 			{+ toResponse(Throwable) : Response}
@@ -389,7 +576,6 @@ Implementing multiple specialized mappers instead of a single general safety net
 			{}
 			{+ toResponse(Throwable) : Response}
 			
-			% --- RELAZIONI (Linee dritte e pulite) ---
 			\umlinherit[geometry=|-|, anchor1=30, anchor2=-50]{ExceptionHandler}{ExceptionMapper<Throwable>}
 			\umlinherit{InvalidFormatExceptionHandler}{ExceptionMapper<InvalidFormat>}
 			\umlinherit{JsonParseExceptionHandler}{ExceptionMapper<JsonParseException>}
@@ -401,6 +587,15 @@ Implementing multiple specialized mappers instead of a single general safety net
 	\label{UML-exceptin-handling}
 	\caption{UML class diagram of the exception handling package}
 \end{figure}
+
+\paragraph{\textbf{Approach Advantages.}}
+Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
+\begin{itemize}
+	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
+	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
+	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
+	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
+\end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)}
 
