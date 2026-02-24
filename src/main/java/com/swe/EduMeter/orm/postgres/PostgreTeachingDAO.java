@@ -16,7 +16,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
 
     @Override
     public int add(Teaching teaching) {
-        String query = "INSERT INTO Teaching (course_id, professor_id) VALUES (?, ?) RETURNING id";
+        String query = "INSERT INTO Teaching (course_id, professor_id) VALUES (?, ?)";
         List<Object> params = List.of(teaching.getCourseId(), teaching.getProfId());
 
         try {

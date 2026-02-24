@@ -23,7 +23,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
 
     @Override
     public int add(Professor prof) {
-        String query = "INSERT INTO Professor (name, surname) VALUES (?, ?) RETURNING id";
+        String query = "INSERT INTO Professor (name, surname) VALUES (?, ?)";
         List<Object> params = List.of(prof.getName(), prof.getSurname());
 
         try {

@@ -22,6 +22,16 @@ public abstract class PostgreDAO<T> {
     protected abstract T mapRowToObject(ResultSet rs) throws SQLException;
 
 
+    protected ResultSet rawQuery(String query, List<Object> params) throws SQLException {
+        Connection conn = DatabaseManager.getInstance().getConnection();
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.closeOnCompletion();
+        setParams(stmt, params);
+
+        return stmt.executeQuery();
+    }
+
     // Executes a SELECT query and returns a list of mapped objects.
     //
     // Accepting a query String is safe here because this method is protected.
@@ -30,13 +40,7 @@ public abstract class PostgreDAO<T> {
     //
     // The connection is not closed as it's managed by the DatabaseManager.
     protected List<T> selectQuery(String query, List<Object> params) throws SQLException {
-        Connection conn = DatabaseManager.getInstance().getConnection();
-
-        PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.closeOnCompletion();
-        setParams(stmt, params);
-
-        try (ResultSet rs = stmt.executeQuery()) {
+        try (ResultSet rs = rawQuery(query, params)) {
             List<T> results = new ArrayList<>();
             while (rs.next()) {
                 results.add(mapRowToObject(rs));
@@ -49,6 +53,15 @@ public abstract class PostgreDAO<T> {
         return  selectQuery(query, List.of());
     }
 
+    protected int insertQuery(String query, List<Object> params) throws SQLException {
+        try (ResultSet rs = rawQuery(query + " RETURNING id", params)) {
+            if(rs.next()) {
+                return rs.getInt("id");
+            }
+            return 0;
+        }
+    }
+
     //Executes DELETE, UPDATE queries.
     protected void updateQuery(String query, List<Object> params) throws SQLException {
         Connection conn = DatabaseManager.getInstance().getConnection();
@@ -57,21 +70,6 @@ public abstract class PostgreDAO<T> {
             setParams(stmt, params);
 
             stmt.executeUpdate();
-        }
-    }
-
-    protected int insertQuery(String query, List<Object> params) throws SQLException {
-        Connection conn = DatabaseManager.getInstance().getConnection();
-
-        PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.closeOnCompletion();
-        setParams(stmt, params);
-
-        try (ResultSet rs = stmt.executeQuery()) {
-            if(rs.next()) {
-                return rs.getInt(1);
-            }
-            return 0;
         }
     }
 }

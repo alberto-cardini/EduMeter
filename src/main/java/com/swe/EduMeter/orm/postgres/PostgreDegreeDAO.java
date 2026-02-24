@@ -24,7 +24,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
 
     @Override
     public int add(Degree degree) {
-        String query = "INSERT INTO Degree (name, type, school_id) VALUES (?, ?, ?) RETURNING id";
+        String query = "INSERT INTO Degree (name, type, school_id) VALUES (?, ?, ?)";
         List<Object> params = List.of(degree.getName(), degree.getType().toString(), degree.getSchoolId());
 
         try {
