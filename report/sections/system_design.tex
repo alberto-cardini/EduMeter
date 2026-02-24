@@ -369,8 +369,9 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 		
 		\node[relationship](files)[below = of user]{Files} edge node[right] {1} (user);
 		\node[entity](report)[below = of files]{Report} edge node[right] {0..n} (files);
-		\node[pk, label=above:id](reportId)[above left = 0.5cm of report]{} edge (report);
-		\node[attr, label=above:date](reportDate)[left = 0.5 cm of report]{} edge (report);
+		\node[pk, label=left:id](reportId)[above left = 0.5cm of report]{} edge (report);
+		\node[attr, label=left:date](reportDate)[left = 0.5 cm of report]{} edge (report);
+		\node[attr, label=left:comment](reportComment)[below left = 0.5 cm of report]{} edge (report);
 		
 		\node[relationship](writes)[right = of user]{Writes} edge node[above] {1} (user);
 		
@@ -406,6 +407,12 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 		\node[entity](admin)[right = 7cm of user]{Admin};
 		\node[pk, label=right:id](adminId)[above right = 0.5cm of admin]{} edge (admin);
 		\node[attr, label=right:email](adminEmail)[right = 0.5cm of admin]{} edge (admin);
+
+		\node[entity](pinChallenge)[below = 0.7cm of admin]{Pin Challenge};
+		\node[pk, label=right:id](pinChallengeId)[above right][above right = 0.5cm of pinChallenge]{} edge (pinChallenge);
+		\node[attr, label=right:pin](pinChallengePin)[right = 0.5cm of pinChallenge]{} edge (pinChallenge);
+		\node[attr, label=right:expiresAt](pinChallengeExpiresAt)[below right = 0.5cm of pinChallenge]{} edge (pinChallenge);
+		\node[attr, label=right:userHash](pinChallengeUserHash)[below right = 1.5cm and 0.5cm of pinChallenge]{} edge (pinChallenge);
 		
 		% School, degress, course, professor
 		\node[relationship](teaches)[below = 2cm of publishedReview]{Teaches} edge node[right] {0..n} (publishedReview);
@@ -423,8 +430,8 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 		\node[attr, label=left:type](degreeType)[below left = 0.5cm of degree]{} edge (degree);
 		\node[relationship](offers)[above = of degree]{Offers} edge node[right] {1..n} (degree);
 		\node[entity][above = of offers](school){School} edge node[right] {1} (offers);
-		\node[pk, label=left:id](schoolId)[above left = 0.5cm of school]{} edge (school);
-		\node[attr, label=left:name](schoolName)[left = 0.5cm of school]{} edge (school);
+		\node[pk, label=left:id](schoolId)[left = 0.5cm of school]{} edge (school);
+		\node[attr, label=left:name](schoolName)[below left = 0.5cm of school]{} edge (school);
 		
 	\end{tikzpicture}
 	\caption{E-R Model}
