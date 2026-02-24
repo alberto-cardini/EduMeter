@@ -3,7 +3,7 @@
     <module name="EduMeter" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="come.swe.EduMeter.business_logic.controllers.*" />
+        <option name="PATTERN" value="com.swe.EduMeter.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
@@ -12,7 +12,7 @@
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="pattern" />
     <patterns>
-      <pattern testClass="com.swe.EduMeter.business_logic.*Test" />
+      <pattern testClass="com.swe.EduMeter.*Test" />
     </patterns>
     <method v="2">
       <option name="Make" enabled="true" />
