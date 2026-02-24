@@ -9,6 +9,8 @@ public class PinChallenge {
     private Instant expiresAt;
     private boolean admin;
 
+    public PinChallenge() {}
+
     public PinChallenge(Integer id, String pin, String userHash, Instant expiresAt, boolean admin) {
         this.id = id;
         this.pin = pin;

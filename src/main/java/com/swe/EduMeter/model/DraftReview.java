@@ -8,6 +8,8 @@ public class DraftReview extends Review {
     private String rawCourse;
     private String rawProfessor;
 
+    public DraftReview() {}
+
     public DraftReview(Integer id, String creatorHash,
                        String comment, LocalDate date,
                        int enjoyment, int difficulty,

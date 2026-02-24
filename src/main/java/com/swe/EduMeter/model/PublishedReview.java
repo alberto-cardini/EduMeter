@@ -8,6 +8,8 @@ public class PublishedReview extends Review {
 
     private int upvotes = 0;
 
+    public PublishedReview() {}
+
     public PublishedReview(Integer id, String creatorHash,
                            String comment, LocalDate date,
                            int enjoyment, int difficulty,
