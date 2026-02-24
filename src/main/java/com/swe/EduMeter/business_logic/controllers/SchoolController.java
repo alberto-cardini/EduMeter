@@ -2,6 +2,7 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.School;
+import com.swe.EduMeter.model.response.ApiObjectCreated;
 import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.SchoolDAO;
 import jakarta.inject.Inject;
@@ -40,8 +41,9 @@ public class SchoolController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public CreateResponse create(School newSchool) {
-        return new CreateResponse(schoolDAO.add(newSchool));
+    public ApiObjectCreated create(School newSchool) {
+        int id = schoolDAO.add(newSchool);
+        return new ApiObjectCreated(id, "School created");
     }
 
     @DELETE
@@ -75,6 +77,4 @@ public class SchoolController {
 
         return new ApiOk("School updated");
     }
-
-    private record CreateResponse(int id) {}
 }
