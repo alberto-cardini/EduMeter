@@ -9,33 +9,36 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemReportDAO implements ReportDAO {
-    private final ConcurrentHashMap<Integer, Report> inMemStorage = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Report> inMemReportStorage = new ConcurrentHashMap<>();
     private int id = 0;
 
     public InMemReportDAO() {}
 
     @Override
     public Optional<Report> get(int id) {
-        return Optional.ofNullable(inMemStorage.get(id));
+        return Optional.ofNullable(inMemReportStorage.get(id));
     }
 
     @Override
     public List<Report> getAll() {
-        return new ArrayList<>(inMemStorage.values());
+        return new ArrayList<>(inMemReportStorage.values());
     }
 
     @Override
     public int add(Report report) {
-        return 1;
+        report.setId(id);
+        inMemReportStorage.put(id, report);
+
+        return id++;
     }
 
     @Override
     public void update(Report report) {
-
+        inMemReportStorage.replace(report.getId(), report);
     }
 
     @Override
     public void delete(int id) {
-
+        inMemReportStorage.remove(id);
     }
 }
