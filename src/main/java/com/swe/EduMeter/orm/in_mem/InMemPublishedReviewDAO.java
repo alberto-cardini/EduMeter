@@ -1,13 +1,7 @@
 package com.swe.EduMeter.orm.in_mem;
 
-import com.swe.EduMeter.model.Course;
-import com.swe.EduMeter.model.Degree;
-import com.swe.EduMeter.model.PublishedReview;
-import com.swe.EduMeter.model.Teaching;
-import com.swe.EduMeter.orm.CourseDAO;
-import com.swe.EduMeter.orm.DegreeDAO;
-import com.swe.EduMeter.orm.PublishedReviewDAO;
-import com.swe.EduMeter.orm.TeachingDAO;
+import com.swe.EduMeter.model.*;
+import com.swe.EduMeter.orm.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,6 +61,11 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
 
     @Override
     public int add(PublishedReview review) {
+        new InMemDAOFactory()
+                .getTeachingDAO()
+                .get(review.getTeachingId())
+                .orElseThrow(() -> new RuntimeException("Invalid teachingId"));
+
         review.setId(id);
         inMemPublishedReviewStorage.put(id, review);
         inMemUpvoteStorage.put(id, ConcurrentHashMap.newKeySet());
@@ -92,8 +91,16 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
 
     @Override
     public void delete(int id) {
+        ReportDAO reportDAO = new InMemDAOFactory().getReportDAO();
+
         inMemPublishedReviewStorage.remove(id);
         inMemUpvoteStorage.remove(id);
+
+        for (Report r: reportDAO.getAll()) {
+            if (r.getReviewId().equals(id)) {
+                reportDAO.delete(r.getId());
+            }
+        }
     }
 
     private PublishedReview addComputedProperties(PublishedReview review, String userHash) {

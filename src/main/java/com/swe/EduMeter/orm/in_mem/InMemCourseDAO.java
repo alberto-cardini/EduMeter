@@ -2,8 +2,10 @@ package com.swe.EduMeter.orm.in_mem;
 
 import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.model.Teaching;
 import com.swe.EduMeter.orm.CourseDAO;
 import com.swe.EduMeter.orm.DegreeDAO;
+import com.swe.EduMeter.orm.TeachingDAO;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +17,12 @@ public class InMemCourseDAO implements CourseDAO {
     private int id = 0;
 
     public InMemCourseDAO() {
-        add(new Course(null, "algorithms-and-data-structures", 0));
-        add(new Course(null, "statistics", 0));
-        add(new Course(null, "diritto-privato", 1));
-        add(new Course(null, "diritto-penale", 1));
-        add(new Course(null, "anatomy", 2));
-        add(new Course(null, "neurology", 2));
+        add(new Course(null, "Algorithms and Data Structures", 0));
+        add(new Course(null, "Statistics", 0));
+        add(new Course(null, "Diritto privato", 1));
+        add(new Course(null, "Diritto penale", 1));
+        add(new Course(null, "Anatomy", 2));
+        add(new Course(null, "Neurology", 2));
     }
 
     @Override
@@ -28,7 +30,8 @@ public class InMemCourseDAO implements CourseDAO {
         new InMemDAOFactory()
                 .getDegreeDAO()
                 .get(course.getDegreeId())
-                .orElseThrow(() -> new RuntimeException("Invalid degreeId in the course init JSON"));
+                .orElseThrow(() -> new RuntimeException("Invalid degreeId"));
+
         course.setId(id);
         inMemStorage.put(id++, course);
         return course.getId();
@@ -47,6 +50,12 @@ public class InMemCourseDAO implements CourseDAO {
     @Override
     public void delete(int id){
         inMemStorage.remove(id);
+
+        TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
+
+        for (Teaching t: teachingDAO.getByCourse(id)) {
+            teachingDAO.delete(t.getId());
+        }
     }
 
     @Override

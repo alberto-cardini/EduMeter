@@ -43,6 +43,12 @@ public class InMemProfDAO implements ProfDAO {
     @Override
     public void delete(int id) {
         inMemStorage.remove(id);
+
+        TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
+
+        for (Teaching t: teachingDAO.getByProf(id)) {
+            teachingDAO.delete(t.getId());
+        }
     }
 
     @Override

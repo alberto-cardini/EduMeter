@@ -15,9 +15,9 @@ public class InMemSchoolDAO implements SchoolDAO {
     private int id = 0;
 
     public InMemSchoolDAO() {
-        add(new School(null, "school-of-engineering"));
-        add(new School(null, "school-of-law"));
-        add(new School(null, "medical-school"));
+        add(new School(null, "School of Engineering"));
+        add(new School(null, "School of Law"));
+        add(new School(null, "Medical School"));
     }
 
     @Override

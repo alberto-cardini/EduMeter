@@ -2,10 +2,8 @@ package com.swe.EduMeter.orm.in_mem;
 
 import com.swe.EduMeter.model.Course;
 import com.swe.EduMeter.model.Degree;
-import com.swe.EduMeter.model.School;
 import com.swe.EduMeter.orm.CourseDAO;
 import com.swe.EduMeter.orm.DegreeDAO;
-import com.swe.EduMeter.orm.SchoolDAO;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +15,9 @@ public class InMemDegreeDAO implements DegreeDAO {
     private int id = 0;
 
     public InMemDegreeDAO() {
-        add(new Degree(null, "computer-engineering", Degree.Type.Bachelor, 0));
-        add(new Degree(null, "law", Degree.Type.Bachelor, 1));
-        add(new Degree(null, "medicine", Degree.Type.Master, 2));
+        add(new Degree(null, "Computer Engineering", Degree.Type.Bachelor, 0));
+        add(new Degree(null, "Law", Degree.Type.Bachelor, 1));
+        add(new Degree(null, "Medicine", Degree.Type.Master, 2));
     }
 
     @Override
@@ -27,7 +25,8 @@ public class InMemDegreeDAO implements DegreeDAO {
         new InMemDAOFactory()
                 .getSchoolDAO()
                 .get(degree.getSchoolId())
-                .orElseThrow(() -> new RuntimeException("Invalid schoolId in the degree init JSON"));
+                .orElseThrow(() -> new RuntimeException("Invalid schoolId"));
+
         degree.setId(id);
         inMemStorage.put(id++, degree);
         return degree.getId();

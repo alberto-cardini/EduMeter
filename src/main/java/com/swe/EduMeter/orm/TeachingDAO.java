@@ -9,6 +9,6 @@ public interface TeachingDAO {
     int add(Teaching teaching);
     Optional<Teaching> get(int id);
     List<Teaching> getByCourse(int courseId);
-    List<Teaching> getByProf(int courseId);
+    List<Teaching> getByProf(int profId);
     void delete(int id);
 }

@@ -26,6 +26,11 @@ public class InMemReportDAO implements ReportDAO {
 
     @Override
     public int add(Report report) {
+        new InMemDAOFactory()
+                .getPublishedReviewDAO()
+                .get(report.getReviewId(), null)
+                .orElseThrow(() -> new RuntimeException("Invalid reportId"));
+
         report.setId(id);
         inMemReportStorage.put(id, report);
 
