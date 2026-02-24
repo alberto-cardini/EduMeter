@@ -86,9 +86,40 @@ public class CourseController {
     }
 
     @GET
-    @Path("/{course_id}/teachings")
+    @Path("/{course_id}/teaching")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Teaching> listTeachings(@PathParam("course_id") int courseId) {
         return teachingDAO.getByCourse(courseId);
     }
+
+    @POST
+    @Path("/{course_id}/teaching")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
+    public ApiObjectCreated addTeaching(@PathParam("course_id") int courseId,
+                                        AddTeachingBody body) {
+        if (body.profId() == null) {
+            throw new BadRequestException("profId must be set");
+        }
+
+        int teachingId = teachingDAO.add(new Teaching(null, courseId, body.profId()));
+
+        return new ApiObjectCreated(teachingId, "Added teacher to course");
+    }
+
+    @DELETE
+    @Path("/{course_id}/teaching/{teaching_id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AdminGuard
+    public ApiOk removeTeaching(@PathParam("course_id") int ignored,
+                                @PathParam("teaching_id") int teachingId) {
+        teachingDAO.get(teachingId).orElseThrow(() -> new NotFoundException("Teaching not found"));
+        teachingDAO.delete(teachingId);
+
+        return new ApiOk("Removed teacher from course");
+    }
+
+    private record AddTeachingBody(Integer profId) {}
 }

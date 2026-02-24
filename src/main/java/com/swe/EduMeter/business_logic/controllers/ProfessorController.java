@@ -72,7 +72,7 @@ public class ProfessorController {
     }
 
     @GET
-    @Path("/{prof_id}/teachings")
+    @Path("/{prof_id}/teaching")
     @Produces
     public List<Teaching> listTeachings(@PathParam("prof_id") int profId) {
         return teachingDAO.getByProf(profId);
