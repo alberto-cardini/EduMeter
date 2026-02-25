@@ -13,7 +13,73 @@
 \usepackage{hyperref}
 \usepackage{multicol}
 \usepackage{styles/tikz-uml}
+\definecolor{UMLDarkGray}{RGB}{80, 80, 80}
 
+% --- RESTYLING MINIMALE COMPLETO (Classi e Use Case) ---
+\definecolor{UMLDarkGray}{RGB}{60, 60, 60}
+
+\makeatletter
+\tikzset{
+	% --- STILE GENERALE CLASSI ---
+	every umlclass/.append style={
+		fill=white,
+		draw=UMLDarkGray,
+		line width=0.8pt,
+		sharp corners,                % Forza angoli vivi
+		font=\small\sffamily,
+		drop shadow={opacity=0.1, shadow xshift=0.3ex, shadow yshift=-0.3ex}
+	},
+	% --- STILE USE CASE (Ellissi e Attori) ---
+	umlusecase/.append style={
+		fill=white,
+		draw=UMLDarkGray,
+		line width=0.8pt,
+		font=\small\sffamily,
+		drop shadow={opacity=0.1}
+	},
+	umlactor/.append style={
+		draw=UMLDarkGray,
+		line width=1pt,
+		fill=white
+	},
+	% --- STILE CONTENITORI (Package e System Boundary) ---
+	every umlpackage/.append style={
+		fill=grey!20, 
+		draw=UMLDarkGray,
+		line width=1pt,
+		sharp corners,
+		font=\small\bfseries\sffamily
+	},
+	% --- STILE RELAZIONI E FRECCE ---
+	every umlrelation/.append style={
+		draw=UMLDarkGray,
+		line width=0.6pt,
+		>=Stealth,
+		font=\footnotesize\sffamily
+	},
+	every tikzumlarrow/.style={
+		fill=UMLDarkGray,
+		draw=UMLDarkGray
+	},
+	% --- NOTE ---
+	every umlnote/.append style={
+		fill=white,
+		draw=gray!50,
+		sharp corners,
+		font=\footnotesize\itshape
+	}
+}
+
+% Reset dei parametri interni di tikz-uml per bypassare i default del pacchetto
+\tikzumlset{
+	fill class=white, 
+	fill usecase=white, 
+	fill package=grey!20, 
+	fill note=white,
+	draw=UMLDarkGray
+}
+\makeatother
+\usepackage{pdflscape}
 \usepackage[defaultsans]{lato} 
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{microtype}                
@@ -56,8 +122,6 @@
 	before skip=2em, 
 	after skip=5em
 }
-
-
 
 \title{EduMeter technical report}
 

@@ -1,121 +1,36 @@
 \section{Implementation Details}
 
-This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}).
+This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}). \\
+
+The implementation phase followed a this approach: use cases were first mapped to a domain model, followed by the design of the business logic. This design-first methodology ended in the final implementation using the Java programming language.
+
+\subsection{Project Dependencies}
+
+The platform relay on several external technologies to operate properly. The choice of these dependencies has been made following the current industrial standard for each one of the components. Particular attention has also been given to the ease of use and maintainability.
+
+\begin{itemize}
+	\item \textbf{Maven}: used as build and management tool for the project. 
+	\item \textbf{Jakarta RESTful Web Services}: employed as the project's RESTful API specification. 
+	\begin{itemize}
+		\item \textbf{Jersey}: framework used as core implementation for the jakarta specification, specifically utilizing the jersey-container-servlet module.
+		\item \textbf{HK2}: dependency injection engine that manages the lifecycle of Jersey resources and services.
+		\item \textbf{Jackson}: handle the serialization and deserialization of Java objects (POJOs) to JSON format.
+	\end{itemize}
+	\item \textbf{JDBC}: API used for persistent data handling. This allows the Jersey-based backend to perform CRUD operations against the relational database.
+	\begin{itemize}
+		\item \textbf{PostgreSQL}: concrete implementation of the DB.
+	\end{itemize}
+	\item \textbf{JUnit Jupiter}: main testing framework. Provides an easy and clear interface to create and run test on the code base.
+	\item \textbf{Mockito}: library used with JUnit to isolate components by creating "stubs" or "mocks" of complex dependencies, such as database connectors. 
+\end{itemize}
+
+\noindent The project is configured to use Java 17 as the compilation target.
 
 \subsection{Domain Model}
 
-The domain model is that part of the projects that concerns the entity representation in the code base. Each class in responsible for maintaining its own data consistency and display a practical and fast collection of methods to the client in order to interact with it safely.  
+The domain model is that part of the projects that concerns the entity representation in the code base. Each class in responsible for maintaining its own data consistency and displaying a practical and fast interface to provide the client with a safe and reliable experience. The complete UML class diagram is reported at Figure \ref{UML-domain-model}.
 
-\begin{figure}
-	\centering
-	\begin{tikzpicture}[scale=0.7, transform shape]
-		
-		% first column (from left to right)
-		\umlclass[width=5cm]{User}{
-			\begin{tabular}{@{} l l @{}}
-				-- hash       		& : String \\ % it is the hash related to the user.
-				-- banned   		& : Boolean 
-			\end{tabular}
-		}{}
-		
-		\umlclass[below=3cm of User, width=5cm]{Admin}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : Integer \\
-				-- email    & : String
-			\end{tabular}
-		}{}
-		
-		\umlclass[below=3cm of Admin, width=5cm]{Report}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : Integer \\
-				-- issuerId & : Integer \\
-				-- status   & : ReportStatus \\
-				-- reviewId & : Integer
-			\end{tabular}
-		}{}
-		
-		\umlenum[below=2.5cm of Report]{ReportStatus}{
-			Pending \\ Accepted \\ Rejected
-		}
-		
-		% second column
-		\umlclass[right=3cm of User, width=6cm]{Review}{
-			\begin{tabular}{@{} l l @{}}
-				-- id          & : Integer   \\
-				-- creatorHash & : String    \\
-				-- courseId    & : Intger    \\
-				-- professorId & : Integer	 \\
-				-- date        & : LocalDate \\
-				-- enjoyment   & : Integer   \\
-				-- difficulty  & : Integer   \\
-				-- comment     & : String    \\
-				-- up-votes    & : Integer   \\
-				-- status      & : ReviewStatus \\
-			\end{tabular}
-		}{
-			\begin{tabular}{@{} l l @{}}
-				-- check\_enjoyment() \\
-				-- check\_difficulty()
-			\end{tabular}
-		}
-		
-		\umlclass[below=4cm of Review, width=6cm]{Professor}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : int       \\
-				-- name     & : string    \\
-				-- surname  & : string    
-			\end{tabular}
-		}{}
-		
-		% third column
-		\umlenum[right=4cm of Review]{DegreeType}{
-			Bachelor \\ Master
-		}
-		
-		\umlclass[below=2.5cm of DegreeType]{School}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- name     & : string
-			\end{tabular}
-		}{}
-		
-		\umlclass[below=2.5cm of School, width=5cm]{Degree}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- name     & : string \\
-				-- school   & : School \\
-				-- type     & : DegreeType
-			\end{tabular}
-		}{}
-		
-		\umlclass[below=2.5cm of Degree, width=5cm]{Course}{
-			\begin{tabular}{@{} l l @{}}
-				-- id       & : int \\
-				-- name     & : string \\
-				-- degree   & : Degree 
-			\end{tabular}
-		}{}
-		
-		\umlcompo{Degree}{Course}
-		\umlcompo{School}{Degree}
-		\umlcompo[geometry=-|-, arm1=-1.2cm, anchor1=west, anchor2=west]{User}{Report}
-		\umlcompo[geometry=-|-, anchor1 = 160]{School}{Review}
-		\umlcompo[geometry=-|-]{Degree}{Review}
-		\umlcompo[geometry=-|-, anchor1 =-160]{Course}{Review}
-		\umlcompo[geometry=-|-]{User}{Review}
-		\umlcompo{Professor}{Review}
-		
-		\umluniassoc[geometry=-|-, arm1=1.2cm, anchor1=east, anchor2=east]{Degree}{DegreeType}
-		\umluniassoc{Report}{ReportStatus}
-		
-	\end{tikzpicture}
-	\caption{UML class diagram}
-	\label{UML-domain-model}
-\end{figure}
-
-\clearpage
-
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
 		\begin{umlpackage}{model}
@@ -201,7 +116,7 @@ The domain model is that part of the projects that concerns the entity represent
 				\end{tabular}
 			}
 			
-			\umlclass[below=1cm of Report]{Pin}{
+			\umlclass[below=1cm of Report]{PinChallenge}{
 				\begin{tabular}{@{} l l @{}}
 					-- id & : Integer \\
 					-- pin & : String \\
@@ -216,10 +131,10 @@ The domain model is that part of the projects that concerns the entity represent
 				\end{tabular}
 			}
 			
-			\umlclass[below=1cm of Pin, type=record]{Token}{
+			\umlclass[below=1cm of PinChallenge, type=record]{Token}{
 				\begin{tabular}{@{} l l @{}}
 					-- userHash & : String \\
-					-- expiresAt & : Instant \\
+					-- expiresAt & : long \\
 					-- isAdmin & : boolean   
 				\end{tabular}
 			}{}
@@ -309,11 +224,15 @@ The domain model is that part of the projects that concerns the entity represent
 		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{DraftedReview}{Review}
 		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{PublishedReview}{Review}
 	\end{tikzpicture}
+	\caption{UML class diagram of the domain model}
+	\label{UML-domain-model}
 \end{figure}
+
+\paragraph{\textbf{Resemblance with the ER model.}} The classes has been designed to align almost perfectly with their counter part in the database, simplifying and speeding up the DB queries. Composition, in other words, nested objects, are entirely avoided using the object's DB IDs.  
 
 \subsection{Business Logic}
 
-This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. 
+This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. These three packages actively engage with each other and with the ORM, which will be explored in section \ref{ORM-section}.
 
 \subsubsection{Authentication and Authorization Service}
 In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control without the need for server-side session state. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided.
@@ -451,7 +370,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[x=2, y=-11]{ReportController}{
+			\umlclass[x=4, y=-12]{ReportController}{
 				\begin{tabular}{@{} l l @{}}
 					-- reportDAO & : ReportDAO \\
 					-- userDAO & : UserDAO
@@ -501,13 +420,23 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=0.5cm of ReportController]{ProfessorController}{
-				
+			\umlclass[right=2cm of ReportController]{ProfessorController}{
+				\begin{tabular}{@{} l l @{}}
+					-- profDAO & : ProfDAO \\
+					-- teachingDAO & : TeachingDAO
+				\end{tabular}
 			}{
-				
+				\begin{tabular}{@{} l l @{}}
+					+ search(String, Integer) & : List<Professor> \\
+					+ get(int) & : Professor \\
+					+ create(Professor) & : ApiObjectCreated \\
+					+ delete(int) & : ApiOk \\
+					+ update(Professor) & : ApiOk \\
+					+ listTeachings(int) & : List<Teaching>
+				\end{tabular}
 			}
 			
-			\umlclass[x=3,y=-16]{PublishedReviewController}{
+			\umlclass[x=3,y=-18]{PublishedReviewController}{
 				+ publishedReviewDAO : PublishedReviewDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -520,10 +449,15 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftedReviewController}{
-				
+			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftReviewController}{
+				-- reviewDAO : DraftReviewDAO
 			}{
-				
+				\begin{tabular}{@{} l l @{}}
+					+ getAll() & : List<DraftReview> \\
+					+ get(int) &  : DraftReview \\
+					+ publish(DraftReview, SecurityContext) & : ApiObjectCreated \\
+					+ delete(int) & : ApiOk
+				\end{tabular}
 			}
 			
 		\end{umlpackage}
@@ -597,9 +531,51 @@ Implementing multiple specialized mappers instead of a single general safety net
 	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
 \end{itemize}
 
-\subsection{Object-Relation Mapper (ORM)}
+\subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
 
 \subsubsection{DAO Interfaces}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=0.7, transform shape]
+		\begin{umlpackage}{ORM}
+			\umlclass[type=interface]{DAOFactory}{}{
+				\begin{tabular}{@{} l l @{}}
+					... & ... \\
+					+ getDegreeDAO() & : DegreeDAO \\
+					... & ...
+				\end{tabular}
+			}
+			\umlclass[type=interface, right=3.5cm of DAOFactory]{AdminDAO}{}{
+				\begin{tabular}{@{} l l @{}}
+					+ get(int) & : Optional<Admin> \\
+					+ getByEmail(String) & : Optional<Admin> \\
+					+ getAll() & : List<Admin> \\
+					+ delete(int) & : void \\
+					+ add(Admin) & : int 
+				\end{tabular}
+			}
+			\umlclass[x=7.5, y=-5]{InMemAdminDAO}{}{}
+			\umlclass[right=2.16cm of InMemAdminDAO]{PostgreAdminDAO}{}{}
+			
+			\umlclass[type=interface, x=7.5, y=-8]{InMemDAOFactory}{}{}
+			\umlclass[type=interface, right=2cm of InMemDAOFactory]{PostgreDAOFactory}{}{}
+			
+		\end{umlpackage}
+		
+		\umldep[geometry=|-|]{InMemDAOFactory}{InMemAdminDAO}
+		\umldep[geometry=|-|]{PostgreDAOFactory}{PostgreAdminDAO}
+		\umldep[anchor1=east, anchor2=west]{DAOFactory}{AdminDAO}
+		
+		\umlinherit[geometry=|-|, arm1=1, anchor1=north]{InMemAdminDAO}{AdminDAO}
+		\umlinherit[geometry=|-|, arm1=1, anchor1=north]{PostgreAdminDAO}{AdminDAO}
+		
+		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.3]{InMemDAOFactory}{DAOFactory}
+		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.3]{PostgreDAOFactory}{DAOFactory}
+	\end{tikzpicture}
+	\caption{Partial UML class diagram of the ORM package. This diagram display only the portion related to the Admin resource, the part referred to the other resources have the exact layout, therefore, it is omitted.}
+	\label{UML-ORM}
+\end{figure}
 
 \subsubsection{In Memory Storage}
 
