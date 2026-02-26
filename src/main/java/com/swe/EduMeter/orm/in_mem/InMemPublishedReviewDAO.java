@@ -1,21 +1,47 @@
 package com.swe.EduMeter.orm.in_mem;
 
-import com.swe.EduMeter.model.*;
-import com.swe.EduMeter.orm.*;
+import com.swe.EduMeter.model.Course;
+import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.model.PublishedReview;
+import com.swe.EduMeter.model.Report;
+import com.swe.EduMeter.model.Teaching;
+import com.swe.EduMeter.orm.CourseDAO;
+import com.swe.EduMeter.orm.DegreeDAO;
+import com.swe.EduMeter.orm.PublishedReviewDAO;
+import com.swe.EduMeter.orm.ReportDAO;
+import com.swe.EduMeter.orm.TeachingDAO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class InMemPublishedReviewDAO implements PublishedReviewDAO {
-    private final ConcurrentHashMap<Integer, PublishedReview> inMemPublishedReviewStorage = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Set<String>> inMemUpvoteStorage= new ConcurrentHashMap<>();
+    private final Map<Integer, PublishedReview> reviewStore;
+    private final Map<Integer, Set<String>> upvoteStore;
+    private final TeachingDAO teachingDAO;
+    private final CourseDAO courseDAO;
+    private final DegreeDAO degreeDAO;
+    private final ReportDAO reportDAO;
     private int id = 0;
+
+    public InMemPublishedReviewDAO(Map<Integer, PublishedReview> reviewStore,
+                                   Map<Integer, Set<String>> upvoteStore,
+                                   TeachingDAO teachingDAO, CourseDAO courseDAO,
+                                   DegreeDAO degreeDAO, ReportDAO reportDAO) {
+        this.reviewStore = reviewStore;
+        this.upvoteStore = upvoteStore;
+        this.teachingDAO = teachingDAO;
+        this.courseDAO = courseDAO;
+        this.degreeDAO = degreeDAO;
+        this.reportDAO = reportDAO;
+    }
+
     @Override
     public Optional<PublishedReview> get(int id, String userHash) {
-        return Optional.ofNullable(inMemPublishedReviewStorage.get(id))
+        return Optional.ofNullable(reviewStore.get(id))
                         .map(r -> addComputedProperties(r, userHash));
     }
 
@@ -24,13 +50,12 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
                                         Integer courseId, Integer professorId,
                                         String userHash) {
 
-        return inMemPublishedReviewStorage.values()
+        return reviewStore.values()
                 .stream()
                 .filter(r -> {
                     if (schoolId == null && degreeId == null &&
                         courseId == null && professorId == null) return true;
 
-                    TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
                     Teaching t = teachingDAO.get(r.getTeachingId())
                                             .orElseThrow(() -> new RuntimeException("Invalid teachingId"));
 
@@ -38,14 +63,12 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
                     if (!t.getCourseId().equals(courseId)) return false;
 
                     if (degreeId != null) {
-                        CourseDAO courseDAO = new InMemDAOFactory().getCourseDAO();
                         Course c = courseDAO.get(t.getCourseId())
                                             .orElseThrow(() -> new RuntimeException("Invalid courseId"));
 
                         if (!degreeId.equals(c.getDegreeId())) return false;
 
                         if (schoolId != null) {
-                            DegreeDAO degreeDAO = new InMemDAOFactory().getDegreeDAO();
                             Degree d = degreeDAO.get(c.getDegreeId())
                                                 .orElseThrow(() -> new RuntimeException("Invalid degreeId"));
 
@@ -61,26 +84,25 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
 
     @Override
     public int add(PublishedReview review) {
-        new InMemDAOFactory()
-                .getTeachingDAO()
-                .get(review.getTeachingId())
-                .orElseThrow(() -> new RuntimeException("Invalid teachingId"));
+        teachingDAO
+            .get(review.getTeachingId())
+            .orElseThrow(() -> new RuntimeException("Invalid teachingId"));
 
         review.setId(id);
-        inMemPublishedReviewStorage.put(id, review);
-        inMemUpvoteStorage.put(id, ConcurrentHashMap.newKeySet());
+        reviewStore.put(id, review);
+        upvoteStore.put(id, ConcurrentHashMap.newKeySet());
 
         return id++;
     }
 
     @Override
     public void update(PublishedReview review) {
-        inMemPublishedReviewStorage.replace(review.getId(), review);
+        reviewStore.replace(review.getId(), review);
     }
 
     @Override
     public void toggleUpvote(int id, String userHash) {
-        Set<String> upvotes = inMemUpvoteStorage.get(id);
+        Set<String> upvotes = upvoteStore.get(id);
 
         if (upvotes.contains(userHash)) {
             upvotes.remove(userHash);
@@ -91,10 +113,8 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
 
     @Override
     public void delete(int id) {
-        ReportDAO reportDAO = new InMemDAOFactory().getReportDAO();
-
-        inMemPublishedReviewStorage.remove(id);
-        inMemUpvoteStorage.remove(id);
+        reviewStore.remove(id);
+        upvoteStore.remove(id);
 
         for (Report r: reportDAO.getAll()) {
             if (r.getReviewId().equals(id)) {
@@ -104,7 +124,7 @@ public class InMemPublishedReviewDAO implements PublishedReviewDAO {
     }
 
     private PublishedReview addComputedProperties(PublishedReview review, String userHash) {
-        Set<String> upvotes = inMemUpvoteStorage.get(id);
+        Set<String> upvotes = upvoteStore.get(id);
         review.setUpvotes(upvotes.size());
         if (userHash != null) {
             review.setIsUpvotedByUser(upvotes.contains(userHash));

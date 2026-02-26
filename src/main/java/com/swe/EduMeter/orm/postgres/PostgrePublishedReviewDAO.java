@@ -26,7 +26,6 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
 
     @Override
     public Optional<PublishedReview> get(int id, String userHash) {
-
         String query = """
                 SELECT pr.*,
                     (SELECT count(*) FROM Up_vote WHERE review_id = pr.id) AS upvotes_count,
@@ -123,7 +122,6 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
 
     @Override
     public List<PublishedReview> search(Integer schoolId, Integer degreeId, Integer courseId, Integer professorId, String userHash) {
-
         StringBuilder query = new StringBuilder("""
                 SELECT pr.*,
                 (SELECT count(*) FROM Up_vote WHERE review_id = r.id) AS upvotes_count

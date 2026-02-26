@@ -6,45 +6,46 @@ import com.swe.EduMeter.orm.ProfDAO;
 import com.swe.EduMeter.orm.TeachingDAO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class InMemProfDAO implements ProfDAO {
-    private final ConcurrentHashMap<Integer, Professor> inMemStorage = new ConcurrentHashMap<>();
+    private final Map<Integer, Professor> store;
+    private final TeachingDAO teachingDAO;
     private int id = 0;
 
-    public InMemProfDAO() {
-        add(new Professor(null, "Alberto", "Cardini"));
-        add(new Professor(null, "Lorenzo", "Bellina"));
-        add(new Professor(null, "Carolina", "Cecchi"));
-        add(new Professor(null, "Marco", "Bertini"));
-        add(new Professor(null, "Fabio", "Corradi"));
-        add(new Professor(null, "Alessandro", "Piva"));
+    public InMemProfDAO(Map<Integer, Professor> store, TeachingDAO teachingDAO) {
+        this.store = store;
+        this.teachingDAO = teachingDAO;
+        //add(new Professor(null, "Alberto", "Cardini"));
+        //add(new Professor(null, "Lorenzo", "Bellina"));
+        //add(new Professor(null, "Carolina", "Cecchi"));
+        //add(new Professor(null, "Marco", "Bertini"));
+        //add(new Professor(null, "Fabio", "Corradi"));
+        //add(new Professor(null, "Alessandro", "Piva"));
     }
 
     @Override
     public int add(Professor prof) {
         prof.setId(id);
-        inMemStorage.put(id++, prof);
+        store.put(id++, prof);
         return prof.getId();
     }
 
     @Override
     public Optional<Professor> get(int id) {
-        return Optional.ofNullable(inMemStorage.get(id));
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public void update(Professor prof) {
-        inMemStorage.replace(prof.getId(), prof);
+        store.replace(prof.getId(), prof);
     }
 
     @Override
     public void delete(int id) {
-        inMemStorage.remove(id);
-
-        TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
+        store.remove(id);
 
         for (Teaching t: teachingDAO.getByProf(id)) {
             teachingDAO.delete(t.getId());
@@ -56,8 +57,6 @@ public class InMemProfDAO implements ProfDAO {
         final List<Integer> allowProfessors;
 
         if (courseId != null) {
-            TeachingDAO teachingDAO = new InMemDAOFactory().getTeachingDAO();
-
             // Get distinct professors which teach the course
             allowProfessors = teachingDAO.getByCourse(courseId)
                                           .stream()
@@ -68,7 +67,7 @@ public class InMemProfDAO implements ProfDAO {
             allowProfessors = null;
         }
 
-        return inMemStorage.values()
+        return store.values()
                 .stream()
                 .filter(p -> allowProfessors == null || allowProfessors.contains(p.getId()))
                 .filter(p -> {

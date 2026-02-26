@@ -3,27 +3,31 @@ package com.swe.EduMeter.orm.in_mem;
 import com.swe.EduMeter.model.PinChallenge;
 import com.swe.EduMeter.orm.PinChallengeDAO;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemPinChallengeDAO implements PinChallengeDAO {
-    private final ConcurrentHashMap<Integer, PinChallenge> inMemPinStorage = new ConcurrentHashMap<>();
+    private final Map<Integer, PinChallenge> store;
     private int id = 0;
+
+    public InMemPinChallengeDAO(Map<Integer, PinChallenge> store) {
+        this.store = store;
+    }
     @Override
     public Optional<PinChallenge> get(Integer id) {
-        return Optional.ofNullable(inMemPinStorage.get(id));
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public int add(PinChallenge pinChallenge) {
         pinChallenge.setId(id);
-        inMemPinStorage.put(id, pinChallenge);
+        store.put(id, pinChallenge);
 
         return id++;
     }
 
     @Override
     public void delete(int id) {
-        inMemPinStorage.remove(id);
+        store.remove(id);
     }
 }

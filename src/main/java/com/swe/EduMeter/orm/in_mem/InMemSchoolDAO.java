@@ -6,46 +6,45 @@ import com.swe.EduMeter.orm.SchoolDAO;
 import com.swe.EduMeter.model.School;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class InMemSchoolDAO implements SchoolDAO {
-    private final ConcurrentHashMap<Integer, School> inMemStorage = new ConcurrentHashMap<>();
+    private final Map<Integer, School> store;
+    private final DegreeDAO degreeDAO;
     private int id = 0;
 
-    public InMemSchoolDAO() {
-        add(new School(null, "School of Engineering"));
-        add(new School(null, "School of Law"));
-        add(new School(null, "Medical School"));
+    public InMemSchoolDAO(Map<Integer, School> store, DegreeDAO degreeDAO) {
+        this.store = store;
+        this.degreeDAO = degreeDAO;
+        //add(new School(null, "School of Engineering"));
+        //add(new School(null, "School of Law"));
+        //add(new School(null, "Medical School"));
     }
 
     @Override
     public int add(School school) {
         school.setId(id);
-        inMemStorage.put(id, school);
+        store.put(id, school);
         id++;
 
         return school.getId();
     }
     @Override
     public Optional<School> get(int id) {
-        return Optional.ofNullable(inMemStorage.get(id));
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public void update(School school) {
-        inMemStorage.put(school.getId(), school);
+        store.replace(school.getId(), school);
     }
 
     @Override
     public void delete(int id){
-        inMemStorage.remove(id);
+        store.remove(id);
 
-        DegreeDAO degreeDAO = new InMemDAOFactory().getDegreeDAO();
-
-        // InMemDAOFactory returns references to static DAOs. This is
-        // useful to replicate DB behaviours, like cascade deletion.
         List<Degree> degrees = degreeDAO.search(null, id);
 
         for (Degree d: degrees) {
@@ -55,7 +54,7 @@ public class InMemSchoolDAO implements SchoolDAO {
 
     @Override
     public List<School> search(String pattern) {
-        return inMemStorage.values()
+        return store.values()
                 .stream()
                 // filter by pattern (if pattern exists)
                 .filter(s -> pattern == null || s.getName().toLowerCase().contains(pattern.toLowerCase()))
