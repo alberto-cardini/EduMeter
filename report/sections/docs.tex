@@ -1,1 +1,85 @@
-\section{Documentation}
+\section{API Endpoint Documentation}
+The EduMeter REST API uses standard HTTP methods to perform CRUD operations. Access levels are strictly enforced via the \texttt{@AdminGuard} and \texttt{@AuthGuard} filters.
+
+\subsection{Authentication (\texttt{/auth})}
+\begin{description}
+	\item[\POST \quad \texttt{/auth/sendPin}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Description:} Initiates the login process by accepting an email and an \texttt{admin} boolean. It validates the email domain (enforcing \texttt{@edu.unifi.it} for students) and generates a 4-digit PIN challenge. Returns a \texttt{challengeId} for the next step.
+	
+	\item[\POST \quad \texttt{/auth/login}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Description:} Completes the identity challenge. Validates the provided \texttt{pin} against the \texttt{challengeId}. If successful, it returns a JWT session token for further requests.
+	
+	\item[\POST \quad \texttt{/auth/logout}] \hfill \\
+	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Description:} Invalidates the provided Bearer token by adding it to the server-side revocation list, effectively ending the user session.
+\end{description}
+
+\subsection{School Management (\texttt{/school})}
+\begin{description}
+	\item[\GET \quad \texttt{/school}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Description:} Fetches all university schools. Supports an optional \texttt{query} parameter to filter schools by name.
+	
+	\item[\POST \quad \texttt{/school}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Creates a new School entity. Requires a JSON body containing the school name.
+	
+	\item[\PUT \quad \texttt{/school}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Updates an existing school's details. The school must exist, otherwise returns a 404 error.
+	
+	\item[\DELETE \quad \texttt{/school/\{school\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Deletes a school and its associated data from the persistence layer.
+\end{description}
+
+\subsection{Course and Teaching (\texttt{/course})}
+\begin{description}
+	\item[\GET \quad \texttt{/course}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Description:} Searches for courses based on name query, \texttt{school\_id}, or \texttt{degree\_id}. Used for navigating the academic tree.
+	
+	\item[\POST \quad \texttt{/course/\{course\_id\}/teaching}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Creates a link between a professor and a course. This "Teaching" entity allows reviews to be categorized by both subject and instructor.
+	
+	\item[\DELETE \quad \texttt{/course/\{course\_id\}/teaching/\{t\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Removes a professor's assignment to a specific course.
+\end{description}
+
+\subsection{Review Operations (\texttt{/review})}
+\begin{description}
+	\item[\GET \quad \texttt{/review}] \hfill \\
+	\textbf{Access:} Mixed (Public / Authenticated) \\
+	\textbf{Description:} Retrieves published reviews. If the request includes a valid Auth token, the response includes a \texttt{voted} boolean for each review, indicating if the current user has upvoted it.
+	
+	\item[\POST \quad \texttt{/review}] \hfill \\
+	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Description:} Submits a new review. The system extracts the user's identity hash from the token and ignores any client-provided hash to prevent identity spoofing.
+	
+	\item[\POST \quad \texttt{/review/\{review\_id\}/vote}] \hfill \\
+	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Description:} Toggles an upvote on a review. If the user has already voted, the vote is removed; otherwise, it is added.
+	
+	\item[\DELETE \quad \texttt{/review/\{review\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Permanently removes a review from the platform.
+\end{description}
+
+\subsection{Moderation and User Control (\texttt{/report} \& \texttt{/user})}
+\begin{description}
+	\item[\POST \quad \texttt{/report}] \hfill \\
+	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Description:} Allows a user to flag a review for moderation. The reporter's hash is stored to prevent duplicate reporting while maintaining anonymity.
+	
+	\item[\POST \quad \texttt{/report/\{report\_id\}/approve}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} The administrator approves the report, resulting in the automatic deletion of the flagged review and the report itself.
+	
+	\item[\POST \quad \texttt{/user/\{user\_hash\}/ban}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Description:} Updates the user's status to "banned." Future authentication attempts for this user hash will be rejected by the \texttt{AuthFilter}.
+\end{description}

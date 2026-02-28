@@ -1,7 +1,7 @@
 \section{Implementation Details}
 This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}). \\
 
-The implementation phase followed a this approach: use cases were first mapped to a domain model, followed by the design of the business logic. This design-first methodology ended in the final implementation using the Java programming language.
+The implementation phase followed this approach: use cases were first mapped to a domain model, followed by the design of the business logic, ending with the persistent relational database. This design-first methodology ended in the final implementation using the Java programming language.
 
 \subsection{Project Dependencies}
 The platform relay on several external technologies to operate properly. The choice of these dependencies has been made following the current industrial standard for each one of the components. Particular attention has also been given to the ease of use and maintainability.
@@ -25,6 +25,7 @@ The platform relay on several external technologies to operate properly. The cho
 \noindent The project is configured to use Java 17 as the compilation target.
 
 \subsection{Project Structure}
+The project has a standard structure divided into two parts: main and test. Both the parts got the same directory layout and file's name scheme \textbf{TODO: WRITE WHY THE STRUCTURE MUST BE SYMMETRIC}. As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
 
 \begin{figure}[h]
 	\small
@@ -55,6 +56,11 @@ The platform relay on several external technologies to operate properly. The cho
 			.4 com.swe.EduMeter.
 			.5 business\_logic.
 			.6 controllers.
+			.6 ....
+			.5 model.
+			.6 ....
+			.5 orm.
+			.6 ....
 		}
 	\end{minipage}
 	\caption{EduMeter Project Directory Structure}
@@ -258,7 +264,7 @@ The domain model is that part of the projects that concerns the entity represent
 		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{DraftedReview}{Review}
 		\umlinherit[geometry=|-|, anchor1=north, anchor2 = south]{PublishedReview}{Review}
 	\end{tikzpicture}
-	\caption{UML class diagram of the domain model}
+	\caption{UML class diagram of the domain model.}
 	\label{UML-domain-model}
 \end{figure}
 
@@ -351,7 +357,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 		\umldep[anchor1=west, anchor2=east, stereo=use]{CryptoService}{Token}
 		\umlimpl[geometry=-|]{AuthFilter}{ContainerRequestFilter}
 	\end{tikzpicture}
-	\caption{UML class diagram of the authentication package}
+	\caption{UML class diagram of the authentication package.}
 	\label{UML-auth}
 \end{figure}
 
@@ -538,7 +544,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 			
 		\end{umlpackage}
 	\end{tikzpicture}
-	\caption{UML class diagram of the resource controllers package}
+	\caption{UML class diagram of the resource controllers package.}
 	\label{UML-controllers}
 \end{figure}
 
@@ -592,7 +598,7 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 		
 	\end{tikzpicture}
 	\label{UML-exceptin-handling}
-	\caption{UML class diagram of the exception handling package}
+	\caption{UML class diagram of the exception handling package.}
 \end{figure}
 
 \paragraph{\textbf{Approach Advantages.}} Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
@@ -762,7 +768,7 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 		\umluniassoc{Published Review}{Teaching}
 
 	\end{tikzpicture}
-	\caption{UML diagram of Database schema}
+	\caption{UML diagram of Database schema.}
 \end{figure}
 
 \subsection{Interface}

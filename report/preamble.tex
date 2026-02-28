@@ -112,6 +112,21 @@
 
 \usepackage{dirtree}
 
+\usepackage{xcolor}
+\definecolor{get-bg}{HTML}{D1E9FF}
+\definecolor{get-text}{HTML}{0056B3}
+\definecolor{post-bg}{HTML}{D4EDDA}
+\definecolor{post-text}{HTML}{155724}
+\definecolor{put-bg}{HTML}{FFF3CD}
+\definecolor{put-text}{HTML}{856404}
+\definecolor{delete-bg}{HTML}{F8D7DA}
+\definecolor{delete-text}{HTML}{721C24}
+
+\newcommand{\GET}{\colorbox{get-bg}{\textcolor{get-text}{\textbf{\texttt{GET}}}}}
+\newcommand{\POST}{\colorbox{post-bg}{\textcolor{post-text}{\textbf{\texttt{POST}}}}}
+\newcommand{\PUT}{\colorbox{put-bg}{\textcolor{put-text}{\textbf{\texttt{PUT}}}}}
+\newcommand{\DELETE}{\colorbox{delete-bg}{\textcolor{delete-text}{\textbf{\texttt{DELETE}}}}}
+
 \makeatother
 \usepackage{pdflscape}
 \usepackage[defaultsans]{lato} 
