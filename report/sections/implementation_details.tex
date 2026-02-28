@@ -1,11 +1,9 @@
 \section{Implementation Details}
-
 This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}). \\
 
 The implementation phase followed a this approach: use cases were first mapped to a domain model, followed by the design of the business logic. This design-first methodology ended in the final implementation using the Java programming language.
 
 \subsection{Project Dependencies}
-
 The platform relay on several external technologies to operate properly. The choice of these dependencies has been made following the current industrial standard for each one of the components. Particular attention has also been given to the ease of use and maintainability.
 
 \begin{itemize}
@@ -21,13 +19,49 @@ The platform relay on several external technologies to operate properly. The cho
 		\item \textbf{PostgreSQL}: concrete implementation of the DB.
 	\end{itemize}
 	\item \textbf{JUnit Jupiter}: main testing framework. Provides an easy and clear interface to create and run test on the code base.
-	\item \textbf{Mockito}: library used with JUnit to isolate components by creating "stubs" or "mocks" of complex dependencies, such as database connectors. 
+	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as database connectors. 
 \end{itemize}
 
 \noindent The project is configured to use Java 17 as the compilation target.
 
-\subsection{Domain Model}
+\subsection{Project Structure}
 
+\begin{figure}[h]
+	\small
+	\begin{minipage}{0.8\textwidth}
+		\dirtree{%
+			.1 src.
+			.2 main.
+			.3 java.
+			.4 com.swe.EduMeter.
+			.5 business\_logic.
+			.6 auth.
+			.7 annotations.
+			.7 filters.
+			.6 controllers.
+			.6 exception\_handlers.
+			.6 MainApplication.class.
+			.5 model.
+			.6 classes.
+			.6 response.
+			.5 orm.
+			.6 in\_mem.
+			.6 postgres.
+			.6 DAO.
+			.3 resources.
+			.4 init.sql.
+			.2 test.
+			.3 java.
+			.4 com.swe.EduMeter.
+			.5 business\_logic.
+			.6 controllers.
+		}
+	\end{minipage}
+	\caption{EduMeter Project Directory Structure}
+	\label{fig:tree}
+\end{figure}
+
+\subsection{Domain Model}
 The domain model is that part of the projects that concerns the entity representation in the code base. Each class in responsible for maintaining its own data consistency and displaying a practical and fast interface to provide the client with a safe and reliable experience. The complete UML class diagram is reported at Figure \ref{UML-domain-model}.
 
 \begin{figure}[H]
@@ -228,25 +262,29 @@ The domain model is that part of the projects that concerns the entity represent
 	\label{UML-domain-model}
 \end{figure}
 
-\paragraph{\textbf{Resemblance with the ER model.}} The classes has been designed to align almost perfectly with their counter part in the database, simplifying and speeding up the DB queries. Composition, in other words, nested objects, are entirely avoided using the object's DB IDs.  
+\paragraph{\textbf{Resemblance with the ER model.}} The classes are designed to align closely with their database counterparts, which simplifies and accelerates DB queries. To maintain this alignment, composition (nested objects) is intentionally avoided; instead, objects reference each other using internal database IDs. This flat structure is reflected in the simplicity of the domain model's UML diagram. (Figure \ref{UML-domain-model}).
+
+\paragraph{\textbf{Review class inheritance.}} The \texttt{Review} class is the core entity of the project. Given its dual nature within EduMeter, it has been divided into two specialized subclasses. The parent class is implemented as an abstract class; it is not intended for polymorphic use, but rather to provide a uniform structure for its children. \texttt{PublishedReview} and \texttt{DraftedReview} are the specific classes utilized by the resource managers.
+
+\paragraph{\textbf{Response interface.}} The \texttt{response} sub-package was created to standardize the management of error messages, object creation confirmations, and system notifications. These records provide a consistent structure for resource manager responses. This allows the controller to select the appropriate message type for an HTTP request result, which is then easily translated by the JSON manager into a legible format.
+
+\paragraph{\textbf{POJOs.}} Many project classes are implemented as POJOs (Plain Old Java Objects) to keep the code simple and easily interpretable by Jackson when deserializing parameters from HTTP requests. Consistency logic is implemented directly within the getters and setters of each class to ensure that field values remain valid.
 
 \subsection{Business Logic}
 
 This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. These three packages actively engage with each other and with the ORM, which will be explored in section \ref{ORM-section}.
 
 \subsubsection{Authentication and Authorization Service}
-In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control without the need for server-side session state. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided.
+In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided in Figure \ref{UML-auth}.
 
-\paragraph{Declarative Security and Name Binding.}
-To secure REST endpoints, the system utilizes a declarative approach through custom annotations, making the code lighter and less repetitive, avoiding boiler plate control sequences. We have created 2 annotations:
+\paragraph{Declarative Security and Name Binding.} To secure REST endpoints, the system utilizes a declarative approach through custom annotations, making the code lighter and less repetitive, avoiding boiler plate control sequences. We have created 2 annotations:
 \begin{itemize}
 	\item \textbf{@AuthGuard}: Applied to resources requiring standard user authentication (e.g up-voting reviews and creating reviews).
 	\item \textbf{@AdminGuard}: Applied to resources restricted to moderators (e.g. draft review and validation, report solving and behavioral countermeasures).
-	\item \textbf{Name Binding}: Both annotations utilize the \texttt{@NameBinding} meta-annotation, allowing the JAX-RS runtime to dynamically associate specific filters with annotated resource methods.
+	\item \textbf{Name Binding}: Both annotations utilize the \texttt{@NameBinding} meta-annotation, allowing JAX-RS to associate specific filters with annotated resource methods.
 \end{itemize}
 
-\paragraph{Request Filtering and Context Injection.}
-The security workflow is managed by two primary providers that intercept incoming traffic:
+\paragraph{Request Filtering and Context Injection.} The security workflow is managed by two primary providers that intercept incoming traffic:
 \begin{itemize}
 	\item \textbf{AuthFilter}: This component intercepts requests marked with \texttt{@AuthGuard}. It extracts the \texttt{Bearer} token (a digital "entry pass" that identifies a user and their permissions automatically, allowing the system to verify them without needing to check a database every time) from the \texttt{Authorization} header and initiates validation through the \texttt{CryptoService}. Upon successful verification, it injects a custom \texttt{SecurityContext} into the request, establishing the user principal and defining roles such as \texttt{ADMIN} or \texttt{BASE}.
 	\item \textbf{AdminFilter}: This filter extends \texttt{AuthFilter} to handle \texttt{@AdminGuard} requirements. It first executes the base authentication logic via \texttt{super.filter()} and then performs a secondary check to ensure the authenticated principal possesses the \texttt{ADMIN} role. Failure to meet this requirement results in a \texttt{ForbiddenException} (HTTP 403).
@@ -257,14 +295,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 \begin{itemize}
 	\item \textbf{JWT Custom Design}: The service implements a simplified version of the JSON Web Token (JWT) concept. To reduce overhead, the standard JWT header is omitted, resulting in a two-part token (instead of three-part) consisting of a Base64-encoded JSON payload and an HMAC-SHA256 signature.
 	\item \textbf{Signature Verification}: Tokens are signed using the \texttt{HmacSHA256} algorithm and a server-side secret. Validation uses \texttt{MessageDigest.isEqual} to compare signatures, providing protection against timing attacks.
-	\item \textbf{User Anonymization}: One of the core EduMeter's features is complete user anonymity, user's sensitive information are never visible to other users nor admins and are never stored directly into the DB. To protect privacy while maintaining database efficiency, the service generates a \texttt{userHash}. This is achieved by computing a 16-byte truncated version of an HMAC-SHA256 hash of the user's email, resulting in a unique 22-character Base64 identifier.
-\end{itemize}
-
-\paragraph{Token Lifecycle and Security Constraints.}
-\begin{itemize}
-	\item \textbf{Expiration}: Tokens are generated with a strict 30-minute validity window.
-	\item \textbf{Revocation}: A \texttt{revokedTokens} set is maintained to handle logout events or compromised tokens. While currently implemented using a \texttt{ConcurrentHashMap}, the service is designed for future migration to a Redis-based key store for persistent, distributed revocation management.
-	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
+	\item \textbf{User Anonymization}: One of the core EduMeter's features is complete user anonymity. User's sensitive information are never visible to other users nor admins and are never stored directly into the DB. To protect privacy while maintaining database efficiency, the service generates a \texttt{userHash}. This is achieved by computing a 16-byte truncated version of an HMAC-SHA256 hash of the user's email, resulting in a unique 22-character Base64 identifier.
 \end{itemize}
 
 \begin{figure}
@@ -324,9 +355,54 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\label{UML-auth}
 \end{figure}
 
-\subsubsection{Resource Controllers}
+\paragraph{Token Lifecycle and Security Constraints.}
+\begin{itemize}
+	\item \textbf{Expiration}: Tokens are generated with a strict 30-minute validity window.
+	\item \textbf{Revocation}: A \texttt{revokedTokens} set is maintained to handle logout events or compromised tokens. While currently implemented using a \texttt{ConcurrentHashMap}, the service is designed for future migration to a Redis-based key store for persistent, distributed revocation management.
+	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
+\end{itemize}
 
-\begin{figure}
+\subsubsection{Resource Controllers} Resource controllers are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction. 
+
+
+\paragraph{\textbf{Single Responsibility Principle.}} The controllers architecture has been designed to respect the single responsibility principle. Consequently, each controller is dedicated to managing only its specific resource, providing the necessary endpoints for user communication. Figure \ref{userControllerCode} demonstrates this approach through the \texttt{UserController} class. As a representative example, each controller is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-controllers}, in each class attributes and in the fact that classes do not interact with each other.
+
+\paragraph{\textbf{Class structure.}} Each class defines a collection of end-points all starting from a common root called \texttt{/source-name} (e.g., \texttt{/user} in this example). The narrower end-points characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
+
+\begin{lstlisting}[language=Java, caption=Example of User controller class, label=userControllerCode]
+	@Path("/user")
+	public class UserController {
+		private final UserDAO userDAO;
+		@Inject
+		public UserController(UserDAO userDAO) {
+			this.userDAO = userDAO;
+		}
+		
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		@AdminGuard
+		public List<User> search(@QueryParam("banned") Boolean banned) {
+			return userDAO.search(banned);
+		}
+		
+		@POST
+		@Path("/{user_hash}/ban")
+		@Produces(MediaType.APPLICATION_JSON)
+		@AdminGuard
+		public ApiOk ban(@PathParam("user_hash") String userHash) {
+			User u = userDAO.get(userHash)
+			.orElseThrow(() -> new NotFoundException("User not found"));
+			u.setBanned(true);
+			
+			userDAO.update(u);
+			
+			return new ApiOk("User banned");
+		}
+		
+	}
+\end{lstlisting}
+
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.6, transform shape]
 		\begin{umlpackage}{controllers}
@@ -466,14 +542,11 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\label{UML-controllers}
 \end{figure}
 
-\subsubsection{Exception Handlers}
-The \textbf{Exception Handlers} package is a fundamental component of the \textit{EduMeter} architecture, responsible for ensuring system robustness and providing a consistent interface for error reporting.
+\subsubsection{Exception Handlers} The \textbf{Exception Handlers} package is a fundamental component of the \textit{EduMeter} architecture, responsible for ensuring system robustness and providing a consistent interface for error reporting.
 
-\paragraph{\textbf{Standardized Error Reporting.}}
-To prevent the leakage of sensitive internal state and to provide a predictable API for client-side consumption, this package intercepts all application-level exceptions and translates them into a standardized JSON format: \texttt{\{"error":"description of the issue"\}}. This mechanism ensures that the backend never returns default HTML error pages.
+\paragraph{\textbf{Standardized Error Reporting.}} To prevent the leakage of sensitive internal state and to provide a predictable API for client-side consumption, this package intercepts all application-level exceptions and translates them into a standardized JSON format: \texttt{\{"error":"description of the issue"\}}. This mechanism ensures that the backend never returns default HTML error pages.
 
-\paragraph{\textbf{Specialized Exception Mappers.}}
-The package utilizes the Jakarta \texttt{ExceptionMapper} interface to provide in-depth control over different error scenarios:
+\paragraph{\textbf{Specialized Exception Mappers.}} The package utilizes the Jakarta \texttt{ExceptionMapper} interface to provide in-depth control over different error scenarios:
 
 \begin{itemize}
 	\item \textbf{Global Exception Handler}: Acts as a universal safety net for any \texttt{Throwable} not caught by more specific mappers. It preserves the HTTP status codes for \texttt{WebApplicationExceptions} while mapping all other unforeseen errors to HTTP 500 (Internal Server Error).
@@ -522,8 +595,7 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 	\caption{UML class diagram of the exception handling package}
 \end{figure}
 
-\paragraph{\textbf{Approach Advantages.}}
-Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
+\paragraph{\textbf{Approach Advantages.}} Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
 \begin{itemize}
 	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
 	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
