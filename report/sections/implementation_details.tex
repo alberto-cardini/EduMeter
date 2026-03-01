@@ -660,112 +660,163 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 \subsubsection{Postgre Remote Storage}
 
 \subsection{Database}
+When the remote storage option is selected, the application relies on a PostgreSQL database to ensure reliable and persistent data storage. This database must be instantiated on the host environment and properly configured to interact seamlessly with the application back-end.
 
-\begin{figure}
+\subsubsection{Connection}
+The connection to the database is managed by a dedicated class: \texttt{DatabaseManager}. This class is structured using the Singleton design pattern to ensure that only a single instance manages database connectivity throughout the application's lifecycle. Access to this instance is controlled via a synchronized \texttt{getInstance()} method, ensuring thread safety even in concurrent environments.
+
+To handle communication with the database, the class provides a \texttt{getConnection()} method. This method optimizes resource usage by first checking if an active connection already exists; if the connection is null or closed, it proceeds to establish a new one.
+ 
+To establish the connection three variable must be set: 
+\begin{itemize}
+	\item \texttt{DB\_URL}: The connection string that tells the JDBC driver where your database is hosted and which specific database instance to connect to. It follows the format:\\ \texttt{jdbc:postgresql://host:port/database\_name}.
+	\item \texttt{DB\_USER}: This is the username of the PostgreSQL account that can access, initialize, and modify the database.
+	\item \texttt{DB\_PASSWORD}: The database password related to the user.
+\end{itemize}
+For security and deployment flexibility, credentials are never hardcoded; instead, they are memorized as environment variable and the \texttt{DatabaseManager} dynamically retrieves them when necessary. If any of these essential variables are missing, the system immediately halts the process by throwing an \texttt{IllegalStateException}. 
+
+Once the environment variables are successfully validated, the manager loads the PostgreSQL JDBC driver (\texttt{org.postgresql.Driver}) and establishes the connection through the \texttt{DriverManager}.
+
+\subsubsection{Structure}
+\paragraph{Initialization}
+When the remote storage option is active and \texttt{PostgreDAOFactory} is instantiated, the database schema is automatically initialized. The factory's constructor triggers an \texttt{initDatabase()} method, which reads an \textit{init.sql} file located in the application's resources folder. The factory requests a connection from the \texttt{DatabaseManager} and executes the script as a single query string.
+
+This automated setup process is inherently safe and idempotent. All queries within the \textit{init.sql} script utilize the \texttt{CREATE TABLE IF NOT EXISTS} clause, ensuring that existing data or structures are never accidentally overwritten if the database has already been configured. 
+
+\paragraph{Implementation}
+The database has been structured following the relational Entity-Relationship schema in Figure \ref{ER model}. The architecture is built around several interconnected core entities:
+\begin{itemize}
+	\item \textbf{Users \& Authentication:} The \texttt{Users} table manages standard accounts (including ban status), while administrative access is handled by the \texttt{Admin} table. Authentication and password recovery rely on a \texttt{Pin} table, which stores temporary codes, their expiration timestamps, and the user's administrative status.
+	\item \textbf{Academic Hierarchy:} The educational structure is represented by linking \texttt{School}, \texttt{Degree}, \texttt{Course}, and \textbf{Professor} tables. A central associative entity, \texttt{Teaching}, acts as a bridge to associate specific professors with specific courses.
+	\item \textbf{Review System:} The core functionality revolves around the \texttt{Published Review} and \texttt{Drafted Review} tables. Published reviews are linked to a specific \texttt{Teaching} instance and a \texttt{User}, storing rating, difficulty, and text comments. Drafts contain similar, though less strictly constrained, information before final submission.
+	\item \textbf{Interaction \& Moderation:} To support community features, an \texttt{Up Vote} table tracks which users have liked specific reviews. Additionally, a \texttt{Report} table allows users to flag problematic reviews, linking the report comment directly to the user and the review in question.
+\end{itemize}
+
+
+\begin{figure}[H]
 	\centering
-	\begin{tikzpicture}
+	\begin{tikzpicture}[scale=0.8, transform shape]
 
-		\umlclass{User}{
-			% The @{} removes extra side padding for a tighter fit
+		\umlclass{Users}{
 			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-					    	& banned      & \textit{boolean}
+				\textbf{PK} & \textbf{id} 	& \textit{char} \\
+							& banned 		& \textit{boolean}
 			\end{tabular}
-		}{}
+		}
 
-
-		\umlclass[below = 1cm of User]{Report}{
+		\umlclass[below = 1cm of Users]{Published Review}{
 			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-					    	& comment     & \textit{varchar} \\
-					    	& date        & \textit{date} \\
-				\textbf{FK} & user\_id    & \textit{int} \\
-				\textbf{FK} & review\_id  & \textit{int}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+				\textbf{FK} & user\_id 		& \textit{int} \\
+							& date			& \textit{date} \\
+				\textbf{FK} & teaching\_id 	& \textit{int} \\
+							& rating		& \textit{int} \\
+							& difficulty  	& \textit{int} \\
+							& comment 		& \textit{text} \\
 			\end{tabular}
-		}{}
-
-		\umlclass[right = 1cm of User]{Drafted Review}{
-			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & comment     & \textit{varchar} \\
-						    & date        & \textit{date} \\
-						    & rating      & \textit{int} \\
-						    & difficulty  & \textit{int} \\
-						    & school      & \textit{varchar} \\
-						    & degree      & \textit{varchar} \\
-						    & course      & \textit{varchar} \\
-						    & professor   & \textit{varchar} \\
-				\textbf{FK} & user\_id    & \textit{int} \\
-			\end{tabular}
-		}{}
-
-		\umlclass[below = 1cm of Drafted Review]{Published Review}{
-			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id}   & \textit{int} \\
-						    & comment       & \textit{varchar} \\
-						    & date          & \textit{date} \\
-						    & rating        & \textit{int} \\
-						    & difficulty    & \textit{int} \\
-				\textbf{FK} & course\_id    & \textit{int} \\
-				\textbf{FK} & professor\_id & \textit{int} \\ 
-				\textbf{FK} & user\_id      & \textit{int} \\
-			\end{tabular}
-		}{}
+		}
 
 		\umlclass[below = 1cm of Published Review]{Teaching}{
 			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK FK} & \textbf{course\_id}    & \textit{int} \\
-				\textbf{PK FK} & \textbf{professor\_id} & \textit{int} \\
+				\textbf{PK} & \textbf{id}	& \textit{id} \\
+				\textbf{FK} & course\_id 	& \textit{int} \\
+				\textbf{FK} & professor\_id & \textit{int} \\
 			\end{tabular}
-		}{}
+		}
 
-		\umlclass[right = 1cm of Teaching]{Course}{
-		    \begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & name        & \textit{varchar} \\
-				\textbf{FK} & degree\_id  & \textit{int} \\
-		    \end{tabular}
-		}{}
+		\umlclass[above = 1cm of Users]{Pin}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& pin	 		& \textit{varchar} \\
+				\textbf{FK} & user\_id 		&\textit{char} \\
+							& expires\_at 	&\textit{timestamp} \\
+							& is\_admin 	&\textit{boolean}
+			\end{tabular}
+		}
+
+		\umlclass[left = 1.5cm of Users]{Drafted Review}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+				\textbf{FK} & user\_id 		& \textit{char} \\
+							& date 			& \textit{date} \\
+							& school 		& \textit{varchar} \\
+							& degree 		& \textit{varchar} \\
+							& course 		& \textit{varchar} \\
+							& professor		& \textit{varchar} \\
+							& rating 		& \textit{int} \\
+							& difficulty 	& \textit{int} \\
+							& comment		& \textit{varchar} \\
+			\end{tabular}
+		}
+
+		\umlclass[above = 1cm of Drafted Review]{Admin}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& email			& \textit{varchar} \\
+			\end{tabular}
+		}
+
+		\umlclass[below = 0.5cm of Drafted Review]{Up Vote}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK FK} & \textbf{user\_id}   & \textit{char} \\
+				\textbf{PK FK} & \textbf{review\_id} & \textit{int} \\
+			\end{tabular}
+		}
+
+		\umlclass[left = 1.5cm of Teaching]{Professor}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& name 			& \textit{varchar} \\
+							& surname		& \textit{varchar} \\
+			\end{tabular}
+		}
+
+		\umlclass[right = 1.5cm of Teaching]{Course}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& name 			& \textit{varchar} \\
+				\textbf{FK} & degree\_id 	& \textit{int} \\
+			\end{tabular}
+		}
 
 		\umlclass[above = 1cm of Course]{Degree}{
-		    \begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & name        & \textit{varchar} \\
-						    & type        & \textit{varchar} \\
-				\textbf{FK} & school\_id  & \textit{int} \\
-		    \end{tabular}
-		}{}
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& name 			& \textit{varchar} \\
+							& type 			& \textit{varchar} \\
+				\textbf{FK} & school\_id 	& \textit{int} \\
+			\end{tabular}
+		}
 
 		\umlclass[above = 1cm of Degree]{School}{
-		    \begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & name        & \textit{varchar} \\
-		    \end{tabular}
-		}{}
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& name 			& \textit{varchar} \\
+			\end{tabular}
+		}
 
-		\umlclass[left = 1cm of Teaching]{Professor}{
-		    \begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & name        & \textit{varchar} \\
-						    & surname     & \textit{varchar} \\
-		    \end{tabular}
-		}{}
+		\umlclass[above = 2cm of School]{Report}{
+			\begin{tabular}{@{} l l l @{}}
+				\textbf{PK} & \textbf{id} 	& \textit{int} \\
+							& comment		& \textit{varchar} \\
+							& date 			& \textit{date} \\
+				\textbf{FK} & user\_id 		& \textit{char} \\
+				\textbf{FK} & review\_id 	& \textit{int}
+			\end{tabular}
+		}
 
-		\umlclass[above = 2cm of School]{Admin}{
-		    \begin{tabular}{@{} l l l @{}}
-				\textbf{PK} & \textbf{id} & \textit{int} \\
-						    & email       & \textit{varchar} \\
-		    \end{tabular}
-		}{}
-
-		\umluniassoc{Report}{User}
-		\umluniassoc{Drafted Review}{User}
-		\umluniassoc[geometry=-|-]{Published Review}{User}
+		\umluniassoc{Report}{Users}
+		\umluniassoc{Report}{Published Review}
+		\umluniassoc{Drafted Review}{Users}
+		\umluniassoc{Published Review}{Users}
 		\umluniassoc{Course}{Degree}
 		\umluniassoc{Degree}{School}
 		\umluniassoc{Teaching}{Course}
 		\umluniassoc{Teaching}{Professor}
 		\umluniassoc{Published Review}{Teaching}
+		\umluniassoc{Pin}{Users}
+		\umluniassoc{Up Vote}{Users}
+		\umluniassoc{Up Vote}{Published Review}
 
 	\end{tikzpicture}
 	\caption{UML diagram of Database schema.}

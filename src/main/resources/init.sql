@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Teaching (
 
 CREATE TABLE IF NOT EXISTS Drafted_Review (
                                     id SERIAL PRIMARY KEY,
-                                    user_id VARCHAR(255) NOT NULL,
+                                    user_id CHAR(22) NOT NULL,
                                     date DATE,
                                     school VARCHAR(255),
                                     degree VARCHAR(255),
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS Drafted_Review (
 
 CREATE TABLE IF NOT EXISTS Published_Review (
                                     id SERIAL PRIMARY KEY,
-                                    user_id VARCHAR(255) NOT NULL,
+                                    user_id CHAR(22) NOT NULL,
                                     date DATE NOT NULL,
                                     teaching_id INT,
                                     enjoyment INT,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS Report (
                                     id SERIAL PRIMARY KEY,
                                     comment VARCHAR(255),
                                     date DATE NOT NULL,
-                                    user_id VARCHAR(255) NOT NULL,
+                                    user_id CHAR(22) NOT NULL,
                                     review_id INT NOT NULL,
                                     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
                                     FOREIGN KEY (review_id) REFERENCES Published_Review(id) ON DELETE CASCADE
