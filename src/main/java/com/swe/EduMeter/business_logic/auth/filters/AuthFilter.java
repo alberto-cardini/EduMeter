@@ -21,7 +21,7 @@ public class AuthFilter implements ContainerRequestFilter {
         //     Authorization: Bearer <token>
         String authHeader = requestContext.getHeaderString("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Invalid authentication header");
+            throw new NotAuthorizedException("Invalid authentication header", "Bearer");
         }
 
         // Extract the <token> from the value part of the header

@@ -12,6 +12,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class CryptoService {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final Mac mac;
+    private Clock clock = Clock.systemUTC();
 
     /* This shouldn't be used in production.
      * Instead, it is advised to use a redis key store,
@@ -89,7 +91,7 @@ public class CryptoService {
      * @return          Base64 encoded token.
      */
     public String generateToken(String userHash, boolean isAdmin) {
-        long expiresAt = Instant.now().plus(Duration.ofMinutes(TOKEN_EXPIRE_MINUTES)).toEpochMilli();
+        long expiresAt = Instant.now(clock).plus(Duration.ofMinutes(TOKEN_EXPIRE_MINUTES)).toEpochMilli();
 
         Token token = new Token(userHash, expiresAt, isAdmin);
 
@@ -117,12 +119,12 @@ public class CryptoService {
      */
     public Token decodeToken(String encodedToken) {
         if (revokedTokens.contains(encodedToken)) {
-            throw new NotAuthorizedException("Revoked token");
+            throw new NotAuthorizedException("Revoked token", "Bearer");
         }
 
         String[] parts = encodedToken.split("\\.");
         if (parts.length != 2) {
-            throw new NotAuthorizedException("Malformed token");
+            throw new NotAuthorizedException("Malformed token", "Bearer");
         }
 
         byte[] payloadBytes = Base64.getUrlDecoder().decode(parts[0]);
@@ -133,7 +135,7 @@ public class CryptoService {
         // This method is used to confront hashes as it is more robust
         // against attacks
         if (!MessageDigest.isEqual(receivedSignature, computedSignature)) {
-            throw new NotAuthorizedException("Invalid token signature");
+            throw new NotAuthorizedException("Invalid token signature", "Bearer");
         }
 
         String jsonString = new String(payloadBytes, StandardCharsets.UTF_8);
@@ -141,13 +143,13 @@ public class CryptoService {
         try {
             Token token = jsonMapper.readValue(jsonString, Token.class);
 
-            if (Instant.now().isAfter(Instant.ofEpochMilli(token.expiresAt()))) {
-                throw new NotAuthorizedException("Expired token");
+            if (Instant.now(clock).isAfter(Instant.ofEpochMilli(token.expiresAt()))) {
+                throw new NotAuthorizedException("Expired token", "Bearer");
             }
 
             return token;
         } catch (JsonProcessingException e) {
-            throw new NotAuthorizedException("Invalid token");
+            throw new NotAuthorizedException("Invalid token", "Bearer");
         }
     }
 
@@ -172,5 +174,10 @@ public class CryptoService {
         assert(encodedHash.length() == 22);
 
         return encodedHash;
+    }
+
+    // Used for testing
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 }
