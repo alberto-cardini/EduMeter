@@ -3,6 +3,7 @@ package com.swe.EduMeter.business_logic.controllers;
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.model.Report;
+import com.swe.EduMeter.model.response.ApiObjectCreated;
 import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.PublishedReviewDAO;
 import com.swe.EduMeter.orm.ReportDAO;
@@ -44,12 +45,14 @@ public class ReportController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuthGuard
-    public CreateResponse create(@Context SecurityContext securityContext,
-                                Report report) {
+    public ApiObjectCreated create(@Context SecurityContext securityContext,
+                                   Report report) {
         String userHash = securityContext.getUserPrincipal().getName();
         report.setIssuerHash(userHash);
 
-        return new CreateResponse(reportDAO.add(report));
+        int id = reportDAO.add(report);
+
+        return new ApiObjectCreated(id, "Report created");
     }
 
     @DELETE
@@ -76,6 +79,4 @@ public class ReportController {
 
         return new ApiOk("Report approved");
     }
-
-    private record CreateResponse(int id) {}
 }

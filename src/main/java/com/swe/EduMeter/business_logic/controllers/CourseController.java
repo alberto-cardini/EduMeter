@@ -121,5 +121,5 @@ public class CourseController {
         return new ApiOk("Removed teacher from course");
     }
 
-    private record AddTeachingBody(Integer profId) {}
+    record AddTeachingBody(Integer profId) {}
 }

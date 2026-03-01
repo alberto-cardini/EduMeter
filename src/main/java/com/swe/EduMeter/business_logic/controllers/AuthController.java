@@ -94,8 +94,8 @@ public class AuthController {
         PinChallenge pinChallenge = pinDAO.get(body.challengeId())
                                 .orElseThrow(() -> new NotFoundException("Invalid challengeId"));
 
-        if (pinChallenge.getExpiresAt().isAfter(Instant.now())) {
-            throw new NotAuthorizedException("Pin challenge expired");
+        if (Instant.now().isAfter(pinChallenge.getExpiresAt())) {
+            throw new NotAuthorizedException("Pin challenge expired", "Bearer");
         }
 
         if (pinChallenge.getPin().equals(body.pin())) {
@@ -104,7 +104,7 @@ public class AuthController {
             return new LoginResponse(encodedToken);
         }
 
-        throw new NotAuthorizedException("Invalid Pin");
+        throw new NotAuthorizedException("Invalid Pin", "Bearer");
     }
 
     @POST
@@ -121,8 +121,8 @@ public class AuthController {
         return new ApiOk("Token revoked");
     }
 
-    private record SendPinBody(String email) {}
-    private record SendPinResponse(int challengeId) {}
-    private record LoginBody(Integer challengeId, String pin) {}
-    private record LoginResponse(String token) {}
+    record SendPinBody(String email) {}
+    record SendPinResponse(int challengeId) {}
+    record LoginBody(Integer challengeId, String pin) {}
+    record LoginResponse(String token) {}
 }

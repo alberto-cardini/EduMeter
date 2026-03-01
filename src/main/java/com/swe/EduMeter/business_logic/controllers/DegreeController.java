@@ -2,6 +2,7 @@ package com.swe.EduMeter.business_logic.controllers;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.model.response.ApiObjectCreated;
 import com.swe.EduMeter.model.response.ApiOk;
 import com.swe.EduMeter.orm.*;
 import jakarta.inject.Inject;
@@ -37,8 +38,10 @@ public class DegreeController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AdminGuard
-    public CreateResponse create(Degree newDegree) {
-        return new CreateResponse(degreeDAO.add(newDegree));
+    public ApiObjectCreated create(Degree newDegree) {
+        int id = degreeDAO.add(newDegree);
+
+        return new ApiObjectCreated(id, "Degree created");
     }
 
     @DELETE
@@ -72,6 +75,4 @@ public class DegreeController {
 
         return new ApiOk("Degree updated");
     }
-
-    private record CreateResponse(int id) {}
 }

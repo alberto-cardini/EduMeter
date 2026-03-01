@@ -56,7 +56,7 @@ public class PinChallenge {
 
     @Override
     public String toString() {
-        return "Pin{" +
+        return "PinChallenge{" +
                 "id=" + id +
                 ", pin='" + pin + '\'' +
                 ", userHash='" + userHash + '\'' +
