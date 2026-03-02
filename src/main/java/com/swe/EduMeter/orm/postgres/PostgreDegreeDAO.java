@@ -27,11 +27,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
         String query = "INSERT INTO Degree (name, type, school_id) VALUES (?, ?, ?)";
         List<Object> params = List.of(degree.getName(), degree.getType().toString(), degree.getSchoolId());
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -39,11 +35,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
         String query = "SELECT * FROM Degree WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -51,11 +43,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
         String query = "UPDATE Degree SET name = ?, type = ?, school_id = ?  WHERE id = ?";
         List<Object> params = List.of(degree.getName(), degree.getType().toString(), degree.getSchoolId(), degree.getId());
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -63,11 +51,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
         String query = "DELETE FROM Degree WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -85,12 +69,7 @@ public class PostgreDegreeDAO extends PostgreDAO<Degree> implements DegreeDAO {
             params.add(schoolId);
         }
 
-        try {
-            String finalQuery = query.toString();
-            return selectQuery(finalQuery, params);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        String finalQuery = query.toString();
+        return selectQuery(finalQuery, params);
     }
 }

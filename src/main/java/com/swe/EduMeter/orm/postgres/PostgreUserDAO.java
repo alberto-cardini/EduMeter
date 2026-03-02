@@ -19,11 +19,7 @@ public class PostgreUserDAO extends PostgreDAO<User> implements UserDAO {
         String query = "INSERT INTO Users (id, banned) VALUES (?, ?)";
         List<Object> params = List.of(user.getHash(), Boolean.FALSE);
 
-        try {
-            insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        insertQuery(query, params);
     }
 
     @Override
@@ -31,11 +27,7 @@ public class PostgreUserDAO extends PostgreDAO<User> implements UserDAO {
         String query = "SELECT * FROM Users WHERE id = ?";
         List<Object> params = List.of(hash);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -43,11 +35,7 @@ public class PostgreUserDAO extends PostgreDAO<User> implements UserDAO {
         String query = "UPDATE Users SET (banned) VALUES (?)";
         List<Object> params = List.of(user.isBanned());
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -55,11 +43,6 @@ public class PostgreUserDAO extends PostgreDAO<User> implements UserDAO {
         String query = "SELECT * FROM Users WHERE banned = ?";
         List<Object> params = List.of(banned);
 
-        try {
-            return selectQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params);
     }
-
 }

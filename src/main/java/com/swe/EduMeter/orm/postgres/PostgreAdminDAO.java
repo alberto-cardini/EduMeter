@@ -20,11 +20,7 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
         String query = "SELECT * FROM Admin WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -32,22 +28,14 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
         String query = "SELECT * FROM Admin WHERE email = ?";
         List<Object> params = List.of(email);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
     public List<Admin> getAll() {
         String query = "SELECT * FROM Admin";
 
-        try {
-            return selectQuery(query);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query);
     }
 
     @Override
@@ -55,11 +43,7 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
         String query = "INSERT INTO Admin (email) VALUES (?)";
         List<Object> params = List.of(admin.getEmail());
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -67,11 +51,7 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
         String query = "DELETE FROM Admin WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
 }

@@ -27,22 +27,14 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
         String query = "SELECT * FROM Report WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
     public List<Report> getAll() {
         String query = "SELECT * FROM Report";
 
-        try {
-            return selectQuery(query);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query);
     }
 
     @Override
@@ -53,11 +45,7 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
                 report.getIssuerHash(), report.getReviewId()
         );
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -69,11 +57,7 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
                 report.getId()
         );
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -81,10 +65,6 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
         String query = "DELETE FROM Report WHERE id=?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 }

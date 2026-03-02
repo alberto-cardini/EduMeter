@@ -12,7 +12,7 @@ import java.util.List;
 //Abstract class that handles executing queries and mapping results.
 
 public abstract class PostgreDAO<T> {
-    private void setParams(PreparedStatement stmt, List<Object> params) throws  SQLException {
+    private void setParams(PreparedStatement stmt, List<Object> params) throws SQLException {
         for (int i = 0; i < params.size(); i++) {
             stmt.setObject(i + 1, params.get(i));
         }
@@ -26,7 +26,6 @@ public abstract class PostgreDAO<T> {
         Connection conn = DatabaseManager.getInstance().getConnection();
 
         PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.closeOnCompletion();
         setParams(stmt, params);
 
         return stmt.executeQuery();
@@ -37,39 +36,44 @@ public abstract class PostgreDAO<T> {
     // Accepting a query String is safe here because this method is protected.
     // It is intended to be called only by concrete DAOs with internally defined queries,
     // never with direct user input.
-    //
-    // The connection is not closed as it's managed by the DatabaseManager.
-    protected List<T> selectQuery(String query, List<Object> params) throws SQLException {
+    protected List<T> selectQuery(String query, List<Object> params) {
         try (ResultSet rs = rawQuery(query, params)) {
             List<T> results = new ArrayList<>();
+
             while (rs.next()) {
                 results.add(mapRowToObject(rs));
             }
             return results;
+        } catch (SQLException e) {
+            throw new RuntimeException("Data" + e.getMessage(), e);
         }
     }
 
-    protected List<T> selectQuery(String query) throws SQLException {
-        return  selectQuery(query, List.of());
+    protected List<T> selectQuery(String query) {
+        return selectQuery(query, List.of());
     }
 
-    protected int insertQuery(String query, List<Object> params) throws SQLException {
+    protected int insertQuery(String query, List<Object> params) {
         try (ResultSet rs = rawQuery(query + " RETURNING id", params)) {
-            if(rs.next()) {
+            if (rs.next()) {
                 return rs.getInt("id");
             }
             return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Data" + e.getMessage(), e);
         }
     }
 
     //Executes DELETE, UPDATE queries.
-    protected void updateQuery(String query, List<Object> params) throws SQLException {
+    protected void updateQuery(String query, List<Object> params) {
         Connection conn = DatabaseManager.getInstance().getConnection();
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             setParams(stmt, params);
 
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Data" + e.getMessage(), e);
         }
     }
 }

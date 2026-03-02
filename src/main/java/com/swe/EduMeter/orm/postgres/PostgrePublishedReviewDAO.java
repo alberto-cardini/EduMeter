@@ -53,21 +53,17 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
     @Override
     public int add(PublishedReview review) {
         String query = """
-        INSERT INTO Published_Review (user_id, date, teaching_id, enjoyment, difficulty, comment)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """;
+                INSERT INTO Published_Review (user_id, date, teaching_id, enjoyment, difficulty, comment)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
 
         List<Object> params = List.of(
-            review.getCreatorHash(), review.getDate(),
-            review.getTeachingId(), review.getEnjoyment(),
-            review.getDifficulty(), review.getComment()
+                review.getCreatorHash(), review.getDate(),
+                review.getTeachingId(), review.getEnjoyment(),
+                review.getDifficulty(), review.getComment()
         );
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -78,16 +74,13 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
                 """;
 
         List<Object> params = List.of(
-            review.getCreatorHash(), review.getDate(),
-            review.getTeachingId(), review.getEnjoyment(),
-            review.getDifficulty(), review.getComment(),
-            review.getId()
+                review.getCreatorHash(), review.getDate(),
+                review.getTeachingId(), review.getEnjoyment(),
+                review.getDifficulty(), review.getComment(),
+                review.getId()
         );
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+
+        updateQuery(query, params);
     }
 
     @Override
@@ -101,11 +94,7 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
 
         List<Object> params = List.of(id, userHash, id, userHash);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -113,11 +102,7 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
         String query = "DELETE FROM Published_Review WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -172,6 +157,5 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
         } catch (SQLException e) {
             throw new RuntimeException("Database error: " + e.getMessage(), e);
         }
-
     }
 }

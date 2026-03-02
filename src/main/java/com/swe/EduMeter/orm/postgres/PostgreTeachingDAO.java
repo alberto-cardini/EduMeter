@@ -19,11 +19,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "INSERT INTO Teaching (course_id, professor_id) VALUES (?, ?)";
         List<Object> params = List.of(teaching.getCourseId(), teaching.getProfId());
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -31,11 +27,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "SELECT * FROM Teaching WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -43,11 +35,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "DELETE FROM Teaching WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -55,11 +43,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "SELECT * FROM Teaching WHERE course_id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params);
     }
 
     @Override
@@ -67,10 +51,6 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "SELECT * FROM Teaching WHERE professor_id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params);
     }
 }

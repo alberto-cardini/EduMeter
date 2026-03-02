@@ -31,31 +31,23 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
         String query = "SELECT * FROM DraftReview WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
     public List<DraftReview> getAll() {
         String query = "SELECT * FROM DraftReview";
 
-        try {
-            return selectQuery(query);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query);
     }
 
     @Override
     public int add(DraftReview review) {
         String query = """
-        INSERT INTO Drafted_Review
-        (user_id, date, school, degree, course, professor, enjoyment, difficulty, comment)
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+                INSERT INTO Drafted_Review
+                (user_id, date, school, degree, course, professor, enjoyment, difficulty, comment)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
         List<Object> params = List.of(
                 review.getCreatorHash(), review.getDate(),
                 review.getRawSchool(), review.getRawDegree(),
@@ -64,11 +56,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
                 review.getComment()
         );
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -85,11 +73,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
                 review.getComment(), review.getId()
         );
 
-        try{
-            updateQuery(query, params);
-        } catch (SQLException e){
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -97,10 +81,6 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
         String query = "DELETE FROM DraftReview WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 }

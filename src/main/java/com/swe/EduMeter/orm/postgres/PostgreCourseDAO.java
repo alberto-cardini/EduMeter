@@ -27,11 +27,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         String query = "INSERT INTO Course (name, degree_id) VALUES (?, ?)";
         List<Object> params = List.of(course.getName(), course.getDegreeId());
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -39,11 +35,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         String query = "SELECT * FROM course WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -51,11 +43,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         String query = "UPDATE Course SET name = ?, degree_id = ?  WHERE id = ?";
         List<Object> params = List.of(course.getName(), course.getDegreeId(), course.getId());
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -63,11 +51,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         String query = "DELETE FROM Course WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -83,8 +67,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         if (degreeId != null) {
             query.append(" AND c.degree_id = ?");
             params.add(degreeId);
-        }
-        else{
+        } else {
             if (schoolId != null) {
                 query.append(" AND d.school_id = ?");
                 params.add(schoolId);
@@ -96,13 +79,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
             params.add("%" + pattern.toLowerCase() + "%");
         }
 
-        try {
-            String finalQuery = query.toString();
-
-            return selectQuery(finalQuery, params);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        String finalQuery = query.toString();
+        return selectQuery(finalQuery, params);
     }
 }

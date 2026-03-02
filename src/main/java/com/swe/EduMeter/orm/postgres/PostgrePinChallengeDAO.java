@@ -27,11 +27,7 @@ public class PostgrePinChallengeDAO extends PostgreDAO<PinChallenge> implements 
         String query = "SELECT * FROM Pin WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -42,11 +38,7 @@ public class PostgrePinChallengeDAO extends PostgreDAO<PinChallenge> implements 
                 pin.getExpiresAt(), pin.isAdmin()
         );
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return insertQuery(query, params);
     }
 
     @Override
@@ -54,10 +46,6 @@ public class PostgrePinChallengeDAO extends PostgreDAO<PinChallenge> implements 
         String query = "DELETE FROM Pin WHERE id = ?;";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 }

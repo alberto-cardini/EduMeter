@@ -26,12 +26,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
         String query = "INSERT INTO Professor (name, surname) VALUES (?, ?)";
         List<Object> params = List.of(prof.getName(), prof.getSurname());
 
-        try {
-            return insertQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
-
+        return insertQuery(query, params);
     }
 
     @Override
@@ -39,11 +34,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
         String query = "SELECT * FROM Professor WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            return selectQuery(query, params).stream().findFirst();
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        return selectQuery(query, params).stream().findFirst();
     }
 
     @Override
@@ -51,11 +42,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
         String query = "UPDATE Professor SET name = ?, surname = ? WHERE id = ?";
         List<Object> params = List.of(prof.getName(), prof.getSurname(), prof.getId());
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -63,11 +50,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
         String query = "DELETE FROM Professor WHERE id = ?";
         List<Object> params = List.of(id);
 
-        try {
-            updateQuery(query, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        updateQuery(query, params);
     }
 
     @Override
@@ -96,12 +79,8 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
             }
         }
 
-        try {
-            String finalQuery = query.toString();
-            return selectQuery(finalQuery, params);
-        } catch (SQLException e) {
-            throw new RuntimeException("Database error: " + e.getMessage(), e);
-        }
+        String finalQuery = query.toString();
+        return selectQuery(finalQuery, params);
     }
 
 }
