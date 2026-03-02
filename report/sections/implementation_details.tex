@@ -25,7 +25,9 @@ The platform relay on several external technologies to operate properly. The cho
 \noindent The project is configured to use Java 17 as the compilation target.
 
 \subsection{Project Structure}
-The project has a standard structure divided into two parts: main and test. Both the parts got the same directory layout and file's name scheme \textbf{TODO: WRITE WHY THE STRUCTURE MUST BE SYMMETRIC}. As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
+The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is expecially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing.
+
+As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
 
 \begin{figure}[h]
 	\small
@@ -559,7 +561,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{JSON Validation Mappers}: Specialized mappers such as \texttt{JsonParseExceptionHandler} and \texttt{UnrecognizedPropertyExceptionHandler} handle errors related to request payloads. These mappers return HTTP 400 (Bad Request), providing specific feedback when a client sends malformed JSON or invalid data fields.
 \end{itemize}
 
-The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, this allows specialized handlers to capture precise issues, such as malformed data or unrecognized fields, and provide detailed feedback with an HTTP 400 status. If no specific mapper is found, the system falls back to a global Throwable handler that serves as a safety net, ensuring that even unforeseen internal errors are caught and translated into a standardized JSON response rather than exposing raw system details.
+The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, it was mandatory to implement specific handlers for JSON exceptions, as there's already an implementation for those under the Jackson package. Those implementations would come up as more specific during the lookup, and our global handler wouldn't fire.
 
 \begin{figure}[H]
 	\centering
