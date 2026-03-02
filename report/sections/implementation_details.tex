@@ -304,7 +304,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{User Anonymization}: One of the core EduMeter's features is complete user anonymity. User's sensitive information are never visible to other users nor admins and are never stored directly into the DB. To protect privacy while maintaining database efficiency, the service generates a \texttt{userHash}. This is achieved by computing a 16-byte truncated version of an HMAC-SHA256 hash of the user's email, resulting in a unique 22-character Base64 identifier.
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
 		\umlclass[type= Jakarta interface, x=10, y=3]{ContainerRequestFilter}{}{}
@@ -561,7 +561,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 
 The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, this allows specialized handlers to capture precise issues, such as malformed data or unrecognized fields, and provide detailed feedback with an HTTP 400 status. If no specific mapper is found, the system falls back to a global Throwable handler that serves as a safety net, ensuring that even unforeseen internal errors are caught and translated into a standardized JSON response rather than exposing raw system details.
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.8, transform shape]
 		
@@ -610,10 +610,21 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 \end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
+%The Object-Relation Mapper (ORM) package serves as the data persistence layer for the application. Its primary responsibility is to connect the object-oriented domain model used within the business logic layer with the underlying data storage mechanisms.
+
+The Object-Relation Mapper (ORM) package has the responsibility of \textbf{connecting the object-oriented domain model} used within the business logic layer \textbf{to the underlying data storage mechanisms}. 
+
+The application is designed to support two distinct storage backends: a volatile In-Memory storage (ideal for testing and rapid prototyping) and a persistent PostgreSQL remote database (intended for production environments). The selection of the active storage mechanism is determined dynamically at application startup by checking the \texttt{IN\_MEM\_DB} environment variable.
 
 \subsubsection{DAO Interfaces}
+To achieve a strict separation between the data access logic and the core business layer, the ORM package uses the Data Access Object (DAO) design pattern alongside the Abstract Factory pattern. 
 
-\begin{figure}
+The \texttt{DAOFactory} interface acts as the central factory, defining methods to instantiate specific resource DAOs, such as \texttt{AdminDAO}, \texttt{UserDAO}, and \texttt{ProfDAO}. These resource-specific interfaces define the standard contract for all CRUD (Create, Read, Update, Delete) operations.
+
+As defined in the \texttt{MainApplication} configuration, Dependency Injection is utilized during startup to bind the application controllers to the concrete implementations (\texttt{InMemDAOFactory} or \texttt{PostgreDAOFactory}) based on the environment configuration. This architectural choice guarantees that the business logic remains entirely agnostic of the underlying database technology, significantly enhancing the maintainability and testability of the system.
+
+
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
 		\begin{umlpackage}{ORM}
@@ -658,6 +669,71 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 \subsubsection{In Memory Storage}
 
 \subsubsection{Postgre Remote Storage}
+The PostgreSQL implementation provides a persistent storage solution intended for production environments. This sub-package utilizes a layered inheritance structure to minimize boilerplate code and ensure consistent database interaction patterns across all resources.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.8, transform shape]
+		\begin{umlpackage}{ORM}
+			\begin{umlpackage}{Postgres}
+				\umlclass[type=abstract]{PostgreDAO}{}{
+					\begin{tabular}{@{} l l @{}}
+						- setParams(PreparedStatement, List<Object>) & : void \\
+						\# \textit{mapRowToObject(ResultSet)} & : T \\
+						\# rawQuery(String, List<Object>) & : ResultSet \\
+						\# selectQuery(String, List<Object) & : List<T> \\
+						\# insertquery(String, List<Object) & : int \\
+						\# updateQuery(String, List<Object>) & : void \\
+					\end{tabular}
+				}
+				
+				\umlclass[below=1.5cm of PostgreDAO]{PostgreAdminDAO}{}{
+					\begin{tabular}{@{} l l @{}}
+						\# mapRowToObject(ResultSet) & : Admin \\
+						+ get(int) & : Optional<Admin> \\
+						+ getByEmail(String) & : Optional<Admin> \\
+						+ getAll() & : List<Admin> \\
+						+ delete(int) & : void \\
+						+ add(Admin) & : int 
+					\end{tabular}
+				}
+			\end{umlpackage}
+			
+			\umlclass[type=interface, left= 1.5cm of PostgreDAO]{AdminDAO}{}{
+				\begin{tabular}{@{} l l @{}}
+					+ get(int) & : Optional<Admin> \\
+					+ getByEmail(String) & : Optional<Admin> \\
+					+ getAll() & : List<Admin> \\
+					+ delete(int) & : void \\
+					+ add(Admin) & : int 
+				\end{tabular}
+			}
+		\end{umlpackage}	
+		
+		\umlinherit[geometry=-|]{PostgreAdminDAO}{AdminDAO}
+		\umlinherit{PostgreAdminDAO}{PostgreDAO}
+	\end{tikzpicture}
+	\caption{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
+\end{figure}
+
+\paragraph{The PostgreDAO Base Class}
+The core of the PostgreSQL implementation is the abstract \texttt{PostgreDAO<T>} class. Through the use of Java Generics and the JDBC API, it provides a template that heavily reduces boilerplate code across the data access layer. Key features of this base class include:
+
+
+\begin{itemize}
+	\item \textbf{Centralized queries management:} It encapsulates the repetitive mechanics of JDBC in protected wrapper methods like \texttt{selectQuery}, \texttt{insertQuery}, and \texttt{updateQuery}. They automatically handle connection retrieval, statement preparation, and the execution lifecycle, keeping concrete DAOs clean.
+	\item \textbf{Secure query execution:} Having methods accept SQL queries as \texttt{String} parameters is completely safe in this architecture. Because these methods are \texttt{protected}, they are strictly intended to be called by concrete DAO subclasses using internally hardcoded SQL strings, not direct user input.
+	\item \textbf{Abstract Result Mapping:} While the base class manages executing the query and iterating through the \texttt{ResultSet}, it delegates the actual object creation to its subclasses via the abstract \texttt{mapRowToObject} method.
+\end{itemize}
+
+\paragraph{Concrete DAOs}
+Concrete classes have the purpose of implementing the methods defined by their respective domain interfaces connecting them directly to the database. Their role focuses on \textbf{constructing the SQL query} based on the input parameters, delegating all the execution infrastructure to the base class.
+
+\begin{itemize}
+	\item \textbf{Construction of queries:} For basic operations creating a query translates to defining static SQL strings with placeholders (e.g., \texttt{WHERE email = ?}) paired with a simple \texttt{List<Object>} that stores the parameters. For more complex methods, the query is dynamically assembled using a \texttt{StringBuilder}; depending on the actual input parameters (e.g., whether \texttt{schoolId} or \texttt{degreeId} are provided or null), the concrete class decides which \texttt{JOIN} and \texttt{WHERE} clauses to append, concurrently populating the parameter list.
+	\item \textbf{Execution delegation to PostgreDAO:} Once the query (as a string) and its parameters have been constructed they are passed to the protected methods of the \texttt{PostgreDAO} superclass.
+	\item \textbf{Data Mapping:} Every class must implement the abstract \texttt{mapRowToObject} method by mapping the raw results (\texttt{ResultSet}) returned by the database into the correct domain objects (\texttt{Admin}, etc.).
+\end{itemize}
 
 \subsection{Database}
 When the remote storage option is selected, the application relies on a PostgreSQL database to ensure reliable and persistent data storage. This database must be instantiated on the host environment and properly configured to interact seamlessly with the application back-end.
