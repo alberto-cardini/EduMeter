@@ -562,7 +562,9 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{JSON Validation Mappers}: Specialized mappers such as \texttt{JsonParseExceptionHandler} and \texttt{UnrecognizedPropertyExceptionHandler} handle errors related to request payloads. These mappers return HTTP 400 (Bad Request), providing specific feedback when a client sends malformed JSON or invalid data fields.
 \end{itemize}
 
-The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types. In the \textit{EduMeter} implementation, it was mandatory to implement specific handlers for JSON exceptions, as there's already an implementation for those under the Jackson package. Those implementations would come up as more specific during the lookup, and our global handler wouldn't fire.
+The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types.
+
+In the \textit{EduMeter} implementation, it was mandatory to implement specific handlers for JSON exceptions, as there are already some implementations of those in the Jackson library, that would come up as more specific during the lookup, and our global handler wouldn't fire.
 
 \begin{figure}[H]
 	\centering
@@ -604,13 +606,13 @@ The exception handling in JAX-RS operates through a hierarchical discovery proce
 	\caption{UML class diagram of the exception handling package.}
 \end{figure}
 
-\paragraph{\textbf{Approach Advantages.}} Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
-\begin{itemize}
-	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
-	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
-	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
-	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
-\end{itemize}
+%\paragraph{\textbf{Approach Advantages.}} Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
+%\begin{itemize}
+%	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
+%	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
+%	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
+%	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
+%\end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
 %The Object-Relation Mapper (ORM) package serves as the data persistence layer for the application. Its primary responsibility is to connect the object-oriented domain model used within the business logic layer with the underlying data storage mechanisms.
