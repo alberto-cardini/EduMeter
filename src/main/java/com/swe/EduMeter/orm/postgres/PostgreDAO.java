@@ -21,7 +21,6 @@ public abstract class PostgreDAO<T> {
     // Converts every row of the ResultSet into a concrete object.
     protected abstract T mapRowToObject(ResultSet rs) throws SQLException;
 
-
     protected ResultSet rawQuery(String query, List<Object> params) throws SQLException {
         Connection conn = DatabaseManager.getInstance().getConnection();
 
@@ -32,7 +31,6 @@ public abstract class PostgreDAO<T> {
     }
 
     // Executes a SELECT query and returns a list of mapped objects.
-    //
     // Accepting a query String is safe here because this method is protected.
     // It is intended to be called only by concrete DAOs with internally defined queries,
     // never with direct user input.

@@ -738,6 +738,27 @@ Concrete classes have the purpose of implementing the methods defined by their r
 	\item \textbf{Data Mapping:} Every class must implement the abstract \texttt{mapRowToObject} method by mapping the raw results (\texttt{ResultSet}) returned by the database into the correct domain objects (\texttt{Admin}, etc.).
 \end{itemize}
 
+\begin{lstlisting}[language=Java, caption=Example of a concrete PostgreDAO class, label=concretePostgreDAO]
+	public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
+	
+		@Override
+		protected Admin mapRowToObject(ResultSet rs) throws SQLException {
+			return new Admin(rs.getInt("id"), rs.getString("email"));
+		}
+		
+		@Override
+		public Optional<Admin> get(int id) {
+			String query = "SELECT * FROM Admin WHERE id = ?";
+			List<Object> params = List.of(id);
+			
+			return selectQuery(query, params).stream().findFirst();
+		}
+		
+		... other merthods ...
+	}
+\end{lstlisting}
+
+
 \subsection{Database}
 When the remote storage option is selected, the application relies on a PostgreSQL database to ensure reliable and persistent data storage. This database must be instantiated on the host environment and properly configured to interact seamlessly with the application back-end.
 
