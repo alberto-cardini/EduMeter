@@ -1,7 +1,7 @@
 package com.swe.EduMeter.business_logic.exception_handlers;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.swe.EduMeter.model.response.ApiError;
+import com.swe.EduMeter.models.response.ApiError;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;

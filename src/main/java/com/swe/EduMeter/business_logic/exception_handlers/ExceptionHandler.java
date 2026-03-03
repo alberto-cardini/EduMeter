@@ -1,13 +1,11 @@
 package com.swe.EduMeter.business_logic.exception_handlers;
 
-import com.swe.EduMeter.model.response.ApiError;
+import com.swe.EduMeter.models.response.ApiError;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-
-import java.util.Map;
 
 /*
  * Handles every type of exception that is thrown within

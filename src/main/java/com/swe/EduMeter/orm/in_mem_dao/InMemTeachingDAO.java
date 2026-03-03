@@ -1,8 +1,8 @@
 package com.swe.EduMeter.orm.in_mem_dao;
 
-import com.swe.EduMeter.model.PublishedReview;
-import com.swe.EduMeter.model.Review;
-import com.swe.EduMeter.model.Teaching;
+import com.swe.EduMeter.models.PublishedReview;
+import com.swe.EduMeter.models.Review;
+import com.swe.EduMeter.models.Teaching;
 import com.swe.EduMeter.orm.dao.CourseDAO;
 import com.swe.EduMeter.orm.dao.ProfDAO;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;

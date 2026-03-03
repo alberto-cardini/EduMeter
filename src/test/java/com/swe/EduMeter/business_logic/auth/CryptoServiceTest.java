@@ -1,20 +1,14 @@
 package com.swe.EduMeter.business_logic.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swe.EduMeter.model.Token;
+import com.swe.EduMeter.models.Token;
 import jakarta.ws.rs.NotAuthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
-import javax.crypto.Mac;
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;

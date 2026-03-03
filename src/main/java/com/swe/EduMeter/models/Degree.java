@@ -1,4 +1,4 @@
-package com.swe.EduMeter.model;
+package com.swe.EduMeter.models;
 
 public class Degree {
     private Integer id;

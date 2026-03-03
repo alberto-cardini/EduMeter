@@ -1,7 +1,7 @@
 package com.swe.EduMeter.business_logic.auth.filters;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
-import com.swe.EduMeter.model.Token;
+import com.swe.EduMeter.models.Token;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.SecurityContext;

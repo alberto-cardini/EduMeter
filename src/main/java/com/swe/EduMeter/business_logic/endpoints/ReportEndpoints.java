@@ -2,9 +2,9 @@ package com.swe.EduMeter.business_logic.endpoints;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
-import com.swe.EduMeter.model.Report;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.Report;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
 import com.swe.EduMeter.orm.dao.ReportDAO;
 import jakarta.inject.Inject;

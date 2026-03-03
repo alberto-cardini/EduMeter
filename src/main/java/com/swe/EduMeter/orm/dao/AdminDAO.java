@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.dao;
 
-import com.swe.EduMeter.model.Admin;
+import com.swe.EduMeter.models.Admin;
 
 import java.util.List;
 import java.util.Optional;

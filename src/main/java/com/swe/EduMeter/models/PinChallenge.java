@@ -1,4 +1,4 @@
-package com.swe.EduMeter.model;
+package com.swe.EduMeter.models;
 
 import java.time.Instant;
 

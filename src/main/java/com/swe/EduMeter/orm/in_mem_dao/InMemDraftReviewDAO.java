@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.in_mem_dao;
 
-import com.swe.EduMeter.model.DraftReview;
+import com.swe.EduMeter.models.DraftReview;
 import com.swe.EduMeter.orm.dao.DraftReviewDAO;
 
 import java.util.*;

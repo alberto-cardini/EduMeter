@@ -1,8 +1,8 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
-import com.swe.EduMeter.model.Admin;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.Admin;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Test;

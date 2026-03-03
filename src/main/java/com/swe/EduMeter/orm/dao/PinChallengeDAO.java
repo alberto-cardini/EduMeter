@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.dao;
 
-import com.swe.EduMeter.model.PinChallenge;
+import com.swe.EduMeter.models.PinChallenge;
 
 import java.util.Optional;
 

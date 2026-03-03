@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.in_mem_dao;
 
-import com.swe.EduMeter.model.*;
+import com.swe.EduMeter.models.*;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 import com.swe.EduMeter.orm.dao.CourseDAO;
 import com.swe.EduMeter.orm.dao.DAOFactory;

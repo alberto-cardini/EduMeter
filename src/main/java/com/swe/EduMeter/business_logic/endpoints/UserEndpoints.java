@@ -1,8 +1,8 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
-import com.swe.EduMeter.model.User;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.User;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;

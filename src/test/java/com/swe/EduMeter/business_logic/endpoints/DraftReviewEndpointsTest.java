@@ -1,8 +1,8 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
-import com.swe.EduMeter.model.DraftReview;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.DraftReview;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.DraftReviewDAO;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.SecurityContext;

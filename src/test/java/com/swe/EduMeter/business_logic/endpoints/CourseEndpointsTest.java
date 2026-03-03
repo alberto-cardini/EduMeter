@@ -1,9 +1,9 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
-import com.swe.EduMeter.model.Course;
-import com.swe.EduMeter.model.Teaching;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.Course;
+import com.swe.EduMeter.models.Teaching;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.CourseDAO;
 import com.swe.EduMeter.orm.dao.TeachingDAO;
 import jakarta.ws.rs.BadRequestException;

@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.in_mem_dao;
 
-import com.swe.EduMeter.model.Report;
+import com.swe.EduMeter.models.Report;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
 import com.swe.EduMeter.orm.dao.ReportDAO;
 

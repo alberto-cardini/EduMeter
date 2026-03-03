@@ -2,7 +2,7 @@ package com.swe.EduMeter.business_logic.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swe.EduMeter.model.Token;
+import com.swe.EduMeter.models.Token;
 import jakarta.ws.rs.NotAuthorizedException;
 
 import javax.crypto.Mac;

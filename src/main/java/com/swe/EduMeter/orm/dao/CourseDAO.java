@@ -1,10 +1,7 @@
 package com.swe.EduMeter.orm.dao;
 
-import com.swe.EduMeter.model.Course;
-import com.swe.EduMeter.model.Degree;
-import com.swe.EduMeter.model.School;
+import com.swe.EduMeter.models.Course;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

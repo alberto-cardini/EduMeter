@@ -1,8 +1,8 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
-import com.swe.EduMeter.model.School;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.School;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.SchoolDAO;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;

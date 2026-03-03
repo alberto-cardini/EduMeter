@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.model.Degree;
+import com.swe.EduMeter.models.Degree;
 import com.swe.EduMeter.orm.dao.DegreeDAO;
 
 import java.sql.ResultSet;

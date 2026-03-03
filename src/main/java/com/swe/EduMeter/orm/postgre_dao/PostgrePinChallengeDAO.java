@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.model.PinChallenge;
+import com.swe.EduMeter.models.PinChallenge;
 import com.swe.EduMeter.orm.dao.PinChallengeDAO;
 
 import java.sql.ResultSet;

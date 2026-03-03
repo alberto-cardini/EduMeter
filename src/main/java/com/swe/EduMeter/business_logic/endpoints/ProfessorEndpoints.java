@@ -1,10 +1,10 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
 import com.swe.EduMeter.business_logic.auth.annotations.AdminGuard;
-import com.swe.EduMeter.model.Professor;
-import com.swe.EduMeter.model.Teaching;
-import com.swe.EduMeter.model.response.ApiObjectCreated;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.Professor;
+import com.swe.EduMeter.models.Teaching;
+import com.swe.EduMeter.models.response.ApiObjectCreated;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.ProfDAO;
 import com.swe.EduMeter.orm.dao.TeachingDAO;
 import jakarta.inject.Inject;

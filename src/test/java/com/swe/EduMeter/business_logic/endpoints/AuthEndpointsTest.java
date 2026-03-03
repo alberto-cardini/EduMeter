@@ -1,9 +1,9 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
-import com.swe.EduMeter.model.Admin;
-import com.swe.EduMeter.model.PinChallenge;
-import com.swe.EduMeter.model.response.ApiOk;
+import com.swe.EduMeter.models.Admin;
+import com.swe.EduMeter.models.PinChallenge;
+import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 import com.swe.EduMeter.orm.dao.PinChallengeDAO;
 import jakarta.ws.rs.BadRequestException;

@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.dao;
 
-import com.swe.EduMeter.model.PublishedReview;
+import com.swe.EduMeter.models.PublishedReview;
 import java.util.List;
 import java.util.Optional;
 

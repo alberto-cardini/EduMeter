@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.model.PublishedReview;
+import com.swe.EduMeter.models.PublishedReview;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
 
 import java.sql.ResultSet;

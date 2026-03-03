@@ -1,6 +1,6 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.model.Admin;
+import com.swe.EduMeter.models.Admin;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 
 import java.sql.ResultSet;

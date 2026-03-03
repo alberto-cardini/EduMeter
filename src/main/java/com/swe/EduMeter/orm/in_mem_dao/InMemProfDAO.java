@@ -1,7 +1,7 @@
 package com.swe.EduMeter.orm.in_mem_dao;
 
-import com.swe.EduMeter.model.Professor;
-import com.swe.EduMeter.model.Teaching;
+import com.swe.EduMeter.models.Professor;
+import com.swe.EduMeter.models.Teaching;
 import com.swe.EduMeter.orm.dao.ProfDAO;
 import com.swe.EduMeter.orm.dao.TeachingDAO;
 
