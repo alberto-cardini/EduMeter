@@ -1,8 +1,8 @@
 package com.swe.EduMeter.business_logic;
 
-import com.swe.EduMeter.orm.*;
-import com.swe.EduMeter.orm.in_mem.InMemDAOFactory;
-import com.swe.EduMeter.orm.postgres.PostgreDAOFactory;
+import com.swe.EduMeter.orm.dao.*;
+import com.swe.EduMeter.orm.in_mem_dao.InMemDAOFactory;
+import com.swe.EduMeter.orm.postgre_dao.PostgreDAOFactory;
 import jakarta.ws.rs.ApplicationPath;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
