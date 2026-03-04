@@ -715,7 +715,7 @@ The PostgreSQL implementation provides a persistent storage solution intended fo
 			}
 		\end{umlpackage}	
 		
-		\umlinherit[geometry=-|]{PostgreAdminDAO}{AdminDAO}
+		\umldep[geometry=-|]{PostgreAdminDAO}{AdminDAO}
 		\umlinherit{PostgreAdminDAO}{PostgreDAO}
 	\end{tikzpicture}
 	\caption{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
@@ -826,7 +826,7 @@ The database has been structured following the relational Entity-Relationship sc
 			\end{tabular}
 		}
 
-		\umlclass[above = 1cm of Users]{Pin}{
+		\umlclass[above = 1cm of Users]{Pin Challenge}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& pin	 		& \textit{varchar} \\
@@ -858,7 +858,7 @@ The database has been structured following the relational Entity-Relationship sc
 			\end{tabular}
 		}
 
-		\umlclass[below = 0.5cm of Drafted Review]{Up Vote}{
+		\umlclass[below = 0.3cm of Drafted Review]{Up Vote}{
 			\begin{tabular}{@{} l l l @{}}
 				\textbf{PK FK} & \textbf{user\_id}   & \textit{char} \\
 				\textbf{PK FK} & \textbf{review\_id} & \textit{int} \\
@@ -907,8 +907,8 @@ The database has been structured following the relational Entity-Relationship sc
 			\end{tabular}
 		}
 
-		\umluniassoc{Report}{Users}
-		\umluniassoc{Report}{Published Review}
+		\umluniassoc[geometry=-|-]{Report}{Users}
+		\umluniassoc[geometry=-|-]{Report}{Published Review}
 		\umluniassoc{Drafted Review}{Users}
 		\umluniassoc{Published Review}{Users}
 		\umluniassoc{Course}{Degree}
@@ -916,9 +916,9 @@ The database has been structured following the relational Entity-Relationship sc
 		\umluniassoc{Teaching}{Course}
 		\umluniassoc{Teaching}{Professor}
 		\umluniassoc{Published Review}{Teaching}
-		\umluniassoc{Pin}{Users}
-		\umluniassoc{Up Vote}{Users}
-		\umluniassoc{Up Vote}{Published Review}
+		\umluniassoc{Pin Challenge}{Users}
+		\umluniassoc[geometry=-|-]{Up Vote}{Users}
+		\umluniassoc[geometry=--]{Up Vote}{Published Review}
 
 	\end{tikzpicture}
 	\caption{UML diagram of Database schema.}

@@ -68,7 +68,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 \subsubsection{Guest Templates}
 \vspace{1em}
 \begin{usecasetable}{1}{Browse Review}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & An unauthenticated user browses the collection of reviews to gather information. \\
 		\textbf{Actors} & Guest (Student) \\
@@ -84,7 +84,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\begin{tabitem}
 			\item[2a.] \textbf{Extension (Apply Filter):} The guest wants to narrow down the search results:
 			\begin{itemize}
-				\item The guest selects specific criteria.
+				\item The guest applies filters to one or more fields (School, Degree, Course or Professor).
 				\item The system updates the view to show only matching reviews.
 			\end{itemize}
 		\end{tabitem}
@@ -93,9 +93,9 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 \subsubsection{Student Templates}
 
-\begin{usecasetable}{2}{Student Login}
-	\begin{tabularx}{\textwidth}{l|X}
-		\textbf{Level} & Function \\
+\begin{usecasetable}{2}{Student Login \textbf{DA SISTEMARE!!} }
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
+		\textbf{Level} & Function  \\
 		\textbf{Description} & The user is authenticated via their institutional email. \\
 		\textbf{Actors} & Student \\
 		\textbf{Pre-conditions} & The user possesses a valid institutional email address. \\
@@ -116,7 +116,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 
 \begin{usecasetable}{3}{Submit Review}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & An authenticated user submits a review for a completed course. \\
 		\textbf{Actors} & Student \\
@@ -125,17 +125,16 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\begin{tabenum}
 			\item The user selects the option to create a review.
 			\item The system displays the review form (Mock-up \ref{mock-up-7-review-form}).
-			\item The user fills the review fields (school, degree, course, professor) by selecting existing option from a provided list.
-			\item The user add a rating and a comment.
+			\item The user fills the Teaching field by selecting an existing option from a provided list.
+			\item The user completes the enjoyment, difficulty and comment fields.
 			\item The user confirms the submission.
-			\item The system stores the review and makes it publicly visible.
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The review is stored in the database. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[3a.] If the information that the student need is not available in the list: 
+			\item[3a.] If the desired teaching is not available: 
 			\begin{itemize}
-				\item The user manually inputs the missing information in the fields.
-				\item Upon submission, the system saves the review but is not published publicly until an Admin approves it (UC \#5: Validate Review Data).
+				\item The user manually register the new teaching data by completing the Professor, Course, Degree and School string fields.
+				\item Upon submission, the system saves the review but is not published until an Admin approves it (UC \#5: Validate Review Data).
 			\end{itemize} 
 		\end{tabitem}
 	\end{tabularx}
@@ -143,27 +142,27 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 
 \begin{usecasetable}{4}{Up-Vote}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & An authenticated Student expresses approval for a specific review. \\
 		\textbf{Actors} & Student \\
 		\textbf{Pre-conditions} & The student must be authenticated. \\
 		\textbf{Steps} &
 		\begin{tabenum}
-			\item The student selects the upvote option on a specific review.
+			\item The student selects the up-vote option on a specific review.
 			\item The system checks if the student has already voted for this review.
 			\item The system increments the vote counter for the review.
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The vote is stored in the database, updating the review's total score. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[3a.] If the student has already voted, the system does not register the new vote.
+			\item[3a.] If the student has already voted, the system interprets the action as a request to retract the vote and remove the existing vote as well as decrementing the total score.
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
 
 \vspace{2em}
 \begin{usecasetable}{5}{Report Review}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & An authenticated student reports inappropriate content. \\
 		\textbf{Actors} & Student \\
@@ -183,9 +182,8 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 \subsubsection{Admin Templates}
 
-\begin{usecasetable}{6}{Admin Login}
-	\renewcommand{\arraystretch}{1.4}
-	\begin{tabularx}{\textwidth}{l|X}
+\begin{usecasetable}{6}{Admin Login \textbf{DA SISTEMARE!}}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & Function \\
 		\textbf{Description} & The admin log in the system to access his functionality. \\
 		\textbf{Actors} & Admin \\
@@ -210,7 +208,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 
 \begin{usecasetable}{7}{Validate Review Information}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & The admin verifies the submitted information. \\
 		\textbf{Actors} & Admin \\
@@ -218,25 +216,21 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Steps} &
 		\begin{tabenum}
 			\item The admin selects a review from the queue of pending validations (Mock-up \ref{mock-up-5-admin-control-panel}).
-			\item The admin links the following fields to existing database entries (Mock-up \ref{mock-up-6-admin-edit-panel}):
-			\begin{itemize}[leftmargin=1.5em, nosep]
-				\item School
-				\item Degree
-				\item Course
-				\item Professor
-			\end{itemize}
-			\item The admin validates and publishes the review.
+			\item The admin verifies the submitted data against official university documentation. 
+			\item The admin links the information in the fields to existing database entries (Mock-up \ref{mock-up-6-admin-edit-panel}).
+			\item The admin approves and publishes the review.
+			\item The system creates the new Teaching entry in the database.
 		\end{tabenum} \\
-		\textbf{Post-conditions} & The review is validated and visible to the public. \\
+		\textbf{Post-conditions} & The review is published and the new Teaching entry is available for future reviews. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[2a.] The admin corrects a field by creating a new entry in the database.
-			\item[2b.] If the fields cannot be linked or verified, the admin discards the review.
+			\item[2a.] If the submitted information is invalid or false, the admin discard the review.
+			\item[3a.] If a specific entity doesn't exist in the database, the admin creates it before linking it.
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
 
 \begin{usecasetable}{8}{Validate Report}
-	\begin{tabularx}{\textwidth}{l|X}
+	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & User Goal \\
 		\textbf{Description} & The admin evaluates reported reviews and take moderation actions. \\
 		\textbf{Actors} & Admin \\
