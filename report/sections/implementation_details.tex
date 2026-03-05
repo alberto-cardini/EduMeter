@@ -8,7 +8,7 @@ The platform relay on several external technologies to operate properly. The cho
 
 \begin{itemize}
 	\item \textbf{Maven}: used as build and management tool for the project. 
-	\item \textbf{Jakarta RESTful Web Services (JAX-RS)}: employed as the project's RESTful API specification. 
+	\item \textbf{Jakarta RESTful Web Services (JAX-RS)}: employed as the project's RESTful API specification.
 	\begin{itemize}
 		\item \textbf{JAX-RS}: it's the section of Jakarta EE about RESTful services.
 		\item \textbf{Jersey}: implements JAX-RS, specifically utilizing the jersey-container-servlet module.
@@ -20,7 +20,7 @@ The platform relay on several external technologies to operate properly. The cho
 		\item \textbf{PostgreSQL}: concrete implementation of the DB.
 	\end{itemize}
 	\item \textbf{JUnit Jupiter}: main testing framework. Provides an easy and clear interface to create and run test on the code base.
-	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as DAOs. 
+	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as DAOs.
 \end{itemize}
 
 \noindent The project is configured to use Java 17 as the compilation target.
@@ -376,7 +376,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
 \end{itemize}
 
-\subsubsection{Resource endpointa} Resource endpointa are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction. 
+\subsubsection{Resource endpointa} Resource endpointa are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction.
 
 TODO: da aggiustare (controllare che sia fattuale)
 \paragraph{\textbf{Single Responsibility Principle.}} The controllers architecture has been designed to respect the single responsibility principle. Consequently, each controller is dedicated to managing only its specific resource, providing the necessary endpoints for user communication. Figure \ref{userControllerCode} demonstrates this approach through the \texttt{UserController} class. As a representative example, each controller is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-endpoints}, in each class attributes and in the fact that classes do not interact with each other.
@@ -622,19 +622,34 @@ In the \textit{EduMeter} implementation, it was mandatory to implement specific 
 %\end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
-%The Object-Relation Mapper (ORM) package serves as the data persistence layer for the application. Its primary responsibility is to connect the object-oriented domain model used within the business logic layer with the underlying data storage mechanisms.
-
 The Object-Relation Mapper (ORM) package has the responsibility of \textbf{connecting the object-oriented domain model} used within the business logic layer \textbf{to the underlying data storage mechanisms}. 
 
 The application is designed to support two distinct storage backends: a volatile In-Memory storage (ideal for testing and rapid prototyping) and a persistent PostgreSQL remote database (intended for production environments). The selection of the active storage mechanism is determined dynamically at application startup by checking the \texttt{IN\_MEM\_DB} environment variable.
 
+%\umlclass[x=15, y=-10]{DatabaseManager}{
+%	\begin{tabular}{@{} l l @{}}
+%		- instance & : DatabaseManager \\
+%		- connection & : Connection
+%	\end{tabular}
+%}{
+%	\begin{tabular}{@{} l l @{}}
+%		- DatabaseManager() & : DatabaseManager \\
+%		+ getInstance() & : DatabaseManager\\
+%		+ getConnection() & : Connection \\
+%
+%	\end{tabular}
+%}
 \subsubsection{DAO Interfaces}
 To achieve a strict separation between the data access logic and the core business layer, the ORM package uses the Data Access Object (DAO) design pattern alongside the Abstract Factory pattern. 
 
-The \texttt{DAOFactory} interface acts as the central factory, defining methods to instantiate specific resource DAOs, such as \texttt{AdminDAO}, \texttt{UserDAO}, and \texttt{ProfDAO}. These resource-specific interfaces define the standard contract for all CRUD (Create, Read, Update, Delete) operations.
+\paragraph{DAO pattern.}
+The DAO pattern introduces a crucial abstraction layer: it allows the business logic to interact with the database through simplified, high-level interfaces with standardised methods for all necessary CRUD operations. This hides the underlying complexities of data persistence such as query execution and connection management. .
+\paragraph{Abstract Factory pattern.}
+The \texttt{DAOFactory} interface acts as the central Abstract Factory, establishing a contract for creating domain-specific DAOs. This allows the system to swap out the entire persistence implementation seamlessly. Currently, the application provides two concrete factory implementations:
+	the \textbf{\texttt{InMemDAOFactory}} (produces DAOs that store data in volatile memory) and the
+ \textbf{\texttt{PostgreDAOFactory}:} (produces DAOs that interact with a persistent PostgreSQL database).
 
-As defined in the \texttt{MainApplication} configuration, Dependency Injection is utilized during startup to bind the application controllers to the concrete implementations (\texttt{InMemDAOFactory} or \texttt{PostgreDAOFactory}) based on the environment configuration. This architectural choice guarantees that the business logic remains entirely agnostic of the underlying database technology, significantly enhancing the maintainability and testability of the system.
-
+During the startup phase, the \texttt{MainApplication} class uses a lambda-based \texttt{AbstractBinder} to dynamically configure the system based on the \texttt{IN\_MEM\_DB} environment variable: if it is present, it instantiates the \texttt{InMemDAOFactory}, otherwise it defaults to the \texttt{PostgreDAOFactory}. Using the selected factory instance, it binds the specific DAO interfaces (e.g., \texttt{UserDAO.class}) to their concrete implementations.
 
 \begin{figure}[H]
 	\centering
@@ -654,14 +669,14 @@ As defined in the \texttt{MainApplication} configuration, Dependency Injection i
 						+ getByEmail(String) & : Optional<Admin> \\
 						+ getAll() & : List<Admin> \\
 						+ delete(int) & : void \\
-						+ add(Admin) & : int 
+						+ add(Admin) & : int
 					\end{tabular}
 				}
 			\end{umlpackage}
 
 			\begin{umlpackage}{in-mem-dao}
 				\umlclass[x=7.5, y=-5]{InMemAdminDAO}{}{}
-				
+
 				\umlclass[type=interface, x=7.5, y=-8]{InMemDAOFactory}{}{}
 			\end{umlpackage}
 
@@ -687,6 +702,16 @@ As defined in the \texttt{MainApplication} configuration, Dependency Injection i
 \end{figure}
 
 \subsubsection{In Memory Storage}
+The In-Memory implementation provides a lightweight, volatile storage solution perfectly suited for rapid prototyping, unit testing, and development environments where the overhead of a persistent database connection is unnecessary. All classes for this implementation reside within the \texttt{in\_mem\_dao} sub-package.
+
+Each class directly implements its respective domain interface and manages its own internal state entirely within the JVM heap. Key characteristics of this implementation include:
+
+\begin{itemize}
+	\item \textbf{Data structures as tables:} The core of the in-memory storage relies on standard Java Collections rather than external tables. Each DAO utilizes a \texttt{Map<Integer, T>} to simulate a relational database table where the \texttt{Integer} key acts as the unique primary key, while the map's value holds the corresponding domain object instance.
+	\item \textbf{Auto-incrementing IDs:} To mimic the behavior of a relational database sequence (like \texttt{SERIAL} in PostgreSQL), each DAO maintains a local integer counter. During an \texttt{add} operation, the domain object is assigned the current ID before being inserted into the \texttt{store} map, and the counter is subsequently incremented.
+	\item \textbf{Query Simulation via Streams API:} Basic CRUD operations are implemented with native Map methods like \texttt{store.get(id)} and \texttt{store.remove(id)}. For queries that require filtering by non-key attributes (such as \texttt{getByEmail}), the DAOs leverage the Java Streams API. They iterate over the Map's values, apply the necessary filter predicates, and return the matching elements (e.g., \texttt{store.values().stream().filter(...).findAny()}).
+	\item \textbf{Inter-DAO Relationships:} To manage complex queries and simulate relational joins, the DAO can maintain references to other DAO instances, that are passed through the constructor, to fetch the related objects it needs to complete the query.
+\end{itemize}
 
 \subsubsection{Postgre Remote Storage}
 The PostgreSQL implementation provides a persistent storage solution intended for production environments. This sub-package utilizes a layered inheritance structure to minimize boilerplate code and ensure consistent database interaction patterns across all resources.
@@ -726,21 +751,20 @@ The PostgreSQL implementation provides a persistent storage solution intended fo
 						+ getByEmail(String) & : Optional<Admin> \\
 						+ getAll() & : List<Admin> \\
 						+ delete(int) & : void \\
-						+ add(Admin) & : int 
+						+ add(Admin) & : int
 					\end{tabular}
 				}
 			\end{umlpackage}
 		\end{umlpackage}	
 		
-		\umldep[geometry=-|]{PostgreAdminDAO}{AdminDAO}
+		\umlimpl[geometry=-|]{PostgreAdminDAO}{AdminDAO}
 		\umlinherit{PostgreAdminDAO}{PostgreDAO}
 	\end{tikzpicture}
 	\caption{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
 \end{figure}
 
-\paragraph{The PostgreDAO Base Class}
+\paragraph{The PostgreDAO Base Class.}
 The core of the PostgreSQL implementation is the abstract \texttt{PostgreDAO<T>} class. Through the use of Java Generics and the JDBC API, it provides a template that heavily reduces boilerplate code across the data access layer. Key features of this base class include:
-
 
 \begin{itemize}
 	\item \textbf{Centralized queries management:} It encapsulates the repetitive mechanics of JDBC in protected wrapper methods like \texttt{selectQuery}, \texttt{insertQuery}, and \texttt{updateQuery}. They automatically handle connection retrieval, statement preparation, and the execution lifecycle, keeping concrete DAOs clean.
@@ -748,7 +772,7 @@ The core of the PostgreSQL implementation is the abstract \texttt{PostgreDAO<T>}
 	\item \textbf{Abstract Result Mapping:} While the base class manages executing the query and iterating through the \texttt{ResultSet}, it delegates the actual object creation to its subclasses via the abstract \texttt{mapRowToObject} method.
 \end{itemize}
 
-\paragraph{Concrete DAOs}
+\paragraph{Concrete DAOs.}
 Concrete classes have the purpose of implementing the methods defined by their respective domain interfaces connecting them directly to the database. Their role focuses on \textbf{constructing the SQL query} based on the input parameters, delegating all the execution infrastructure to the base class.
 
 \begin{itemize}
@@ -797,12 +821,12 @@ For security and deployment flexibility, credentials are never hardcoded; instea
 Once the environment variables are successfully validated, the manager loads the PostgreSQL JDBC driver (\texttt{org.postgresql.Driver}) and establishes the connection through the \texttt{DriverManager}.
 
 \subsubsection{Structure}
-\paragraph{Initialization}
+\paragraph{Initialization.}
 When the remote storage option is active and \texttt{PostgreDAOFactory} is instantiated, the database schema is automatically initialized. The factory's constructor triggers an \texttt{initDatabase()} method, which reads an \textit{init.sql} file located in the application's resources folder. The factory requests a connection from the \texttt{DatabaseManager} and executes the script as a single query string.
 
 This automated setup process is inherently safe and idempotent. All queries within the \textit{init.sql} script utilize the \texttt{CREATE TABLE IF NOT EXISTS} clause, ensuring that existing data or structures are never accidentally overwritten if the database has already been configured. 
 
-\paragraph{Implementation}
+\paragraph{Implementation.}
 The database has been structured following the relational Entity-Relationship schema in Figure \ref{ER model}. The architecture is built around several interconnected core entities:
 \begin{itemize}
 	\item \textbf{Users \& Authentication:} The \texttt{Users} table manages standard accounts (including ban status), while administrative access is handled by the \texttt{Admin} table. Authentication and password recovery rely on a \texttt{Pin} table, which stores temporary codes, their expiration timestamps, and the user's administrative status.

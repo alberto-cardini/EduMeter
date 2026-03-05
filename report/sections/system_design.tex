@@ -245,7 +245,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Post-conditions} & The report has been processed and the moderation procedure is consistent in the database. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
 			\item[3a.] If the review  doesn't contain any violation, the report is dismissed and the review remains visible.
-			\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria the admin can map the review to the student ID and suspend his account.
+			\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria, the admin gets the student ID related to the review and suspend the student's account.
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
@@ -339,7 +339,7 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 
 \subsection{Relational Model}
 
-\textbf{EduMeter}'s schema is architected to ensure strict traceability between users and their contributions while maintaining a hierarchical organization of academic data including Schools, Degrees, and Courses. The E-R model (Figure 3) is organized into three functional clusters:
+\textbf{EduMeter}'s schema is architected to ensure strict traceability between users and their contributions while maintaining a hierarchical organization of academic data including Schools, Degrees, and Courses. The E-R model (Figure 7) is organized into three functional clusters:
 
 \begin{itemize}
 	\item \textbf{User and Moderation}: The \textbf{User} entity serves as the central actor. To facilitate platform safety, an \texttt{isBanned} attribute allows for administrative control. Users are linked to \textbf{Reports} via a \texttt{Files} relationship, enabling a transparent moderation history.
