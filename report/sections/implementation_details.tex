@@ -639,28 +639,36 @@ As defined in the \texttt{MainApplication} configuration, Dependency Injection i
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
-		\begin{umlpackage}{ORM}
-			\umlclass[type=interface]{DAOFactory}{}{
-				\begin{tabular}{@{} l l @{}}
-					... & ... \\
-					+ getDegreeDAO() & : DegreeDAO \\
-					... & ...
-				\end{tabular}
-			}
-			\umlclass[type=interface, right=3.5cm of DAOFactory]{AdminDAO}{}{
-				\begin{tabular}{@{} l l @{}}
-					+ get(int) & : Optional<Admin> \\
-					+ getByEmail(String) & : Optional<Admin> \\
-					+ getAll() & : List<Admin> \\
-					+ delete(int) & : void \\
-					+ add(Admin) & : int 
-				\end{tabular}
-			}
-			\umlclass[x=7.5, y=-5]{InMemAdminDAO}{}{}
-			\umlclass[right=2.16cm of InMemAdminDAO]{PostgreAdminDAO}{}{}
-			
-			\umlclass[type=interface, x=7.5, y=-8]{InMemDAOFactory}{}{}
-			\umlclass[type=interface, right=2cm of InMemDAOFactory]{PostgreDAOFactory}{}{}
+		\begin{umlpackage}{orm}
+			\begin{umlpackage}{dao}
+				\umlclass[type=interface]{DAOFactory}{}{
+					\begin{tabular}{@{} l l @{}}
+						... & ... \\
+						+ getDegreeDAO() & : DegreeDAO \\
+						... & ...
+					\end{tabular}
+				}
+				\umlclass[type=interface, right=3.5cm of DAOFactory]{AdminDAO}{}{
+					\begin{tabular}{@{} l l @{}}
+						+ get(int) & : Optional<Admin> \\
+						+ getByEmail(String) & : Optional<Admin> \\
+						+ getAll() & : List<Admin> \\
+						+ delete(int) & : void \\
+						+ add(Admin) & : int 
+					\end{tabular}
+				}
+			\end{umlpackage}
+
+			\begin{umlpackage}{in-mem-dao}
+				\umlclass[x=7.5, y=-5]{InMemAdminDAO}{}{}
+				
+				\umlclass[type=interface, x=7.5, y=-8]{InMemDAOFactory}{}{}
+			\end{umlpackage}
+
+			\begin{umlpackage}{postgre-dao}
+				\umlclass[right=2.16cm of InMemAdminDAO]{PostgreAdminDAO}{}{}
+				\umlclass[type=interface, right=2cm of InMemDAOFactory]{PostgreDAOFactory}{}{}
+			\end{umlpackage}
 			
 		\end{umlpackage}
 		
@@ -668,11 +676,11 @@ As defined in the \texttt{MainApplication} configuration, Dependency Injection i
 		\umldep[geometry=|-|]{PostgreDAOFactory}{PostgreAdminDAO}
 		\umldep[anchor1=east, anchor2=west]{DAOFactory}{AdminDAO}
 		
-		\umlinherit[geometry=|-|, arm1=1, anchor1=north]{InMemAdminDAO}{AdminDAO}
-		\umlinherit[geometry=|-|, arm1=1, anchor1=north]{PostgreAdminDAO}{AdminDAO}
+		\umlinherit[geometry=-|, arm1=1, anchor1=-5]{InMemAdminDAO}{AdminDAO}
+		\umlinherit[geometry=-|, arm1=1, anchor1=185]{PostgreAdminDAO}{AdminDAO}
 		
-		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.3]{InMemDAOFactory}{DAOFactory}
-		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.3]{PostgreDAOFactory}{DAOFactory}
+		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.7]{InMemDAOFactory}{DAOFactory}
+		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.7]{PostgreDAOFactory}{DAOFactory}
 	\end{tikzpicture}
 	\caption{Partial UML class diagram of the ORM package. This diagram display only the portion related to the Admin resource, the part referred to the other resources have the exact layout, therefore, it is omitted.}
 	\label{UML-ORM}
@@ -686,8 +694,8 @@ The PostgreSQL implementation provides a persistent storage solution intended fo
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.8, transform shape]
-		\begin{umlpackage}{ORM}
-			\begin{umlpackage}{Postgres}
+		\begin{umlpackage}{orm}
+			\begin{umlpackage}{postgre-dao}
 				\umlclass[type=abstract]{PostgreDAO}{}{
 					\begin{tabular}{@{} l l @{}}
 						- setParams(PreparedStatement, List<Object>) & : void \\
@@ -711,15 +719,17 @@ The PostgreSQL implementation provides a persistent storage solution intended fo
 				}
 			\end{umlpackage}
 			
-			\umlclass[type=interface, left= 1.5cm of PostgreDAO]{AdminDAO}{}{
-				\begin{tabular}{@{} l l @{}}
-					+ get(int) & : Optional<Admin> \\
-					+ getByEmail(String) & : Optional<Admin> \\
-					+ getAll() & : List<Admin> \\
-					+ delete(int) & : void \\
-					+ add(Admin) & : int 
-				\end{tabular}
-			}
+			\begin{umlpackage}{dao}
+				\umlclass[type=interface, left= 1.5cm of PostgreDAO]{AdminDAO}{}{
+					\begin{tabular}{@{} l l @{}}
+						+ get(int) & : Optional<Admin> \\
+						+ getByEmail(String) & : Optional<Admin> \\
+						+ getAll() & : List<Admin> \\
+						+ delete(int) & : void \\
+						+ add(Admin) & : int 
+					\end{tabular}
+				}
+			\end{umlpackage}
 		\end{umlpackage}	
 		
 		\umldep[geometry=-|]{PostgreAdminDAO}{AdminDAO}
