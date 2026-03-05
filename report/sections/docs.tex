@@ -1,5 +1,3 @@
-TODO: add query parameters, body, response shape
-
 \section{API Endpoint Documentation}
 The EduMeter REST API uses standard HTTP methods to perform CRUD operations. Access levels are strictly enforced via the \texttt{@AdminGuard} and \texttt{@AuthGuard} filters.
 
@@ -7,14 +5,22 @@ The EduMeter REST API uses standard HTTP methods to perform CRUD operations. Acc
 \begin{description}
 	\item[\POST \quad \texttt{/auth/sendPin}] \hfill \\
 	\textbf{Access:} Public \\
+	\textbf{Query Params:} \texttt{admin} (boolean) \\
+	\textbf{Body:} \texttt{\{ "email": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "challengeId": 1234 \}} \\
 	\textbf{Description:} Initiates the login process by accepting an email and an \texttt{admin} boolean. It validates the email domain (enforcing \texttt{@edu.unifi.it} for students) and generates a 4-digit PIN challenge. Returns a \texttt{challengeId} for the next step.
 	
 	\item[\POST \quad \texttt{/auth/login}] \hfill \\
 	\textbf{Access:} Public \\
+	\textbf{Query Params:} \texttt{admin} (boolean) \\
+	\textbf{Body:} \texttt{\{ "challengeId": 1234, "pin": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "token": "JWT\_ACCESS\_TOKEN" \}} \\
 	\textbf{Description:} Completes the identity challenge. Validates the provided \texttt{pin} against the \texttt{challengeId}. If successful, it returns a JWT session token for further requests.
 	
 	\item[\POST \quad \texttt{/auth/logout}] \hfill \\
 	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Header Params:} \texttt{bearer} (String) \\
+	\textbf{Response:} \texttt{\{ "message": "Token revoked" \}} \\
 	\textbf{Description:} Invalidates the provided Bearer token by adding it to the server-side revocation list, effectively ending the user session.
 \end{description}
 
@@ -22,66 +28,265 @@ The EduMeter REST API uses standard HTTP methods to perform CRUD operations. Acc
 \begin{description}
 	\item[\GET \quad \texttt{/school}] \hfill \\
 	\textbf{Access:} Public \\
-	\textbf{Description:} Fetches all university schools. Supports an optional \texttt{query} parameter to filter schools by name.
+	\textbf{Query Params:} \texttt{query} (string) \\
+	\textbf{Response:} \texttt{List<\{ "id": int, "name": "string" \}>} \\
+	\textbf{Description:} Fetches all university schools. Supports an optional query parameter to filter schools by name.
 	
 	\item[\POST \quad \texttt{/school}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "name": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "School created" \}} \\
 	\textbf{Description:} Creates a new School entity. Requires a JSON body containing the school name.
 	
 	\item[\PUT \quad \texttt{/school}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "id": int, "name": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "message": "School updated" \}} \\
 	\textbf{Description:} Updates an existing school's details. The school must exist, otherwise returns a 404 error.
+	
+	\item[\GET \quad \texttt{/school/\{school\_id\}}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{school\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "id": int, "name": "string" \}} \\
+	\textbf{Description:} Returns the information of the school internally referred with such school id.
 	
 	\item[\DELETE \quad \texttt{/school/\{school\_id\}}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{school\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "School deleted" \}} \\
 	\textbf{Description:} Deletes a school and its associated data from the persistence layer.
+\end{description}
+
+\subsection{Degree Management (\texttt{/degree})}
+\begin{description}
+	\item[\GET \quad \texttt{/degree}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Query Params:} \texttt{query} (string), \texttt{school\_id} (int) \\
+	\textbf{Response:} \texttt{List<\{ "id": int, "name": "string", "schoolId": int \}>} \\
+	\textbf{Description:} Searches for degrees based on a name query or a specific \texttt{school\_id}. Returns a list of all matching degree entities.
+	
+	\item[\GET \quad \texttt{/degree/\{degree\_id\}}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{degree\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "id": int, "name": "string", "schoolId": int \}} \\
+	\textbf{Description:} Fetches the details of a specific degree by its unique identifier. Returns a 404 error if the degree does not exist.
+	
+	\item[\POST \quad \texttt{/degree}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "name": "string", "schoolId": int \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Degree created" \}} \\
+	\textbf{Description:} Creates a new Degree entity and associates it with a school. Requires a JSON body with the degree's name and school ID.
+	
+	\item[\PUT \quad \texttt{/degree}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "id": int, "name": "string", "schoolId": int \}} \\
+	\textbf{Response:} \texttt{\{ "message": "Degree updated" \}} \\
+	\textbf{Description:} Updates an existing degree's information. The \texttt{id} must be provided in the body; if the degree is not found, it returns a 404 error.
+	
+	\item[\DELETE \quad \texttt{/degree/\{degree\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{degree\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Degree deleted" \}} \\
+	\textbf{Description:} Permanently removes a degree from the persistence layer. The system first verifies existence via an internal lookup.
 \end{description}
 
 \subsection{Course and Teaching (\texttt{/course})}
 \begin{description}
 	\item[\GET \quad \texttt{/course}] \hfill \\
 	\textbf{Access:} Public \\
-	\textbf{Description:} Searches for courses based on name query, \texttt{school\_id}, or \texttt{degree\_id}. Used for navigating the academic tree.
+	\textbf{Query Params:} \texttt{query} (string), \texttt{school\_id} (int), \texttt{degree\_id} (int) \\
+	\textbf{Response:} \texttt{List<\{"id": int, "name"; "string", "degree\_Id": int\}>} \\
+	\textbf{Description:} Searches for courses based on name query, \texttt{school\_d}, or \texttt{degree\_id}. Used for navigating the academic tree.
+	
+	\item[\POST \quad \texttt{/course}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ { "id": int, "name" : "string", "degreeId" : "int" } \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Course created" \}} \\
+	\textbf{Description:} Creates a new course with the provided informations.
+	
+	\item[\PUT \quad \texttt{/course}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ { "id": int, "name" : "string", "degreeId" : "int" } \}} \\
+	\textbf{Response:} \texttt{\{ "message": "Course updated" \}} \\
+	\textbf{Description:} Updates the course, if it exists, with the provided informations. The id given with the JSON must be not null.
+	
+	\item[\GET \quad \texttt{/course/\{course\_id\}}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{course\_id} (int) \\
+	\textbf{Response:} \texttt{\{"id": int, "name", "string", "degreeId": int\}} \\
+	\textbf{Description:} Returns the information about the course internally referred with such id.
+	
+	
+	\item[\DELETE \quad \texttt{/course/\{course\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{course\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Course deleted" \}} \\
+	\textbf{Description:} Deletes the course internally referred with such id, if it exists.
+	
+	\item[\GET \quad \texttt{/course/\{course\_id\}/teaching}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{course\_id} (int) \\
+	\textbf{Response:} \texttt{List<\{ "id"; int, "courseId": int, "profId": int \}>} \\
+	\textbf{Description:} Reveals the Teachings related to the course with the provided it.
 	
 	\item[\POST \quad \texttt{/course/\{course\_id\}/teaching}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{course\_id} (int), \texttt{teaching} (int) \\
+	\textbf{Body:} \texttt{\{ "profId": int \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Added teacher to course" \}} \\
 	\textbf{Description:} Creates a link between a professor and a course. This "Teaching" entity allows reviews to be categorized by both subject and instructor.
 	
-	\item[\DELETE \quad \texttt{/course/\{course\_id\}/teaching/\{t\_id\}}] \hfill \\
+	\item[\DELETE \quad \texttt{/course/\{course\_id\}/teaching/\{teaching\_id\}}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{course\_id} (int), \texttt{teaching\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Removed teacher from course" \}} \\
 	\textbf{Description:} Removes a professor's assignment to a specific course.
 \end{description}
 
-\subsection{Review Operations (\texttt{/review})}
+\subsection{Professor Management (\texttt{/prof})}
+\begin{description}
+	\item[\GET \quad \texttt{/prof}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Query Params:} \texttt{query} (string), \texttt{course\_id} (int) \\
+	\textbf{Response:} \texttt{List<\{ "id": int, "name": "string", "surname": "string" \}>} \\
+	\textbf{Description:} Searches for professors based on a name query or by a specific \texttt{course\_id}. Returns a list of matching professor entities.
+	
+	\item[\POST \quad \texttt{/prof}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "name": "string", "surname": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Professor created" \}} \\
+	\textbf{Description:} Registers a new professor in the system. Access is restricted to administrators.
+	
+	\item[\PUT \quad \texttt{/prof}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "id": int, "name": "string", "surname": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "message": "Professor updated" \}} \\
+	\textbf{Description:} Updates the details of an existing professor. The \texttt{id} must be specified in the request body to identify the entity.
+	
+	\item[\GET \quad \texttt{/prof/\{prof\_id\}}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{prof\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "id": int, "name": "string", "surname": "string" \}} \\
+	\textbf{Description:} Retrieves the detailed information of a specific professor. Returns a 404 error if the professor is not found.
+	
+	\item[\DELETE \quad \texttt{/prof/\{prof\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{prof\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Professor deleted" \}} \\
+	\textbf{Description:} Deletes a professor from the persistence layer. The system checks for the existence of the professor before proceeding with removal.
+	
+	\item[\GET \quad \texttt{/prof/\{prof\_id\}/teaching}] \hfill \\
+	\textbf{Access:} Public \\
+	\textbf{Path Params:} \texttt{prof\_id} (int) \\
+	\textbf{Response:} \texttt{List<\{ "id": int, "courseId": int, "profId": int \}>} \\
+	\textbf{Description:} Returns a list of all "Teaching" assignments for a specific professor, showing which courses they are currently linked to.
+\end{description}
+
+\subsection{Review Management (\texttt{/review})}
 \begin{description}
 	\item[\GET \quad \texttt{/review}] \hfill \\
-	\textbf{Access:} Mixed (Public / Authenticated) \\
-	\textbf{Description:} Retrieves published reviews. If the request includes a valid Auth token, the response includes a \texttt{voted} boolean for each review, indicating if the current user has upvoted it.
+	\textbf{Access:} Public / Mixed \\
+	\textbf{Query Params:} \texttt{school\_id} (int), \texttt{degree\_id} (int), \texttt{course\_id} (int), \texttt{professor\_id} (int) \\
+	\textbf{Response:} \texttt{\seqsplit{List<\{ "id": int, "comment": "string", "date": "string", "enjoyment": int, "difficulty": int, "teachingId": int, "upvotes": int, "upvotedByUser": boolean \}>}} \\
+	\textbf{Description:} Searches for published reviews based on academic filters. If the request is authenticated, the \texttt{upvotedByUser} field is populated based on the requester's identity.
 	
 	\item[\POST \quad \texttt{/review}] \hfill \\
 	\textbf{Access:} \texttt{@AuthGuard} \\
-	\textbf{Description:} Submits a new review. The system extracts the user's identity hash from the token and ignores any client-provided hash to prevent identity spoofing.
+	\textbf{Body:} \texttt{\seqsplit{\{ "comment": "string", "enjoyment": int, "difficulty": int, "teachingId": int \}}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "string" \}} \\
+	\textbf{Description:} Submits a new review directly. The system automatically sets the current date, initializes upvotes to zero, and extracts the creator's hash from the security context.
+	
+	\item[\PUT \quad \texttt{/review}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\{ "id": int, "comment": "string", "enjoyment": int, "difficulty": int, "teachingId": int \}} \\
+	\textbf{Response:} \texttt{\{ "message": "Review updated" \}} \\
+	\textbf{Description:} Updates an existing published review. This operation is restricted to administrators and requires a valid review \texttt{id}.
+	
+	\item[\GET \quad \texttt{/review/\{review\_id\}}] \hfill \\
+	\textbf{Access:} Public / Mixed \\
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\seqsplit{\{ "id": int, "comment": "string", "date": "string", "enjoyment": int, "difficulty": int, "teachingId": int, "upvotes": int, "upvotedByUser": boolean \}}} \\
+	\textbf{Description:} Retrieves a specific published review by its ID. It includes the voting status if the user is logged in.
 	
 	\item[\POST \quad \texttt{/review/\{review\_id\}/vote}] \hfill \\
 	\textbf{Access:} \texttt{@AuthGuard} \\
-	\textbf{Description:} Toggles an upvote on a review. If the user has already voted, the vote is removed; otherwise, it is added.
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Vote toggled" \}} \\
+	\textbf{Description:} Toggles an upvote for the current user on the specified review. The review must exist to complete the operation.
 	
 	\item[\DELETE \quad \texttt{/review/\{review\_id\}}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
-	\textbf{Description:} Permanently removes a review from the platform.
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Review deleted" \}} \\
+	\textbf{Description:} Permanently removes a published review. This endpoint verifies existence before performing the deletion.
+	
+	\item[\GET \quad \texttt{/review/draft}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Response:} \texttt{\seqsplit{List<\{ "id": int, "comment": "string", "date": "string", "enjoyment": int, "difficulty": int, "rawSchool": "string", "rawDegree": "string", "rawCourse": "string", "rawProfessor": "string" \}>}} \\
+	\textbf{Description:} Retrieves all review drafts submitted by users for entities not yet present in the database. Restricted to administrators.
+	
+	\item[\POST \quad \texttt{/review/draft}] \hfill \\
+	\textbf{Access:} \texttt{@AuthGuard} \\
+	\textbf{Body:} \texttt{\seqsplit{\{ "comment": "string", "enjoyment": int, "difficulty": int, "rawSchool": "string", "rawDegree": "string", "rawCourse": "string", "rawProfessor": "string" \}}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Published review" \}} \\
+	\textbf{Description:} Creates a new draft review. The system saves the textual "raw" information of the academic entities for later processing by administrators.
+	
+	\item[\GET \quad \texttt{/review/draft/\{review\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\seqsplit{\{ "id": int, "comment": "string", "date": "string", "enjoyment": int, "difficulty": int, "rawSchool": "string", "rawDegree": "string", "rawCourse": "string", "rawProfessor": "string" \}}} \\
+	\textbf{Description:} Retrieves the details of a specific draft review for moderation or conversion.
+	
+	\item[\DELETE \quad \texttt{/review/draft/\{review\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Review deleted" \}} \\
+	\textbf{Description:} Deletes a draft review from the system. Often used when a draft is rejected or manually converted to a published review.
 \end{description}
 
-\subsection{Moderation and User Control (\texttt{/report} \& \texttt{/user})}
+\subsection{Moderation and Reporting (\texttt{/report})}
 \begin{description}
+	\item[\GET \quad \texttt{/report}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Response:} \texttt{\seqsplit{List<\{ "id": int, "reviewId": int, "issuerHash": "string", "reason": "string" \}>}} \\
+	\textbf{Description:} Retrieves a complete list of all filed reports. This endpoint is restricted to administrators for moderation purposes.
+	
+	\item[\GET \quad \texttt{/report/\{report\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{report\_id} (int) \\
+	\textbf{Response:} \texttt{\seqsplit{\{ "id": int, "reviewId": int, "issuerHash": "string", "reason": "string" \}}} \\
+	\textbf{Description:} Fetches the details of a specific report. Returns a 404 error if the \texttt{report\_id} does not exist in the database.
+	
 	\item[\POST \quad \texttt{/report}] \hfill \\
 	\textbf{Access:} \texttt{@AuthGuard} \\
-	\textbf{Description:} Allows a user to flag a review for moderation. The reporter's hash is stored to prevent duplicate reporting while maintaining anonymity.
+	\textbf{Body:} \texttt{\{ "reviewId": int, "reason": "string" \}} \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Report created" \}} \\
+	\textbf{Description:} Allows an authenticated user to flag a review for moderation. The system automatically attaches the user's identity hash from the security context to the report.
+	
+	\item[\DELETE \quad \texttt{/report/\{report\_id\}}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Path Params:} \texttt{report\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Report deleted" \}} \\
+	\textbf{Description:} Removes a report without taking action on the flagged review. Used when a moderator determines that a report is unfounded.
 	
 	\item[\POST \quad \texttt{/report/\{report\_id\}/approve}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
-	\textbf{Description:} The administrator approves the report, resulting in the automatic deletion of the flagged review and the report itself.
+	\textbf{Path Params:} \texttt{report\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "message": "Report approved" \}} \\
+	\textbf{Description:} Approves the moderation request. This operation is destructive: it deletes the report and automatically removes the associated review from the platform.
+\end{description}
+
+\subsection{User Control (\texttt{/user})}
+\begin{description}
+	\item[\GET \quad \texttt{/user}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Query Params:} \texttt{banned} (boolean, optional) \\
+	\textbf{Response:} \texttt{List<\{ "hash": "string", "email": "string", "banned": boolean \}>} \\
+	\textbf{Description:} Retrieves a list of users registered in the system. The optional \texttt{banned} parameter allows filtering the results to show only banned or active users. Access is restricted to administrators.
 	
 	\item[\POST \quad \texttt{/user/\{user\_hash\}/ban}] \hfill \\
 	\textbf{Access:} \texttt{@AdminGuard} \\
-	\textbf{Description:} Updates the user's status to "banned." Future authentication attempts for this user hash will be rejected by the \texttt{AuthFilter}.
+	\textbf{Path Params:} \texttt{user\_hash} (string) \\
+	\textbf{Response:} \texttt{\{ "message": "User banned" \}} \\
+	\textbf{Description:} Updates the status of a specific user to "banned" using their unique identity hash. Once banned, any future authentication attempts for this hash will be rejected by the system.
 \end{description}
