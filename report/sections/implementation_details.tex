@@ -8,21 +8,26 @@ The platform relay on several external technologies to operate properly. The cho
 
 \begin{itemize}
 	\item \textbf{Maven}: used as build and management tool for the project. 
-	\item \textbf{Jakarta RESTful Web Services}: employed as the project's RESTful API specification. 
+	\item \textbf{Jakarta RESTful Web Services (JAX-RS)}: employed as the project's RESTful API specification. 
 	\begin{itemize}
-		\item \textbf{Jersey}: framework used as core implementation for the jakarta specification, specifically utilizing the jersey-container-servlet module.
-		\item \textbf{HK2}: dependency injection engine that manages the lifecycle of Jersey resources and services.
-		\item \textbf{Jackson}: handle the serialization and deserialization of Java objects (POJOs) to JSON format.
+		\item \textbf{JAX-RS}: it's the section of Jakarta EE about RESTful services.
+		\item \textbf{Jersey}: implements JAX-RS, specifically utilizing the jersey-container-servlet module.
+		\item \textbf{Jackson}: handles the serialization and deserialization of Java objects (POJOs) to JSON format.
+		\item \textbf{Glassfish}: a complete application server, which is necessary to export the project as a \textbf{WAR} (Web ARchive), which is runnable by Apache Tomcat.
 	\end{itemize}
 	\item \textbf{JDBC}: API used for persistent data handling. This allows the Jersey-based backend to perform CRUD operations against the relational database.
 	\begin{itemize}
 		\item \textbf{PostgreSQL}: concrete implementation of the DB.
 	\end{itemize}
 	\item \textbf{JUnit Jupiter}: main testing framework. Provides an easy and clear interface to create and run test on the code base.
-	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as database connectors. 
+	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as DAOs. 
 \end{itemize}
 
 \noindent The project is configured to use Java 17 as the compilation target.
+
+\subsubsection{JAX-RS}
+
+TODO: talk about how the library works
 
 \subsection{Project Structure}
 The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is expecially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing.
@@ -371,13 +376,15 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
 \end{itemize}
 
-\subsubsection{Resource Controllers} Resource controllers are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction. 
+\subsubsection{Resource endpointa} Resource endpointa are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction. 
 
+TODO: da aggiustare (controllare che sia fattuale)
+\paragraph{\textbf{Single Responsibility Principle.}} The controllers architecture has been designed to respect the single responsibility principle. Consequently, each controller is dedicated to managing only its specific resource, providing the necessary endpoints for user communication. Figure \ref{userControllerCode} demonstrates this approach through the \texttt{UserController} class. As a representative example, each controller is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-endpoints}, in each class attributes and in the fact that classes do not interact with each other.
 
-\paragraph{\textbf{Single Responsibility Principle.}} The controllers architecture has been designed to respect the single responsibility principle. Consequently, each controller is dedicated to managing only its specific resource, providing the necessary endpoints for user communication. Figure \ref{userControllerCode} demonstrates this approach through the \texttt{UserController} class. As a representative example, each controller is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-controllers}, in each class attributes and in the fact that classes do not interact with each other.
+TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
+\paragraph{\textbf{Class structure.}} Each class defines a collection of end-points all starting from a common root(e.g., \texttt{/user} in this example). The narrower end-points characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
 
-\paragraph{\textbf{Class structure.}} Each class defines a collection of end-points all starting from a common root called \texttt{/source-name} (e.g., \texttt{/user} in this example). The narrower end-points characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
-
+TODO: cambiare nome da Controller a Endpoint
 \begin{lstlisting}[language=Java, caption=Example of User controller class, label=userControllerCode]
 	@Path("/user")
 	public class UserController {
@@ -414,8 +421,8 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.6, transform shape]
-		\begin{umlpackage}{controllers}
-			\umlclass{AdminController}{
+		\begin{umlpackage}{endpoints}
+			\umlclass{AdminEndpoint}{
 				- adminDAO : AdminDAO \\
 			}{
 			    \begin{tabular}{@{} l l @{}}
@@ -427,7 +434,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				
 			}
 			
-			\umlclass[right=0.7cm of AdminController]{UserController}{
+			\umlclass[right=0.7cm of AdminEndpoint]{UserEndpoint}{
 				+ userDAO : UserDAO \\
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -437,7 +444,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=0.7cm of UserController]{AuthController}{
+			\umlclass[right=0.7cm of UserEndpoint]{AuthEndpoint}{
 				\begin{tabular}{@{} l l @{}}
 					+ \underline{WHITELISTED\_DOMAINS} & : String \\
 					+ \underline{PIN\_EXPIRATION\_MIN} & : int \\
@@ -455,7 +462,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[x=4, y=-12]{ReportController}{
+			\umlclass[x=4, y=-12]{ReportEndpoint}{
 				\begin{tabular}{@{} l l @{}}
 					-- reportDAO & : ReportDAO \\
 					-- userDAO & : UserDAO
@@ -469,7 +476,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[x=0.5, y=-6]{DegreeController}{
+			\umlclass[x=0.5, y=-6]{DegreeEndpoint}{
 				-- degreeDAO : DegreeDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -481,7 +488,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=0.5cm of DegreeController,y=-3]{SchoolController}{
+			\umlclass[right=0.5cm of DegreeEndpoint,y=-3]{SchoolEndpoint}{
 				-- schoolDAO : SchoolDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -493,7 +500,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=0.5cm of SchoolController, y=-3]{CourseController}{
+			\umlclass[right=0.5cm of SchoolEndpoint, y=-3]{CourseEndpoint}{
 				-- courselDAO : courseDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -505,7 +512,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=2cm of ReportController]{ProfessorController}{
+			\umlclass[right=2cm of ReportEndpoint]{ProfessorEndpoint}{
 				\begin{tabular}{@{} l l @{}}
 					-- profDAO & : ProfDAO \\
 					-- teachingDAO & : TeachingDAO
@@ -521,7 +528,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[x=3,y=-18]{PublishedReviewController}{
+			\umlclass[x=3,y=-18]{PublishedReviewEndpoint}{
 				+ publishedReviewDAO : PublishedReviewDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -534,7 +541,7 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 				\end{tabular}
 			}
 			
-			\umlclass[right=2cm of PublishedReviewController,y=-6]{DraftReviewController}{
+			\umlclass[right=2cm of PublishedReviewEndpoint,y=-6]{DraftReviewEndpoint}{
 				-- reviewDAO : DraftReviewDAO
 			}{
 				\begin{tabular}{@{} l l @{}}
@@ -547,8 +554,8 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 			
 		\end{umlpackage}
 	\end{tikzpicture}
-	\caption{UML class diagram of the resource controllers package.}
-	\label{UML-controllers}
+	\caption{UML class diagram of the endpoints package.}
+	\label{UML-endpoints}
 \end{figure}
 
 \subsubsection{Exception Handlers} The \textbf{Exception Handlers} package is a fundamental component of the \textit{EduMeter} architecture, responsible for ensuring system robustness and providing a consistent interface for error reporting.
