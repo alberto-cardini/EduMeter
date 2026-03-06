@@ -99,24 +99,24 @@ This part is responsible for managing the core application logic, interfacing wi
 	\centering
 	\begin{tikzpicture}[thick, font=\sffamily]
 
-	\begin{umlpackage}[y=-1]{business-logic}
+	\begin{umlpackage}{business-logic}
 		\begin{umlpackage} {auth} \end{umlpackage}
 		\begin{umlpackage}[x=3] {endpoints} \end{umlpackage}
 		\begin{umlpackage}[x=2,y=-3] {exception-handlers} \end{umlpackage}
 	\end{umlpackage}
-	\begin{umlpackage}[x=2, y=-7]{models}\end{umlpackage}
+	\begin{umlpackage}[x=3, y=-7, minimum width=3cm]{models}\end{umlpackage}
 	\begin{umlpackage}[x=8]{orm}
-		\begin{umlpackage} {postgre-dao} \end{umlpackage}
-		\begin{umlpackage}[y=-3] {in-mem-dao} \end{umlpackage}
-		\begin{umlpackage}[y=-6] {dao} \end{umlpackage}
+		\begin{umlpackage} [x=0]{dao} \end{umlpackage}
+		\begin{umlpackage}[x=4, y=-3] {postgre-dao} \end{umlpackage}
+		\begin{umlpackage}[x=0, y=-3] {in-mem-dao} \end{umlpackage}
 	\end{umlpackage}
 
 	\umlimport[geometry=|-, anchor1=-130, anchor2=west]{business-logic}{models}
 	\umlimport[geometry=-|-, anchor1=east, anchor2=west]{endpoints}{dao}
-	\umlimport[geometry=|-, anchor1 = -170, anchor2=east]{orm}{models}
+	\umlimport[geometry=|-, anchor1=-130, anchor2=east]{orm}{models}
 
-	\umlimport[geometry=-|-, anchor1=east, anchor2=-10, arm1=2cm]{dao}{postgre-dao}
-	\umlimport[geometry=-|-, anchor1=east, anchor2=east, arm1=1cm]{dao}{in-mem-dao}
+	\umlimport[geometry=-|, anchor1=east, anchor2=30, arm1=5cm]{dao}{postgre-dao}
+	\umlimport[geometry=-|, anchor1=east, anchor2=30]{dao}{in-mem-dao}
 
 	% DB node
 	\node[cylinder, 
@@ -126,10 +126,10 @@ This part is responsible for managing the core application logic, interfacing wi
 		minimum width=2cm, 
 		aspect=0.25, 
 		fill=gray!10, 
-		align=center] (db) at (13, 0) {PostgreSQL\\Database};
+		align=center] (db) at (12, -7) {PostgreSQL\\Database};
 
 	\draw[<->, >=latex, line width=1pt] (db) -- (postgre-dao)
-	node[above, midway] {JDBC};
+	node[left, midway] {JDBC};
 
 	\end{tikzpicture}
 	\caption{UML diagram of the complete code-base. Comprehensive of each component and relationship between each.}

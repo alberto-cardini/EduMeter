@@ -14,6 +14,8 @@
 \usepackage{multicol}
 \usepackage{styles/tikz-uml}
 \definecolor{UMLDarkGray}{RGB}{80, 80, 80}
+\definecolor{UMLBlue}{RGB}{200, 215, 245} 
+\definecolor{UMLDarkBlue}{RGB}{50, 100, 150}
 
 % --- RESTYLING MINIMALE COMPLETO (Classi e Use Case) ---
 \definecolor{UMLDarkGray}{RGB}{60, 60, 60}
@@ -44,15 +46,15 @@
 	},
 	% --- STILE CONTENITORI (Package e System Boundary) ---
 	every umlpackage/.append style={
-		fill=grey!20, 
+		fill=blue!20, 
 		draw=UMLDarkGray,
-		line width=1pt,
+		line width=2pt,
 		sharp corners,
 		font=\small\bfseries\sffamily
 	},
 	% --- STILE RELAZIONI E FRECCE ---
 	every umlrelation/.append style={
-		draw=UMLDarkGray,
+		draw=black,
 		line width=0.6pt,
 		>=Stealth,
 		font=\footnotesize\sffamily
@@ -72,10 +74,9 @@
 
 % Reset dei parametri interni di tikz-uml per bypassare i default del pacchetto
 \tikzumlset{
-	fill class=white, 
-	fill usecase=white, 
-	fill package=grey!20, 
-	fill note=white,
+	fill class=yellow!20, 
+	fill usecase=UMLBlue!40, 
+	fill package=UMLBlue!50,
 	draw=UMLDarkGray
 }
 
@@ -153,8 +154,6 @@
 \usepackage[table]{xcolor}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins}
-\definecolor{UMLBlue}{RGB}{200, 215, 245} 
-\definecolor{UMLDarkBlue}{RGB}{50, 100, 150}
 \newtcolorbox{usecasetable}[2]{
 	enhanced,
 	before upper={\renewcommand{\arraystretch}{1.5}\centering\rowcolors{2}{}{UMLBlue!30}},
@@ -205,6 +204,13 @@
 	{\}}{{{\color{delim}{\}}}}}{1}
 	{[}{{{\color{delim}{[}}}}{1}
 	{]}{{{\color{delim}{]}}}}{1},
+}
+
+\usetikzlibrary{shapes.multipart, positioning, arrows.meta}
+\tikzset{
+	umlclass/.style={rectangle split, rectangle split parts=2,
+		draw, fill=yellow!20, align=center, font=\sffamily},
+	umlarrow/.style={-{Stealth[scale=1.2]}, draw}
 }
 
 \title{EduMeter technical report}
