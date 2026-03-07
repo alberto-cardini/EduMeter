@@ -1,1 +1,17 @@
 \section{Testing}
+
+The project includes unit-testing, which provides a way to assess functionality of individuals parts of the codebase, and integration-testing, which judges the result of the cooperation of the indivdual parts.
+
+\subsection{Unit-Test}
+
+A good portion of the code has complete coverage with unit-tests: almost 100\% of the buiness logic and 100\% of the InMemDAOs. Mocking the DAOs opens the possibility to explore every branch of the endpoints, and providing acccess to the underline store allows for complete access during InMemDAOs evaluation.
+
+We used package private field, in combination with a symmetric folder structure, to allow us to access fields and methods for testing. For example the \verb|CryptoService| class exposes as package-private the \verb|setClock(Clock)| method, which allows us to "move" the clock as we please to test for expiration of tokens. This method is not accessible otherwise.
+
+The models are not taken directyly into consideration, as they are all POJOs, and are still collaterally covered nearly to 100\% by the DAOs tests.
+
+\subsection{Integration-Test}
+
+This architecture makes integration testing cumbersome, as it requires spinning up a lightweight HTTP server just to handle test requests. One of the problem with this, is that it ends up as being mostly a test for the library implementation and not for the application code itself; that's why whe decided to perform most of this tests using industrial-level application like Insomnia, which is an application designed to test HTTP endpoints.
+
+Performing manual tests allows to perform better database testing, which is then correlated with manual queries or checks with dedicated software, which allows to view and understand if the database logic is working correctly. In an automated test scenario, we would use other functions which are also tested as sources of truth, and that's a contradiction in and of itself.
