@@ -10,6 +10,31 @@ We used package private field, in combination with a symmetric folder structure,
 
 The models are not taken directyly into consideration, as they are all POJOs, and are still collaterally covered nearly to 100\% by the DAOs tests.
 
+\begin{figure}[H]
+	\centering
+
+	\setlength{\arrayrulewidth}{0.5mm}
+	\rowcolors{2}{UMLBlue!30}{}
+
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabular}{l c c c}
+		\textbf{Package} & \textbf{Class \%} & \textbf{Method \%} & \textbf{Line \%} \\
+		\hline
+		%business\_logic & 0\% (0/2) & 0\% (0/3) & 0\% (0/18) \\
+		business\_logic.auth & 100\% (1/1) & 100\% (8/8) & 87\% (47/54) \\
+		business\_logic.auth.filters & 100\% (3/3) & 100\% (9/9) & 100\% (21/21) \\
+		business\_logic.endpoints & 100\% (15/15) & 100\% (64/64) & 100\% (183/183) \\
+		business\_logic.exception\_handlers & 100\% (4/4) & 100\% (8/8) & 100\% (30/30) \\
+		models & 100\% (14/14) & 66,9\% (81/121) & 73,3\% (129/176) \\
+		models.response & 66,7\% (2/3) & 66,7\% (2/3) & 66,7\% (2/3) \\
+		%orm & 0\% (0/1) & 0\% (0/3) & 0\% (0/17) \\
+		orm.in\_mem\_dao & 91,7\% (11/12) & 85,7\% (78/91) & 88,9\% (304/342) \\
+		orm.postgre\_dao & 0\% (0/13) & 0\% (0/95) & 0\% (0/385) \\
+	\end{tabular}
+
+	\caption{Coverage report of \texttt{com.swe.EduMeter.*}}
+\end{figure}
+
 \subsection{Integration-Test}
 
 This architecture makes integration testing cumbersome, as it requires spinning up a lightweight HTTP server just to handle test requests. One of the problem with this, is that it ends up as being mostly a test for the library implementation and not for the application code itself; that's why whe decided to perform most of this tests using industrial-level application like Insomnia, which is an application designed to test HTTP endpoints.
