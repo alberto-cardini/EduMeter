@@ -3,6 +3,7 @@ package com.swe.EduMeter.orm.in_mem_dao;
 import com.swe.EduMeter.models.PinChallenge;
 import com.swe.EduMeter.orm.dao.PinChallengeDAO;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ public class InMemPinChallengeDAO implements PinChallengeDAO {
 
     public InMemPinChallengeDAO(Map<Integer, PinChallenge> store) {
         this.store = store;
+        setupIncrementalId();
     }
     @Override
     public Optional<PinChallenge> get(Integer id) {
@@ -29,5 +31,16 @@ public class InMemPinChallengeDAO implements PinChallengeDAO {
     @Override
     public void delete(int id) {
         store.remove(id);
+    }
+
+    private void setupIncrementalId() {
+        if (store.size() == 0) return;
+
+        int maxKey = store.keySet()
+                .stream()
+                .max(Comparator.comparingInt(a -> a))
+                .orElse(0);
+
+        id = maxKey + 1;
     }
 }

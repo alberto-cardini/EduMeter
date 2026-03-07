@@ -4,10 +4,7 @@ import com.swe.EduMeter.models.Report;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
 import com.swe.EduMeter.orm.dao.ReportDAO;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class InMemReportDAO implements ReportDAO {
     private final Map<Integer, Report> store;
@@ -17,6 +14,7 @@ public class InMemReportDAO implements ReportDAO {
     public InMemReportDAO(Map<Integer, Report> store, PublishedReviewDAO publishedReviewDAO) {
         this.store = store;
         this.publishedReviewDAO = publishedReviewDAO;
+        setupIncrementalId();
     }
 
     @Override
@@ -49,5 +47,16 @@ public class InMemReportDAO implements ReportDAO {
     @Override
     public void delete(int id) {
         store.remove(id);
+    }
+
+    private void setupIncrementalId() {
+        if (store.size() == 0) return;
+
+        int maxKey = store.keySet()
+                .stream()
+                .max(Comparator.comparingInt(a -> a))
+                .orElse(0);
+
+        id = maxKey + 1;
     }
 }
