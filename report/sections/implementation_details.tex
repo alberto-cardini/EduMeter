@@ -1,10 +1,10 @@
 \section{Implementation Details}
-This section outlines the engineering decisions made during the development of EduMeter. Every choice is detailed to reflect the team’s commitment to technical excellence and architectural integrity. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}). \\
+This section outlines the engineering decisions made during the development of EduMeter. To ensure a robust codebase, several core design principles were strictly followed, including Don’t Repeat Yourself (\textbf{DRY}), the Single Responsibility Principle (\textbf{SRP}), and the Dependency Inversion Principle (\textbf{DIP}). \\
 
 The implementation phase followed this approach: use cases were first mapped to a domain model, followed by the design of the business logic, ending with the persistent relational database. This design-first methodology ended in the final implementation using the Java programming language.
 
 \subsection{Project Dependencies}
-The platform relay on several external technologies to operate properly. The choice of these dependencies has been made following the current industrial standard for each one of the components. Particular attention has also been given to the ease of use and maintainability.
+The platform relies on several external technologies to operate properly. The choice of these dependencies has been made following the current industry standards for each one of the components. Particular attention has also been given to the ease of use and maintainability.
 
 \begin{itemize}
 	\item \textbf{Maven}: used as build and management tool for the project. 
@@ -142,7 +142,7 @@ The domain model is that part of the projects that concerns the entity represent
 				\end{tabular}
 			}
 			
-			\umlclass[x=6, y=-7]{DraftedReview}{
+			\umlclass[x=6.5, y=-7]{DraftedReview}{
 				\begin{tabular}{@{} l l @{}}
 					-- rawSchool & : String \\
 					-- rawDegree & : String \\
@@ -156,9 +156,9 @@ The domain model is that part of the projects that concerns the entity represent
 				\end{tabular}
 			}
 			
-			\umlclass[right=2cm of DraftedReview, y=-7]{PublishedReview}{
+			\umlclass[right=1.5cm of DraftedReview, y=-7]{PublishedReview}{
 				\begin{tabular}{@{} l l @{}}
-					-- teachingId &: String \\
+					-- teachingId &: Integer \\
 					-- upvotedByUser &: boolean \\
 					-- upvotes &: int 
 				\end{tabular}
@@ -426,7 +426,7 @@ Resource endpoints are responsible for HTTP request dispatching and resolution. 
 In a couple of cases this principle is crossed. This occurs in those endpoints serving, due to their nature, as multiple resources aggregators. For instance:
 
 \begin{itemize}
-	\item \texttt{reportEndpoints:} reports has been designed to be strictly related to a certain published review, hence, this class requires access both to the reports and the published review DAOs. Actively deleting justified reported reviews. The code is visible at the Listing \ref{reportEndpointCode}. 
+	\item \texttt{reportEndpoints:} reports has been designed to be strictly related to a certain published review, hence, this class requires access both to the report and the published review DAOs to actively delete justified reported reviews. The code is visible at the Listing \ref{reportEndpointCode}. 
 	\item \texttt{courseEndpoints:} the endpoint have full access to the course resource and to the teaching resource. This is crucial in order to pair courses and professors accordingly. These are the single endpoints able to interact with the teaching resource. 
 	\item \texttt{professorEndpoints:} differently from the previous one, these endpoints leverage the teaching resource access only with displaying intent. Therefore it is not a proper transgression of the SRP. Code visible in the Listing \ref{professorEndpointCode}. 
 \end{itemize}
@@ -757,19 +757,7 @@ The Object-Relation Mapper (ORM) package has the responsibility of connecting th
 
 The application is designed to support two distinct storage backends: a volatile In-Memory storage (ideal for testing and rapid prototyping) and a persistent PostgreSQL remote database (intended for production environments). The selection of the active storage mechanism is determined dynamically at application startup by checking the \texttt{IN\_MEM\_DB} environment variable.
 
-%\umlclass[x=15, y=-10]{DatabaseManager}{
-%	\begin{tabular}{@{} l l @{}}
-%		- instance & : DatabaseManager \\
-%		- connection & : Connection
-%	\end{tabular}
-%}{
-%	\begin{tabular}{@{} l l @{}}
-%		- DatabaseManager() & : DatabaseManager \\
-%		+ getInstance() & : DatabaseManager\\
-%		+ getConnection() & : Connection \\
-%
-%	\end{tabular}
-%}
+
 \subsubsection{DAO Interfaces}
 To achieve a strict separation between the data access logic and the core business layer, the ORM package uses the Data Access Object (DAO) design pattern alongside the Abstract Factory pattern. 
 
@@ -777,11 +765,42 @@ To achieve a strict separation between the data access logic and the core busine
 The DAO pattern introduces a crucial abstraction layer for database interactions, effectively decoupling the application’s business logic from its persistence layer. It allows the business logic to interact with the database through simplified, high-level interfaces with standardised methods for all necessary CRUD operations. This hides the underlying complexities of data persistence such as query execution and connection management.
 
 \paragraph{Abstract Factory pattern.}
-The \texttt{DAOFactory} interface acts as the central Abstract Factory, establishing a contract for creating domain-specific DAOs. This allows the system to swap out the entire persistence implementation seamlessly. Currently, the application provides two concrete factory implementations:
-	the \textbf{\texttt{InMemDAOFactory}} (produces DAOs that store data in volatile memory) and the
- \textbf{\texttt{PostgreDAOFactory}:} (produces DAOs that interact with a persistent PostgreSQL database).
+The Abstract Factory pattern provides a way to create families of related data-access objects without tying the application to a specific database implementation.
+The \texttt{DAOFactory} interface acts as the central Abstract Factory, establishing a contract for creating domain-specific DAOs. Currently, the application provides two concrete factory implementations:
+	the \textbf{\texttt{InMemDAOFactory}}, which produces DAOs that store data in volatile memory, and the
+ \textbf{\texttt{PostgreDAOFactory}}, which produces DAOs that interact with a persistent PostgreSQL database.
 
-During the startup phase, the \texttt{MainApplication} class uses a lambda-based \texttt{AbstractBinder} to dynamically configure the system based on the \texttt{IN\_MEM\_DB} environment variable: if it is present, it instantiates the \texttt{InMemDAOFactory}, otherwise it defaults to the \texttt{PostgreDAOFactory}. Using the selected factory instance, it binds the specific DAO interfaces (e.g., \texttt{UserDAO.class}) to their concrete implementations.
+\paragraph{}
+During the startup phase, the \texttt{MainApplication} class uses an \texttt{AbstractBinder} to dynamically configure the system based on the \texttt{IN\_MEM\_DB} environment variable: if it is present, it instantiates the \texttt{InMemDAOFactory}, otherwise it defaults to the \texttt{PostgreDAOFactory}. Using the selected factory instance, it then binds the specific DAO interfaces to their concrete implementations.
+
+\vspace{1em}
+\begin{lstlisting}[language=Java, caption=Main Application Class, label=mainApplCode]
+	@ApplicationPath("/api")
+	public class MainApplication extends ResourceConfig {
+		public static final String IN_MEM_DB = "IN_MEM_DB";
+		
+		public MainApplication() {
+			// where to find endpoints
+			packages("com.swe.EduMeter.business_logic");
+			
+			// register types for injection
+			register(new AbstractBinder() {
+				@Override
+				protected void configure() {
+					DAOFactory backendFactory;
+					if (System.getenv(IN_MEM_DB) != null) {
+						backendFactory = new InMemDAOFactory();
+					}
+					else {
+						backendFactory = new PostgreDAOFactory();
+					}
+					
+					bind(backendFactory.getUserDAO()).to(UserDAO.class);
+					bind(backendFactory.getAdminDAO()).to(AdminDAO.class);
+					...
+			
+\end{lstlisting}
+
 
 \begin{figure}[H]
 	\centering
@@ -834,9 +853,8 @@ During the startup phase, the \texttt{MainApplication} class uses a lambda-based
 \end{figure}
 
 \subsubsection{In Memory Storage}
-The In-Memory implementation provides a lightweight, volatile storage solution perfectly suited for rapid prototyping, unit testing, and development environments where the overhead of a persistent database connection is unnecessary. All classes for this implementation reside within the \texttt{in\_mem\_dao} sub-package.
-
-Each class directly implements its respective domain interface and manages its own internal state entirely within the JVM heap. Key characteristics of this implementation include:
+This lightweight implementation avoids the overhead of a database connection. 
+Each class of the \texttt{in\_mem\_dao} sub-package directly implements its respective domain interface and manages its own internal state entirely within the JVM heap. Key characteristics of this implementation include:
 
 \begin{itemize}
 	\item \textbf{Data structures as tables:} The core of the in-memory storage relies on standard Java Collections rather than external tables. Each DAO utilizes a \texttt{Map<Integer, T>} to simulate a relational database table where the \texttt{Integer} key acts as the unique primary key, while the map's value holds the corresponding domain object instance.
@@ -846,7 +864,7 @@ Each class directly implements its respective domain interface and manages its o
 \end{itemize}
 
 \subsubsection{Postgre Remote Storage}
-The PostgreSQL implementation provides a persistent storage solution intended for production environments. This sub-package utilizes a layered inheritance structure to minimize boilerplate code and ensure consistent database interaction patterns across all resources.
+This PostgreSQL sub-package utilizes a layered inheritance structure to minimize boilerplate code and ensure consistent database interaction patterns across all resources.
 
 \begin{figure}[H]
 	\centering
@@ -959,12 +977,11 @@ When the remote storage option is active and \texttt{PostgreDAOFactory} is insta
 This automated setup process is inherently safe and idempotent. All queries within the \textit{init.sql} script utilize the \texttt{CREATE TABLE IF NOT EXISTS} clause, ensuring that existing data or structures are never accidentally overwritten if the database has already been configured. 
 
 \paragraph{Implementation.}
-The database has been structured following the relational Entity-Relationship schema in Figure \ref{ER model}. The architecture is built around several interconnected core entities:
+The database has been structured following the relational Entity-Relationship schema in Figure \ref{ER model}. The E-R model was translated into a relational structure using the following mapping strategies:
 \begin{itemize}
-	\item \textbf{Users \& Authentication:} The \texttt{Users} table manages standard accounts (including ban status), while administrative access is handled by the \texttt{Admin} table. Authentication and password recovery rely on a \texttt{Pin} table, which stores temporary codes, their expiration timestamps, and the user's administrative status.
-	\item \textbf{Academic Hierarchy:} The educational structure is represented by linking \texttt{School}, \texttt{Degree}, \texttt{Course}, and \textbf{Professor} tables. A central associative entity, \texttt{Teaching}, acts as a bridge to associate specific professors with specific courses.
-	\item \textbf{Review System:} The core functionality revolves around the \texttt{Published Review} and \texttt{Drafted Review} tables. Published reviews are linked to a specific \texttt{Teaching} instance and a \texttt{User}, storing rating, difficulty, and text comments. Drafts contain similar, though less strictly constrained, information before final submission.
-	\item \textbf{Interaction \& Moderation:} To support community features, an \texttt{Up Vote} table tracks which users have liked specific reviews. Additionally, a \texttt{Report} table allows users to flag problematic reviews, linking the report comment directly to the user and the review in question.
+	\item A central associative table, Teaching, was introduced to resolve the many-to-many Teaches relationship between Course and Professor.
+	\item The generalization between review types was implemented using a concrete table strategy, resulting in separate Published Review and Drafted Review tables. While published reviews enforce referential integrity by linking to a specific Teaching instance, drafts temporarily store simple string data.
+	\item The Upvote review and Files report relationships are materialized as junction tables (Up Vote and Report), mapping the primary keys of the reporting/voting User to the target Review.
 \end{itemize}
 
 \begin{figure}[H]
@@ -1120,4 +1137,3 @@ The database has been structured following the relational Entity-Relationship sc
 	\end{tikzpicture}
 	\caption{UML diagram of Database schema.}
 \end{figure}
-\subsection{Interface}
