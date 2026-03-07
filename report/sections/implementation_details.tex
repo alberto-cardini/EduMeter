@@ -738,7 +738,7 @@ During the startup phase, the \texttt{MainApplication} class uses a lambda-based
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
-		\begin{umlpackage}{orm}
+		\begin{umlpackage}[minimum height=10.5cm]{orm}
 			\begin{umlpackage}{dao}
 				\umlclass[type=interface]{DAOFactory}{}{
 					\begin{tabular}{@{} l l @{}}
@@ -778,8 +778,8 @@ During the startup phase, the \texttt{MainApplication} class uses a lambda-based
 		\umlinherit[geometry=-|, arm1=1, anchor1=-5]{InMemAdminDAO}{AdminDAO}
 		\umlinherit[geometry=-|, arm1=1, anchor1=185]{PostgreAdminDAO}{AdminDAO}
 		
-		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.7]{InMemDAOFactory}{DAOFactory}
-		\umlinherit[geometry=|-|, anchor1=south, arm1=-0.7]{PostgreDAOFactory}{DAOFactory}
+		\umlinherit[geometry=|-|,anchor1=south, arm1=-1]{InMemDAOFactory}{DAOFactory}
+		\umlinherit[geometry=|-|, anchor1=south, arm1=-1]{PostgreDAOFactory}{DAOFactory}
 	\end{tikzpicture}
 	\caption{Partial UML class diagram of the ORM package. This diagram display only the portion related to the Admin resource, the part referred to the other resources have the exact layout, therefore, it is omitted.}
 	\label{UML-ORM}
@@ -802,7 +802,7 @@ The PostgreSQL implementation provides a persistent storage solution intended fo
 
 \begin{figure}[H]
 	\centering
-	\begin{tikzpicture}[scale=0.8, transform shape]
+	\begin{tikzpicture}[scale=0.7, transform shape]
 		\begin{umlpackage}{orm}
 			\begin{umlpackage}{postgre-dao}
 				\umlclass[type=abstract]{PostgreDAO}{}{
@@ -919,50 +919,67 @@ The database has been structured following the relational Entity-Relationship sc
 	\item \textbf{Interaction \& Moderation:} To support community features, an \texttt{Up Vote} table tracks which users have liked specific reviews. Additionally, a \texttt{Report} table allows users to flag problematic reviews, linking the report comment directly to the user and the review in question.
 \end{itemize}
 
-
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[scale=0.8, transform shape]
-
-		\umlclass{Users}{
-			\begin{tabular}{@{} l l l @{}}
+		\node[umlclass] (Users) {
+			\textbf{Users}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{char} \\
 							& banned 		& \textit{boolean}
 			\end{tabular}
-		}
-
-		\umlclass[below = 1cm of Users]{Published Review}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, below = 1cm of Users] (PublishedReview) {
+			\textbf{Published Review}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 				\textbf{FK} & user\_id 		& \textit{int} \\
 							& date			& \textit{date} \\
 				\textbf{FK} & teaching\_id 	& \textit{int} \\
 							& rating		& \textit{int} \\
-							& difficulty  	& \textit{int} \\
+							& difficulty  	& \textit{int} \\
 							& comment 		& \textit{text} \\
 			\end{tabular}
-		}
-
-		\umlclass[below = 1cm of Published Review]{Teaching}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, below = 1cm of PublishedReview] (Teaching) {
+			\textbf{Teaching}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id}	& \textit{id} \\
 				\textbf{FK} & course\_id 	& \textit{int} \\
 				\textbf{FK} & professor\_id & \textit{int} \\
 			\end{tabular}
-		}
-
-		\umlclass[above = 1cm of Users]{Pin Challenge}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, above = 1cm of Users] (PinChallenge) {
+			\textbf{Pin Challenge}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& pin	 		& \textit{varchar} \\
 				\textbf{FK} & user\_id 		&\textit{char} \\
 							& expires\_at 	&\textit{timestamp} \\
 							& is\_admin 	&\textit{boolean}
 			\end{tabular}
-		}
-
-		\umlclass[left = 1.5cm of Users]{Drafted Review}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, left = 1.5cm of PublishedReview] (UpVote) {
+			\textbf{Up Vote}
+			\nodepart{two}
+			\begin{tabular}{l l l}
+				\textbf{PK FK} & \textbf{user\_id}   & \textit{char} \\
+				\textbf{PK FK} & \textbf{review\_id} & \textit{int} \\
+			\end{tabular}
+		};
+		
+		\node[umlclass, above = 1cm of UpVote] (DraftedReview) {
+			\textbf{Drafted Review}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 				\textbf{FK} & user\_id 		& \textit{char} \\
 							& date 			& \textit{date} \\
@@ -974,79 +991,85 @@ The database has been structured following the relational Entity-Relationship sc
 							& difficulty 	& \textit{int} \\
 							& comment		& \textit{varchar} \\
 			\end{tabular}
-		}
-
-		\umlclass[above = 1cm of Drafted Review]{Admin}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, above = 1cm of DraftedReview] (Admin) {
+			\textbf{Admin}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& email			& \textit{varchar} \\
 			\end{tabular}
-		}
-
-		\umlclass[below = 0.3cm of Drafted Review]{Up Vote}{
-			\begin{tabular}{@{} l l l @{}}
-				\textbf{PK FK} & \textbf{user\_id}   & \textit{char} \\
-				\textbf{PK FK} & \textbf{review\_id} & \textit{int} \\
-			\end{tabular}
-		}
-
-		\umlclass[left = 1.5cm of Teaching]{Professor}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		
+		
+		\node[umlclass, left = 1.5cm of Teaching] (Professor) {
+			\textbf{Professor}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& name 			& \textit{varchar} \\
 							& surname		& \textit{varchar} \\
 			\end{tabular}
-		}
-
-		\umlclass[right = 1.5cm of Teaching]{Course}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, right = 1.5cm of Teaching] (Course) {
+			\textbf{Course}
+			\nodepart{two}
+			\begin{tabular}{ l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& name 			& \textit{varchar} \\
 				\textbf{FK} & degree\_id 	& \textit{int} \\
 			\end{tabular}
-		}
-
-		\umlclass[above = 1cm of Course]{Degree}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, above = 1cm of Course] (Degree) {
+			\textbf{Degree}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& name 			& \textit{varchar} \\
 							& type 			& \textit{varchar} \\
 				\textbf{FK} & school\_id 	& \textit{int} \\
 			\end{tabular}
-		}
-
-		\umlclass[above = 1cm of Degree]{School}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, above = 1cm of Degree] (School) {
+			\textbf{School}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& name 			& \textit{varchar} \\
 			\end{tabular}
-		}
-
-		\umlclass[above = 2cm of School]{Report}{
-			\begin{tabular}{@{} l l l @{}}
+		};
+		
+		\node[umlclass, above = 2cm of School] (Report) {
+			\textbf{Report}
+			\nodepart{two}
+			\begin{tabular}{l l l}
 				\textbf{PK} & \textbf{id} 	& \textit{int} \\
 							& comment		& \textit{varchar} \\
 							& date 			& \textit{date} \\
 				\textbf{FK} & user\_id 		& \textit{char} \\
 				\textbf{FK} & review\_id 	& \textit{int}
 			\end{tabular}
-		}
-
-		\umluniassoc[geometry=-|-]{Report}{Users}
-		\umluniassoc[geometry=-|-]{Report}{Published Review}
-		\umluniassoc{Drafted Review}{Users}
-		\umluniassoc{Published Review}{Users}
-		\umluniassoc{Course}{Degree}
-		\umluniassoc{Degree}{School}
-		\umluniassoc{Teaching}{Course}
-		\umluniassoc{Teaching}{Professor}
-		\umluniassoc{Published Review}{Teaching}
-		\umluniassoc{Pin Challenge}{Users}
-		\umluniassoc[geometry=-|-]{Up Vote}{Users}
-		\umluniassoc[geometry=--]{Up Vote}{Published Review}
-
+		};
+		
+		\draw[umlarrow] (Report.west) -- ++(-0.5,0) |- (Users.east);
+		\draw[umlarrow] (Report.west) -- ++(-0.5,0) |- (PublishedReview.east);
+		\draw[umlarrow] ([yshift=-4mm]DraftedReview.east) --  ([yshift=4mm]Users.west);
+		\draw[umlarrow] (PublishedReview) -- (Users);
+		\draw[umlarrow] (Course) -- (Degree);
+		\draw[umlarrow] (Degree) -- (School);
+		\draw[umlarrow] (Teaching) -- (Course);
+		\draw[umlarrow] (Teaching) -- (Professor);
+		\draw[umlarrow] (PublishedReview) -- (Teaching);
+		\draw[umlarrow] (PinChallenge) -- (Users);
+		\draw[umlarrow] (UpVote.east) -- ++(0.55,0) |- ([yshift=-4mm]Users.west);
+		\draw[umlarrow] (UpVote.east) -- (PublishedReview);
+		
 	\end{tikzpicture}
 	\caption{UML diagram of Database schema.}
 \end{figure}
-
 \subsection{Interface}
