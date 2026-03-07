@@ -376,21 +376,105 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
 \end{itemize}
 
-\subsubsection{Resource endpointa} Resource endpointa are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction.
+\subsubsection{Resource endpointa} Resource endpoints are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction.
 
-TODO: da aggiustare (controllare che sia fattuale)
-\paragraph{\textbf{Single Responsibility Principle.}} The controllers architecture has been designed to respect the single responsibility principle. Consequently, each controller is dedicated to managing only its specific resource, providing the necessary endpoints for user communication. Figure \ref{userControllerCode} demonstrates this approach through the \texttt{UserController} class. As a representative example, each controller is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-endpoints}, in each class attributes and in the fact that classes do not interact with each other.
+\paragraph{\textbf{Single Responsibility Principle.}} The endpoints architecture has been designed to respect the single responsibility principle. Consequently, each endpoint is dedicated to managing only its specific resource, providing the necessary paths for user communication. Listing \ref{userEndpointCode} demonstrates this approach through the \texttt{UserEndpoint} class. As a representative example, each endpoint is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-endpoints}, in each class attributes and in the fact that classes do not interact with each other. \\
+
+In a couple of cases this principle is crossed. This occurs in those endpoints that, due to their nature, are multiple resources aggregators, for instance:
+
+\begin{itemize}
+	\item \texttt{reportEndpoints:} reports has been designed to be strictly related to a certain published review, hence, this class requires access both to the reports and the published review DAOs. Actively deleting justified reported reviews. The code is visible at the Listing \ref{reportEndpointCode}. 
+	\item \texttt{courseEndpoints:} the endpoint have full access to the course resource and to the teaching resource. This is crucial in order to pair courses and professors accordingly. These are the single endpoints able to interact with the teaching resource. 
+	\item \texttt{professorEndpoints:} differently from the previous one, these endpoints leverage the teaching resource access only with displaying intent. Therefore it is not a proper transgression of the SRP. Code visible in the Listing \ref{professorEndpointCode}. 
+\end{itemize}
 
 TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
-\paragraph{\textbf{Class structure.}} Each class defines a collection of end-points all starting from a common root(e.g., \texttt{/user} in this example). The narrower end-points characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
+\paragraph{\textbf{Class structure.}} Each class defines a collection of endpoints all starting from a common root(e.g., \texttt{/user} in this example). The narrower endpoints characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
 
-TODO: cambiare nome da Controller a Endpoint
-\begin{lstlisting}[language=Java, caption=Example of User controller class, label=userControllerCode]
+\begin{lstlisting}[language=Java, caption=Fragment of Report endpoint class, label=reportEndpointCode]
+	
+	@Path("/report")
+	public class ReportEndpoints {
+		private final ReportDAO reportDAO;
+		private final PublishedReviewDAO reviewDAO;
+		
+		@Inject
+		public ReportEndpoints(ReportDAO reportDAO, PublishedReviewDAO reviewDAO) {
+			this.reportDAO = reportDAO;
+			this.reviewDAO = reviewDAO;
+		}
+		
+		...
+		
+		@POST
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		@AuthGuard
+		public ApiObjectCreated create(@Context SecurityContext securityContext,
+		Report report) {
+			String userHash = securityContext.getUserPrincipal().getName();
+			report.setIssuerHash(userHash);
+			
+			int id = reportDAO.add(report);
+			
+			return new ApiObjectCreated(id, "Report created");
+		}
+
+		...
+		
+		@POST
+		@Path("/{report_id}/approve")
+		@Produces(MediaType.APPLICATION_JSON)
+		@AdminGuard
+		public ApiOk acceptReport(@PathParam("report_id") int reportId) {
+			Report r = this.get(reportId);
+			this.delete(reportId);
+			
+			reviewDAO.delete(r.getReviewId());
+			
+			return new ApiOk("Report approved");
+		}
+	}
+	
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java, caption=Fragment of Professor endpoint class, label=professorEndpointCode]
+	@Path("/prof")
+	public class ProfessorEndpoints {
+		private final ProfDAO profDAO;
+		private final TeachingDAO teachingDAO;
+		
+		@Inject
+		public ProfessorEndpoints(ProfDAO profDAO, TeachingDAO teachingDAO) {
+			this.profDAO = profDAO;
+			this.teachingDAO = teachingDAO;
+		}
+		
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		public List<Professor> search(@QueryParam("query") String query,
+		@QueryParam("course_id") Integer id) {
+			return profDAO.search(query, id);
+		}
+		
+		...
+		
+		@GET
+		@Path("/{prof_id}/teaching")
+		@Produces
+		public List<Teaching> listTeachings(@PathParam("prof_id") int profId) {
+			return teachingDAO.getByProf(profId);
+		}
+	}
+	
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java, caption=User endpoint class, label=userEndpointCode]
 	@Path("/user")
-	public class UserController {
+	public class UserEndpoint {
 		private final UserDAO userDAO;
 		@Inject
-		public UserController(UserDAO userDAO) {
+		public UserEndpoint(UserDAO userDAO) {
 			this.userDAO = userDAO;
 		}
 		

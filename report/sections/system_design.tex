@@ -76,8 +76,8 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Steps} & 
 		\begin{tabenum}
 			\item The guest accesses the EduMeter platform (Mock-up \ref{mock-up-1-landing-page}).
-			\item The system displays a list of reviews.
-			\item The guest scrolls through and reads them (Mock-up \ref{mock-up-2-browsing-page}).
+			\item The system displays a list of reviews (Mock-up \ref{mock-up-2-browsing-page}).
+			\item The guest scrolls through and reads them.
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The user has viewed the desired information. \\
 		\textbf{Alternative Steps} & 
@@ -93,7 +93,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 \subsubsection{Student Templates}
 
-\begin{usecasetable}{2}{Student Login \textbf{DA SISTEMARE!!} }
+\begin{usecasetable}{2}{Student Login} }
 	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & Function  \\
 		\textbf{Description} & The user is authenticated via their institutional email. \\
@@ -124,10 +124,10 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Steps} &
 		\begin{tabenum}
 			\item The user selects the option to create a review.
-			\item The system displays the review form (Mock-up \ref{mock-up-7-review-form}).
+			\item The system displays the review form (Mock-up \ref{mock-up-7-review-form-a}).
 			\item The user fills the Teaching field by selecting an existing option from a provided list.
 			\item The user completes the enjoyment, difficulty and comment fields.
-			\item The user confirms the submission.
+			\item The user confirms the submission (Mock-up \ref{mock-up-7-review-form-b}).
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The review is stored in the database. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
@@ -182,7 +182,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 
 \subsubsection{Admin Templates}
 
-\begin{usecasetable}{6}{Admin Login \textbf{DA SISTEMARE!}}
+\begin{usecasetable}{6}{Admin Login}}
 	\begin{tabularx}{\textwidth}{@{} l|X @{}}
 		\textbf{Level} & Function \\
 		\textbf{Description} & The admin log in the system to access his functionality. \\
@@ -323,7 +323,7 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 		\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{1pt}\color{lightgray}
 		\fbox{\includegraphics[width=\textwidth]{./images/review-form-page-mobile-crop-1.png}}
 		\caption{Mock-up \#7: review form part I. The user needs to fill the form in order to try to publish a review.}
-		\label{mock-up-7-review-form}
+		\label{mock-up-7-review-form-a}
 	\end{subfigure}
 	\hfill % Inserisce spazio elastico tra le due foto
 	\begin{subfigure}[t]{0.45\textwidth}
@@ -331,6 +331,7 @@ As stated in the introduction, the frontend is not yet fully developed. These mo
 		\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{1pt}\color{lightgray}
 		\fbox{\includegraphics[width=\textwidth]{./images/review-form-page-mobile-crop-2.png}}
 		\caption{Mock-up \#8: review from part II.}
+		\label{mock-up-7-review-form-b}
 	\end{subfigure}
 	\caption{Form for the review composition.}
 \end{figure}
