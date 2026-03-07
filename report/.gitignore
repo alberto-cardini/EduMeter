@@ -8,4 +8,5 @@
 *.fdb_latexmk
 *.fls
 *.pdf
+*.dvi
 .idea

@@ -3,10 +3,7 @@ package com.swe.EduMeter.orm.in_mem_dao;
 import com.swe.EduMeter.models.Admin;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class InMemAdminDAO implements AdminDAO {
     private final Map<Integer, Admin> store;
@@ -14,6 +11,7 @@ public class InMemAdminDAO implements AdminDAO {
 
     public InMemAdminDAO(Map<Integer, Admin> store) {
         this.store = store;
+        setupIncrementalId();
         //add(new Admin(null, "alberto.cardini@edu.unifi.it"));
         //add(new Admin(null, "lorenzo.bellina@edu.unifi.it"));
         //add(new Admin(null, "carolina.cecchi@edu.unifi.it"));
@@ -48,5 +46,16 @@ public class InMemAdminDAO implements AdminDAO {
     @Override
     public void delete(int id) {
         store.remove(id);
+    }
+
+    private void setupIncrementalId() {
+        if (store.size() == 0) return;
+
+        int maxKey = store.keySet()
+                .stream()
+                .max(Comparator.comparingInt(a -> a))
+                .orElse(0);
+
+        id = maxKey + 1;
     }
 }
