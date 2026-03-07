@@ -275,31 +275,32 @@ The domain model is that part of the projects that concerns the entity represent
 	\label{UML-domain-model}
 \end{figure}
 
-\paragraph{\textbf{Resemblance with the ER model.}} The classes are designed to align closely with their database counterparts, which simplifies and accelerates DB queries. To maintain this alignment, composition (nested objects) is intentionally avoided; instead, objects reference each other using internal database IDs. This flat structure is reflected in the simplicity of the domain model's UML diagram. (Figure \ref{UML-domain-model}).
+\paragraph{\textbf{Resemblance with the ER model.}} The classes are designed to align closely with their database counterparts, simplifying DB queries. To maintain this alignment, composition (nested objects) is intentionally avoided; instead, objects reference each other using internal database IDs. This flat structure is reflected in the simplicity of the domain model's UML diagram. (Figure \ref{UML-domain-model}).
 
 \paragraph{\textbf{Review class inheritance.}} The \texttt{Review} class is the core entity of the project. Given its dual nature within EduMeter, it has been divided into two specialized subclasses. The parent class is implemented as an abstract class; it is not intended for polymorphic use, but rather to provide a uniform structure for its children. \texttt{PublishedReview} and \texttt{DraftedReview} are the specific classes utilized by the resource managers.
 
-\paragraph{\textbf{Response interface.}} The \texttt{response} sub-package was created to standardize the management of error messages, object creation confirmations, and system notifications. These records provide a consistent structure for resource manager responses. This allows the controller to select the appropriate message type for an HTTP request result, which is then easily translated by the JSON manager into a legible format.
+\paragraph{\textbf{Response interface.}} The \texttt{response} sub-package was created to standardize the management of error messages, object creation confirmations, and system notifications. These records provide a consistent structure for resource manager responses. This allows the endpoints to select the appropriate message type for an HTTP request result, which is then easily translated by the JSON manager into a legible format.
 
 \paragraph{\textbf{POJOs.}} Many project classes are implemented as POJOs (Plain Old Java Objects) to keep the code simple and easily interpretable by Jackson when deserializing parameters from HTTP requests. Consistency logic is implemented directly within the getters and setters of each class to ensure that field values remain valid.
 
 \subsection{Business Logic}
 
-This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource controllers} and \textbf{exception handlers}. These three packages actively engage with each other and with the ORM, which will be explored in section \ref{ORM-section}.
+This package is responsible for the heavy lifting of the backend's functional duties. The logic has been divided into three distinct components, each providing a fundamental service to the entire project: \textbf{authentication service}, \textbf{resource endpoints} and \textbf{exception handlers}. These three packages actively engage with each other and with the ORM, which will be explored in section \ref{ORM-section}.
 
 \subsubsection{Authentication and Authorization Service}
 In EduMeter, users and admins needs to authenticate in order to perform their specific actions (publication and management). The authentication and authorization system is designed as a stateless, token-based security layer integrated into the JAX-RS request lifecycle. This design ensures secure communication and fine access control. Follows a description of all the structural decisions made by the team to implement this service. A detailed UML package diagram is also provided in Figure \ref{UML-auth}.
 
 \paragraph{Declarative Security and Name Binding.} To secure REST endpoints, the system utilizes a declarative approach through custom annotations, making the code lighter and less repetitive, avoiding boiler plate control sequences. We have created 2 annotations:
 \begin{itemize}
-	\item \textbf{@AuthGuard}: Applied to resources requiring standard user authentication (e.g up-voting reviews and creating reviews).
-	\item \textbf{@AdminGuard}: Applied to resources restricted to moderators (e.g. draft review and validation, report solving and behavioral countermeasures).
-	\item \textbf{Name Binding}: Both annotations utilize the \texttt{@NameBinding} meta-annotation, allowing JAX-RS to associate specific filters with annotated resource methods.
+	\item \textbf{@AuthGuard}: applied to resources requiring standard user authentication (e.g up-voting reviews and creating reviews).
+	\item \textbf{@AdminGuard}: applied to resources restricted to moderators (e.g. draft review and validation, report solving and behavioral countermeasures).
 \end{itemize}
+
+\noindent Both annotations utilize the \texttt{@NameBinding} meta-annotation, allowing JAX-RS to associate specific filters with annotated resource methods.
 
 \paragraph{Request Filtering and Context Injection.} The security workflow is managed by two primary providers that intercept incoming traffic:
 \begin{itemize}
-	\item \textbf{AuthFilter}: This component intercepts requests marked with \texttt{@AuthGuard}. It extracts the \texttt{Bearer} token (a digital "entry pass" that identifies a user and their permissions automatically, allowing the system to verify them without needing to check a database every time) from the \texttt{Authorization} header and initiates validation through the \texttt{CryptoService}. Upon successful verification, it injects a custom \texttt{SecurityContext} into the request, establishing the user principal and defining roles such as \texttt{ADMIN} or \texttt{BASE}.
+	\item \textbf{AuthFilter}: This component intercepts requests marked with \texttt{@AuthGuard}. It extracts the \texttt{Bearer} token (a digital "entry pass" that identifies a user and their permissions automatically, allowing the system to verify them without needing to check a database every time) from the \texttt{Authorization} header and initiates validation through the \texttt{CryptoService}. Upon successful verification, it injects a custom \texttt{SecurityContext} into the request, establishing the user principal and defining roles such as \texttt{ADMIN} and \texttt{BASE}.
 	\item \textbf{AdminFilter}: This filter extends \texttt{AuthFilter} to handle \texttt{@AdminGuard} requirements. It first executes the base authentication logic via \texttt{super.filter()} and then performs a secondary check to ensure the authenticated principal possesses the \texttt{ADMIN} role. Failure to meet this requirement results in a \texttt{ForbiddenException} (HTTP 403).
 \end{itemize}
 
@@ -369,18 +370,15 @@ The \texttt{CryptoService} serves as a singleton utility responsible for the pla
 	\label{UML-auth}
 \end{figure}
 
-\paragraph{Token Lifecycle and Security Constraints.}
-\begin{itemize}
-	\item \textbf{Expiration}: Tokens are generated with a strict 30-minute validity window.
-	\item \textbf{Revocation}: A \texttt{revokedTokens} set is maintained to handle logout events or compromised tokens. While currently implemented using a \texttt{ConcurrentHashMap}, the service is designed for future migration to a Redis-based key store for persistent, distributed revocation management.
-	\item \textbf{Secret Management}: The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
-\end{itemize}
+\paragraph{Token Lifecycle and Security Constraints.} Tokens are generated with a strict 30-minute validity window, ensuring a standard expiration date for every user login code. The revocation of such tokens is managed through a set of strings called \texttt{revokedTokens}, which is maintained to handle logout events or compromised tokens. While currently implemented using a \texttt{ConcurrentHashMap}, the service is designed for future migration to a Redis-based key store for persistent, distributed revocation management. The system requires a \texttt{SECRET} environment variable; if missing, it falls back to a randomly generated secure secret, ensuring that keys are invalidated upon every deployment for security.
 
-\subsubsection{Resource endpointa} Resource endpoints are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for resource management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction.
+\subsubsection{Resource endpoints} 
 
-\paragraph{\textbf{Single Responsibility Principle.}} The endpoints architecture has been designed to respect the single responsibility principle. Consequently, each endpoint is dedicated to managing only its specific resource, providing the necessary paths for user communication. Listing \ref{userEndpointCode} demonstrates this approach through the \texttt{UserEndpoint} class. As a representative example, each endpoint is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly visible in Figure \ref{UML-endpoints}, in each class attributes and in the fact that classes do not interact with each other. \\
+Resource endpoints are responsible for HTTP request dispatching and resolution. This encompasses multiple tasks, including authentication management, exception handling, and database interaction for records management. This layer represents the core of the backend, it glues the system components together and serves as the primary interface for client interaction.
 
-In a couple of cases this principle is crossed. This occurs in those endpoints that, due to their nature, are multiple resources aggregators, for instance:
+\paragraph{\textbf{Single Responsibility Principle.}} The endpoints architecture has been designed to respect the single responsibility principle. Consequently, each endpoint is dedicated to managing only its specific resource, providing the necessary paths for user communication. As a representative example, in Listing \ref{userEndpointCode}, this approach is visible through the \texttt{UserEndpoint} class.  Each endpoint is injected with only its corresponding Resource DAO, which serves as its sole point of data access. It is also clearly noticeable in Figure \ref{UML-endpoints}, where classes do not interact with each other. \\
+
+In a couple of cases this principle is crossed. This occurs in those endpoints serving, due to their nature, as multiple resources aggregators. For instance:
 
 \begin{itemize}
 	\item \texttt{reportEndpoints:} reports has been designed to be strictly related to a certain published review, hence, this class requires access both to the reports and the published review DAOs. Actively deleting justified reported reviews. The code is visible at the Listing \ref{reportEndpointCode}. 
@@ -390,6 +388,8 @@ In a couple of cases this principle is crossed. This occurs in those endpoints t
 
 TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
 \paragraph{\textbf{Class structure.}} Each class defines a collection of endpoints all starting from a common root(e.g., \texttt{/user} in this example). The narrower endpoints characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
+
+\pagebreak
 
 \begin{lstlisting}[language=Java, caption=Fragment of Report endpoint class, label=reportEndpointCode]
 	
@@ -655,7 +655,9 @@ TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
 
 The exception handling in JAX-RS operates through a hierarchical discovery process that prioritizes the most specific match available to resolve a failure. When an error occurs, the runtime builds a map of all classes annotated with \texttt{@Provider} and searches for an ExceptionMapper that matches the thrown exception type, starting from the most narrow "leaf" class and moving up the inheritance tree toward more general types.
 
-In the \textit{EduMeter} implementation, it was mandatory to implement specific handlers for JSON exceptions, as there are already some implementations of those in the Jackson library, that would come up as more specific during the lookup, and our global handler wouldn't fire.
+In the \textit{EduMeter} implementation, it was mandatory to implement specific handlers for JSON exceptions, as there are already some implementations of those in the Jackson library, that would come up as more specific during the lookup, and our global handler wouldn't be called.
+
+\vspace{2em}
 
 \begin{figure}[H]
 	\centering
@@ -706,7 +708,7 @@ In the \textit{EduMeter} implementation, it was mandatory to implement specific 
 %\end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
-The Object-Relation Mapper (ORM) package has the responsibility of \textbf{connecting the object-oriented domain model} used within the business logic layer \textbf{to the underlying data storage mechanisms}. 
+The Object-Relation Mapper (ORM) package has the responsibility of connecting the object-oriented domain model used within the business logic layer to the underlying data storage mechanisms. 
 
 The application is designed to support two distinct storage backends: a volatile In-Memory storage (ideal for testing and rapid prototyping) and a persistent PostgreSQL remote database (intended for production environments). The selection of the active storage mechanism is determined dynamically at application startup by checking the \texttt{IN\_MEM\_DB} environment variable.
 
@@ -727,7 +729,8 @@ The application is designed to support two distinct storage backends: a volatile
 To achieve a strict separation between the data access logic and the core business layer, the ORM package uses the Data Access Object (DAO) design pattern alongside the Abstract Factory pattern. 
 
 \paragraph{DAO pattern.}
-The DAO pattern introduces a crucial abstraction layer: it allows the business logic to interact with the database through simplified, high-level interfaces with standardised methods for all necessary CRUD operations. This hides the underlying complexities of data persistence such as query execution and connection management. .
+The DAO pattern introduces a crucial abstraction layer for database interactions, effectively decoupling the application’s business logic from its persistence layer. It allows the business logic to interact with the database through simplified, high-level interfaces with standardised methods for all necessary CRUD operations. This hides the underlying complexities of data persistence such as query execution and connection management.
+
 \paragraph{Abstract Factory pattern.}
 The \texttt{DAOFactory} interface acts as the central Abstract Factory, establishing a contract for creating domain-specific DAOs. This allows the system to swap out the entire persistence implementation seamlessly. Currently, the application provides two concrete factory implementations:
 	the \textbf{\texttt{InMemDAOFactory}} (produces DAOs that store data in volatile memory) and the
