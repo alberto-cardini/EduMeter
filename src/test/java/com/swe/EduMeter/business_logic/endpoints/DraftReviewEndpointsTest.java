@@ -1,9 +1,14 @@
 package com.swe.EduMeter.business_logic.endpoints;
 
 import com.swe.EduMeter.models.DraftReview;
+import com.swe.EduMeter.models.PublishedReview;
+import com.swe.EduMeter.models.Teaching;
 import com.swe.EduMeter.models.response.ApiObjectCreated;
 import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.DraftReviewDAO;
+import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
+import com.swe.EduMeter.orm.dao.TeachingDAO;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.SecurityContext;
 import org.junit.jupiter.api.Test;
@@ -25,6 +30,12 @@ public class DraftReviewEndpointsTest {
 
     @Mock
     private DraftReviewDAO reviewDAO;
+
+    @Mock
+    private TeachingDAO teachingDAO;
+
+    @Mock
+    private PublishedReviewDAO publishedReviewDAO;
 
     @Mock
     private SecurityContext securityContext;
@@ -87,7 +98,7 @@ public class DraftReviewEndpointsTest {
         // Mock the DAO add method
         when(reviewDAO.add(review)).thenReturn(expectedId);
 
-        ApiObjectCreated response = draftReviewEndpoints.publish(review, securityContext);
+        ApiObjectCreated response = draftReviewEndpoints.insert(review, securityContext);
 
         // Verify the response
         assertEquals(expectedId, response.id());
@@ -121,6 +132,78 @@ public class DraftReviewEndpointsTest {
                 () -> draftReviewEndpoints.delete(id));
 
         assertEquals("Review not found", exception.getMessage());
+        verify(reviewDAO, never()).delete(anyInt());
+    }
+
+    @Test
+    public void testPublishDraftReview_Success() {
+        int draftId = 42;
+        int teachingId = 100;
+        int newPublishedId = 999;
+
+        DraftReviewEndpoints.PublishPayload payload = new DraftReviewEndpoints.PublishPayload(teachingId);
+        DraftReview draftReview = new DraftReview(draftId, "user1_hash", "Great course", LocalDate.now(), 5, 2, "School", "CS", "Algo", "Smith");
+
+        when(teachingDAO.get(teachingId)).thenReturn(Optional.of(mock(Teaching.class)));
+        when(reviewDAO.get(draftId)).thenReturn(Optional.of(draftReview));
+        when(publishedReviewDAO.add(any(PublishedReview.class))).thenReturn(newPublishedId);
+
+        ApiObjectCreated response = draftReviewEndpoints.publish(draftId, payload);
+
+        assertEquals(newPublishedId, response.id());
+        assertEquals("Published review", response.message());
+
+        verify(publishedReviewDAO, times(1)).add(any(PublishedReview.class));
+        verify(reviewDAO, times(1)).delete(draftId);
+    }
+
+    @Test
+    public void testPublishDraftReview_NullTeachingId_ThrowsBadRequest() {
+        int draftId = 42;
+        DraftReviewEndpoints.PublishPayload payload = new DraftReviewEndpoints.PublishPayload(null);
+
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> draftReviewEndpoints.publish(draftId, payload));
+
+        assertEquals("'teachingId' must be set", exception.getMessage());
+
+        verify(publishedReviewDAO, never()).add(any());
+        verify(reviewDAO, never()).delete(anyInt());
+    }
+
+    @Test
+    public void testPublishDraftReview_TeachingNotFound_ThrowsNotFound() {
+        int draftId = 42;
+        int teachingId = 99;
+        DraftReviewEndpoints.PublishPayload payload = new DraftReviewEndpoints.PublishPayload(teachingId);
+
+        when(teachingDAO.get(teachingId)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> draftReviewEndpoints.publish(draftId, payload));
+
+        assertEquals("'teachingId' not found", exception.getMessage());
+
+        verify(reviewDAO, never()).get(anyInt());
+        verify(publishedReviewDAO, never()).add(any());
+        verify(reviewDAO, never()).delete(anyInt());
+    }
+
+    @Test
+    public void testPublishDraftReview_DraftNotFound_ThrowsNotFound() {
+        int draftId = 42;
+        int teachingId = 100;
+        DraftReviewEndpoints.PublishPayload payload = new DraftReviewEndpoints.PublishPayload(teachingId);
+
+        when(teachingDAO.get(teachingId)).thenReturn(Optional.of(mock(Teaching.class)));
+        when(reviewDAO.get(draftId)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> draftReviewEndpoints.publish(draftId, payload));
+
+        assertEquals("Review not found", exception.getMessage());
+
+        verify(publishedReviewDAO, never()).add(any());
         verify(reviewDAO, never()).delete(anyInt());
     }
 }
