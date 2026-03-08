@@ -26,7 +26,7 @@ public class PostgreCourseDAO extends PostgreDAO<Course> implements CourseDAO {
         String query = "INSERT INTO Course (name, degree_id) VALUES (?, ?)";
         List<Object> params = List.of(course.getName(), course.getDegreeId());
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

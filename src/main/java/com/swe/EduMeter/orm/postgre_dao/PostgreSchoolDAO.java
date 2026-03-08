@@ -21,7 +21,7 @@ public class PostgreSchoolDAO extends PostgreDAO<School> implements SchoolDAO {
         String query = "INSERT INTO School (name) VALUES (?)";
         List<Object> params = List.of(school.getName());
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

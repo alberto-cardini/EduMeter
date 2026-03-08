@@ -19,7 +19,7 @@ public class PostgreTeachingDAO extends PostgreDAO<Teaching> implements Teaching
         String query = "INSERT INTO Teaching (course_id, professor_id) VALUES (?, ?)";
         List<Object> params = List.of(teaching.getCourseId(), teaching.getProfId());
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

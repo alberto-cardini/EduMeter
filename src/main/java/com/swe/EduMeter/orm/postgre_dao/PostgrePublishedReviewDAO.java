@@ -63,7 +63,7 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
                 review.getDifficulty(), review.getComment()
         );
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

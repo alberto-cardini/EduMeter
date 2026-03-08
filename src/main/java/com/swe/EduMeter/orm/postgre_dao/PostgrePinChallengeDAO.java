@@ -38,7 +38,7 @@ public class PostgrePinChallengeDAO extends PostgreDAO<PinChallenge> implements 
                 pin.getExpiresAt(), pin.isAdmin()
         );
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

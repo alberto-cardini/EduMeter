@@ -43,7 +43,7 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
         String query = "INSERT INTO Admin (email) VALUES (?)";
         List<Object> params = List.of(admin.getEmail());
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

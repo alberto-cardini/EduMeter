@@ -45,7 +45,7 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
                 report.getIssuerHash(), report.getReviewId()
         );
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

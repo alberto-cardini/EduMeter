@@ -56,7 +56,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
                 review.getComment()
         );
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override

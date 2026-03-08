@@ -49,10 +49,10 @@ public abstract class PostgreDAO<T> {
         return selectQuery(query, List.of());
     }
 
-    protected int insertQuery(String query, List<Object> params) {
+    protected Object insertQuery(String query, List<Object> params) {
         try (ResultSet rs = rawQuery(query + " RETURNING id", params)) {
             if (rs.next()) {
-                return rs.getInt("id");
+                return rs.getObject("id");
             }
             return 0;
         } catch (SQLException e) {

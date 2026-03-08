@@ -26,7 +26,7 @@ public class PostgreProfDAO extends PostgreDAO<Professor> implements ProfDAO {
         String query = "INSERT INTO Professor (name, surname) VALUES (?, ?)";
         List<Object> params = List.of(prof.getName(), prof.getSurname());
 
-        return insertQuery(query, params);
+        return (Integer) insertQuery(query, params);
     }
 
     @Override
