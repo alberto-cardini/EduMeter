@@ -2,13 +2,13 @@
 
 The project includes unit-testing, which provides a way to assess functionality of individuals parts of the codebase, and integration-testing, which judges the result of the cooperation of the individual parts.
 
-\subsection{Unit-Test}
+\subsection{Unit Test}
 
-A good portion of the code has complete coverage with unit-tests: almost 100\% of the business logic and 100\% of the InMemDAOs. Mocking the DAOs opens the possibility to explore every branch of the endpoints, and providing access to the underline store allows for complete access during InMemDAOs evaluation.
+A good portion of the code has complete coverage with unit-tests: almost 100\% of the business logic and DAOs. Mocking the DAOs opens the possibility to explore every branch of the endpoints, and providing access to the underline store allows for complete access during InMemDAOs evaluation.
 
 We used package private field, in combination with a symmetric folder structure, to allow us to access fields and methods for testing. For example the \verb|CryptoService| class exposes as package-private the \verb|setClock(Clock)| method, which allows us to "move" the clock as we please to test for expiration of tokens. This method is not accessible otherwise.
 
-The models are not taken directly into consideration, as they are all POJOs, and are still collaterally covered nearly to 100\% by the DAOs tests.
+The models are not taken directly into consideration, as they are all POJOs, and are still collaterally covered nearly to 100\% by unit and integration tests.
 
 \begin{figure}[H]
 	\centering
@@ -22,24 +22,31 @@ The models are not taken directly into consideration, as they are all POJOs, and
 		\hline
 		%business\_logic & 0\% (0/2) & 0\% (0/3) & 0\% (0/18) \\
 		business\_logic.auth & 100\% (1/1) & 100\% (8/8) & 87\% (47/54) \\
-		business\_logic.auth.filters & 100\% (3/3) & 100\% (9/9) & 100\% (21/21) \\
-		business\_logic.endpoints & 100\% (16/16) & 100\% (66/66) & 100\% (198/198) \\
+		business\_logic.auth.filters & 100\% (3/3) & 100\% (9/9) & 100\% (27/27) \\
+		business\_logic.endpoints & 100\% (16/16) & 100\% (66/66) & 100\% (206/206) \\
 		business\_logic.exception\_handlers & 100\% (4/4) & 100\% (8/8) & 100\% (30/30) \\
-		models & 100\% (14/14) & 66,9\% (81/121) & 73,3\% (129/176) \\
-		models.response & 66,7\% (2/3) & 66,7\% (2/3) & 66,7\% (2/3) \\
-		%orm & 0\% (0/1) & 0\% (0/3) & 0\% (0/17) \\
+		models & 100\% (14/14) & 86,2\% (106/123) & 86,1\% (161/187) \\
+		models.response & 100\% (3/3) & 100\% (3/3) & 100\% (3/3) \\
 		orm.in\_mem\_dao & 91,7\% (11/12) & 85,7\% (78/91) & 88,9\% (304/342) \\
-		orm.postgre\_dao & 0\% (0/13) & 0\% (0/95) & 0\% (0/385) \\
+		orm.postgre\_dao & 92,9\% (13/14) & 82\% (82/100) & 83,9\% (348/415) \\
 	\end{tabular}
 
-	\caption{Coverage report of \texttt{com.swe.EduMeter.*}}
+	\caption{Coverage report of \texttt{com.swe.EduMeter.*} (Unit and Integration).}
 \end{figure}
 
-\subsection{Integration-Test}
+\subsection{Integration Test}
 
 This architecture makes integration testing cumbersome, as it requires spinning up a lightweight HTTP server just to handle test requests. One of the problem with this, is that it ends up as being mostly a test for the library implementation and not for the application code itself; that's why we decided to perform most of this tests using industrial-level application like Insomnia, which is an application designed to test HTTP endpoints.
 
-Performing manual tests allows to perform better database testing, which is then correlated with manual queries or checks with dedicated software, which allows to view and understand if the database logic is working correctly. In an automated test scenario, we would use other functions which are also tested as sources of truth, and that's a contradiction in and of itself.
+Instead, we opted for automated integration testing for the PostgreDAOs, which require a database to connect to.
+
+\paragraph{PostgreDAOs testing} 
+
+The postgre\_dao package is tested through integration tests that interact with a real database instance. To ensure that the tests run in an isolated and reproducible environment, the project uses Testcontainers which spins up a PostgreSQL container.
+
+A base test class initializes a PostgreSQL container. The container is configured with a test database name, username, and password. Additionally, the initialization SQL script (init.sql) is executed to create the required database schema before the tests run.
+
+Each DAO test class extends this base test class, allowing it to reuse the same container configuration. After each test execution, the database tables are cleared using SQL TRUNCATE and then repopulated with a fixed set of data. This guarantees that every test does not interfere with other tests.
 
 \subsection{Endpoints unit test documentation:}
 	
@@ -61,9 +68,11 @@ Performing manual tests allows to perform better database testing, which is then
 	\renewcommand{\labelenumi}{\theenumi}
 	\item \texttt{testSendPin\_MissingEmail()} \label{test:testSendPin_MissingEmail:Auth}
 	\item \texttt{testSendPin\_Admin\_Valid()} \label{test:testSendPin_Admin_Valid:Auth}
+	\item \texttt{testSendPin\_Admin\_InvalidEmail()} \label{test:testSendPin_Admin_InvalidEmail:Auth}
 	\item \texttt{testSendPin\_Student\_ValidDomain()} \label{test:testSendPin_Student_ValidDomain:Auth}
 	\item \texttt{testSendPin\_Student\_InvalidDomain()} \label{test:testSendPin_Student_InvalidDomain:Auth}
 	\item \texttt{testLogin\_Valid()} \label{test:testLogin_Vaid:Auth}
+	\item \texttt{testLogin\_Banned()} \label{test:testLogin_Banned:Auth}
 	\item \texttt{testLogin\_ExpiredPin()} \label{test:testLogin_ExpiredPin:Auth}
 	\item \texttt{testLogin\_WrongPin()} \label{test:testLogin_WrongPin:Auth}
 	\item \texttt{testLogin\_MissingFields()} \label{test:testLogin_MissingFields:Auth}

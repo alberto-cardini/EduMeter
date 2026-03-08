@@ -112,6 +112,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The student is authenticated and identified by their unique ID. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
+			\item[2a.] If the student account associated to the email has been banned, the system will notify the user that login is restricted. (Test \ref{test:testLogin_Banned:Auth})
 			\item[4a.] If the code does not match, the system signals an error and does not grant access (Tests \ref{test:testLogin_WrongPin:Auth}, \ref{test:testLogin_ExpiredPin:Auth}).
 		\end{tabitem}
 	\end{tabularx}

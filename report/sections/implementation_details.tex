@@ -3,7 +3,7 @@ This section outlines the engineering decisions made during the development of E
 
 The implementation phase followed this approach: use cases were first mapped to a domain model, followed by the design of the business logic, ending with the persistent relational database. This design-first methodology ended in the final implementation using the Java programming language.
 
-\subsection{Project Dependencies}
+\subsection{Project Dependencies} \label{project-dependencies}
 The platform relies on several external technologies to operate properly. The choice of these dependencies has been made following the current industry standards for each one of the components. Particular attention has also been given to the ease of use and maintainability.
 
 \begin{itemize}
@@ -21,6 +21,7 @@ The platform relies on several external technologies to operate properly. The ch
 	\end{itemize}
 	\item \textbf{JUnit Jupiter}: main testing framework. Provides an easy and clear interface to create and run test on the code base.
 	\item \textbf{Mockito}: library used with JUnit to isolate components by creating mocks of complex dependencies, such as DAOs.
+	\item \textbf{Testcontainers}: library used for integration testing that runs lightweight Docker containers during the test execution. In this project it is used to automatically start a temporary PostgreSQL database instance.
 \end{itemize}
 
 \noindent The project is configured to use Java 17 as the compilation target.
@@ -58,7 +59,7 @@ JAX-RS leverages these Java features to enable a more quick and idiomatic way of
 	\item \verb|@Path(String subpath)|: when applied to a method, binds the method to the subpath. The subpath may contain '{varName}', which extracts the path segment to a variable (e.g. \verb|@Path("/user/{userId}")|), see \verb|@PathParam()|. When applied to a class, binds every method of the class to the subpath. If the annotation is present on both the class and the method, binds the method to the concatenation of subpaths.
 	\item \verb|@GET/@POST/@PUT/@DELETE|: applies to methods and binds only specific HTTP methods to it.
 	\item \verb|@Consums(MediaType type)/@Produces(MediaType type)|: defines what the endpoints accepts and what the endpoints will produce. Can be used as a filter, but it's especially useful to automatically parse and produce JSONs.
-	\item \verb|@Inject()|: can be applied to fields and constructors. As object instantiation is often delegated to the framework (e.g. endpoint classses are never explicitly constructed), it becomes a problem when the classes have dependencies that are being passed as constructor argument. In those cases, annotating the constructor with the \verb|Inject()| annotations allows JAX-RS the pass in registered objects as params or to set them as object fields.
+	\item \verb|@Inject()|: can be applied to fields and constructors. As object instantiation is often delegated to the framework (e.g. endpoint classes are never explicitly constructed), it becomes a problem when the classes have dependencies that are being passed as constructor argument. In those cases, annotating the constructor with the \verb|Inject()| annotations allows JAX-RS the pass in registered objects as params or to set them as object fields.
 
 	But what are registered objects? During application startup (inside of \texttt{MainApplicaiton.java}), some objects are registered along their type for dependency injection. The fact that objects are registered with their type as their identification, makes it impossibile to register two instance of the same class; this is usually never a problem, as injected dependencies often are or behave like Singletones.
 
@@ -74,7 +75,7 @@ JAX-RS leverages these Java features to enable a more quick and idiomatic way of
 \end{itemize}
 
 \subsection{Project Structure}
-The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is expecially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing. As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
+The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is especially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing. As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
 
 \begin{figure}[H]
 	\small
@@ -89,7 +90,7 @@ The project has a standard structure divided into two parts: \verb|main| and \ve
 			.7 annotations/.
 			.7 filters/.
 			.7 CryptoService.java.
-			.6 controllers/.
+			.6 endpoints/.
 			.6 exception\_handlers/.
 			.6 MainApplication.java.
 			.5 models/.
@@ -429,7 +430,6 @@ In a couple of cases this principle is crossed. This occurs in those endpoints s
 	\item \texttt{professorEndpoints:} differently from the previous one, these endpoints leverage the teaching resource access only with displaying intent. Therefore it is not a proper transgression of the SRP. Code visible in the Listing \ref{professorEndpointCode}. 
 \end{itemize}
 
-TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
 \paragraph{\textbf{Class structure.}} Each class defines a collection of endpoints all starting from a common root(e.g., \texttt{/user} in this example). The narrower endpoints characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
 
 \begin{lstlisting}[language=Java, caption=Fragment of Report endpoint class, label=reportEndpointCode]
@@ -741,13 +741,6 @@ In the \textit{EduMeter} implementation, it was mandatory to implement specific 
 	\caption{UML class diagram of the exception handling package.}
 \end{figure}
 
-%\paragraph{\textbf{Approach Advantages.}} Implementing multiple specialized mappers instead of a single general safety net provides several engineering advantages:
-%\begin{itemize}
-%	\item \textbf{Precise Client Feedback}: Clients receive exact details about validation errors (such as the specific unrecognized field name) rather than a vague "Internal Error".
-%	\item \textbf{Semantic HTTP Accuracy}: This approach ensures that client-side mistakes correctly return HTTP 400 (Bad Request) codes, whereas a single safety net might incorrectly categorize them as 500 (Internal Server Error).
-%	\item \textbf{Security and Sanitization}: Specific mappers allow for "sanitizing" error messages to ensure that internal database structures or logic are not leaked, while the general handler prevents the exposure of raw stack traces.
-%	\item \textbf{Operational Efficiency}: Decoupling error handling from business logic allows core services to focus on the "happy path," while the provider architecture automatically manages the complexity of error translation at the edge of the application.
-%\end{itemize}
 
 \subsection{Object-Relation Mapper (ORM)} \label{ORM-section}
 The Object-Relation Mapper (ORM) package has the responsibility of connecting the object-oriented domain model used within the business logic layer to the underlying data storage mechanisms. 
@@ -867,7 +860,7 @@ This PostgreSQL sub-package utilizes a layered inheritance structure to minimize
 	\centering
 	\begin{tikzpicture}[scale=0.7, transform shape]
 		\begin{umlpackage}{orm}
-			\begin{umlpackage}{postgre-dao}
+			\begin{umlpackage}[minimum width = 10cm]{postgre-dao}
 				\umlclass[type=abstract]{PostgreDAO}{}{
 					\begin{tabular}{@{} l l @{}}
 						- setParams(PreparedStatement, List<Object>) & : void \\
@@ -889,10 +882,29 @@ This PostgreSQL sub-package utilizes a layered inheritance structure to minimize
 						+ add(Admin) & : int 
 					\end{tabular}
 				}
+				
+					\umlclass[below = 1.5cm of PostgreAdminDAO]{DatabaseManager}{
+					\begin{tabular}{@{} l l @{}}
+						- instance & : DatabaseManager \\
+						- connection & : Connection \\
+						- dbUrl & : String \\
+						- dbUser & : String \\
+						- dbPassword & : String \\
+					\end{tabular}
+				}{
+					\begin{tabular}{@{} l l @{}}
+						- DatabaseManager() & : DatabaseManager \\
+						- DatabaseManager(String, String, String) & : DatabaseManager \\
+						+ getInstance() & : DatabaseManager\\
+						\textasciitilde\ initWhitCredential(String, String, String)  & : void \\
+						+ getConnection() & : Connection \\
+						
+					\end{tabular}
+				}
 			\end{umlpackage}
 			
 			\begin{umlpackage}{dao}
-				\umlclass[type=interface, left= 1.5cm of PostgreDAO]{AdminDAO}{}{
+				\umlclass[type=interface, left = 3.5cm of PostgreAdminDAO]{AdminDAO}{}{
 					\begin{tabular}{@{} l l @{}}
 						+ get(int) & : Optional<Admin> \\
 						+ getByEmail(String) & : Optional<Admin> \\
@@ -904,10 +916,11 @@ This PostgreSQL sub-package utilizes a layered inheritance structure to minimize
 			\end{umlpackage}
 		\end{umlpackage}	
 		
-		\umlimpl[geometry=-|]{PostgreAdminDAO}{AdminDAO}
+		\umldep[geometry = -|-, arm1=1cm, anchor1=east, anchor2=east]{PostgreDAO}{DatabaseManager}
+		\umlimpl{PostgreAdminDAO}{AdminDAO}
 		\umlinherit{PostgreAdminDAO}{PostgreDAO}
 	\end{tikzpicture}
-	\caption[UML class diagram of the PostgreDAO package]{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
+	\caption{UML class diagram showing the internal structure of the postgre-dao package, using PostgreAdminDAO to illustrate class dependencies, inheritance, and interface implementation.}
 \end{figure}
 
 \paragraph{The PostgreDAO Base Class.}
