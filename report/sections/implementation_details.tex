@@ -113,7 +113,7 @@ The project has a standard structure divided into two parts: \verb|main| and \ve
 			.6 ....
 		}
 	\end{minipage}
-	\caption{EduMeter Project Directory Structure}
+	\caption[Project structure]{EduMeter Project Directory Structure}
 	\label{fig:tree}
 \end{figure}
 
@@ -845,7 +845,7 @@ During the startup phase, the \texttt{MainApplication} class uses an \texttt{Abs
 		\umlinherit[geometry=|-|,anchor1=south, arm1=-1]{InMemDAOFactory}{DAOFactory}
 		\umlinherit[geometry=|-|, anchor1=south, arm1=-1]{PostgreDAOFactory}{DAOFactory}
 	\end{tikzpicture}
-	\caption{Partial UML class diagram of the ORM package. This diagram display only the portion related to the Admin resource, the part referred to the other resources have the exact layout, therefore, it is omitted.}
+	\caption[UML class diagram of the ORM package]{Partial UML class diagram of the ORM package. This diagram display only the portion related to the Admin resource, the part referred to the other resources have the exact layout, therefore, it is omitted.}
 	\label{UML-ORM}
 \end{figure}
 
@@ -907,7 +907,7 @@ This PostgreSQL sub-package utilizes a layered inheritance structure to minimize
 		\umlimpl[geometry=-|]{PostgreAdminDAO}{AdminDAO}
 		\umlinherit{PostgreAdminDAO}{PostgreDAO}
 	\end{tikzpicture}
-	\caption{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
+	\caption[UML class diagram of the PostgreDAO package]{An example of a concrete PostgreDAO class (PostgreAdminDAO) and its relations to other classes.}
 \end{figure}
 
 \paragraph{The PostgreDAO Base Class.}

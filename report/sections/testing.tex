@@ -40,3 +40,155 @@ The models are not taken directly into consideration, as they are all POJOs, and
 This architecture makes integration testing cumbersome, as it requires spinning up a lightweight HTTP server just to handle test requests. One of the problem with this, is that it ends up as being mostly a test for the library implementation and not for the application code itself; that's why we decided to perform most of this tests using industrial-level application like Insomnia, which is an application designed to test HTTP endpoints.
 
 Performing manual tests allows to perform better database testing, which is then correlated with manual queries or checks with dedicated software, which allows to view and understand if the database logic is working correctly. In an automated test scenario, we would use other functions which are also tested as sources of truth, and that's a contradiction in and of itself.
+
+\subsection{Endpoints unit test documentation:}
+	
+\subsubsection{AdminEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetAll()} \label{test:testGetAll:Admin}
+	\item \texttt{testGet\_Found()} \label{test:testGet_Found:Admin}
+	\item \texttt{testGet\_NotFound()} \label{test:testGet_NotFound:Admin}
+	\item \texttt{testCreate()} \label{test:testCreate:Admin}
+	\item \texttt{testDelete\_Found()} \label{test:testDelete_Found:Admin}
+	\item \texttt{testDelete\_NotFound()} \label{test:testDelete_NotFound:Admin}
+\end{enumerate}
+
+\subsubsection{AuthEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testSendPin\_MissingEmail()} \label{test:testSendPin_MissingEmail:Auth}
+	\item \texttt{testSendPin\_Admin\_Valid()} \label{test:testSendPin_Admin_Valid:Auth}
+	\item \texttt{testSendPin\_Student\_ValidDomain()} \label{test:testSendPin_Student_ValidDomain:Auth}
+	\item \texttt{testSendPin\_Student\_InvalidDomain()} \label{test:testSendPin_Student_InvalidDomain:Auth}
+	\item \texttt{testLogin\_Valid()} \label{test:testLogin_Vaid:Auth}
+	\item \texttt{testLogin\_ExpiredPin()} \label{test:testLogin_ExpiredPin:Auth}
+	\item \texttt{testLogin\_WrongPin()} \label{test:testLogin_WrongPin:Auth}
+	\item \texttt{testLogin\_MissingFields()} \label{test:testLogin_MissingFields:Auth}
+	\item \texttt{testLogin\_NotFound()} \label{test:testLogin_NotFound:Auth}
+	\item \texttt{testLogout()} \label{test:testLogout:Auth}
+\end{enumerate}
+
+\subsubsection{CourseEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetCourse\_Found()} \label{test:testGetCourse_Found:Course}
+	\item \texttt{testGetCourse\_NotFound()} \label{test:testGetCourse_NotFound:Course}
+	\item \texttt{testSearchCourse\_All()} \label{test:testSearchCourse_All:Course}
+	\item \texttt{testCreateCourse()} \label{test:testCreateCourse:Course}
+	\item \texttt{testDeleteCourse\_Found()} \label{test:testDeleteCourse_Found:Course}
+	\item \texttt{testDeleteCourse\_NotFound()} \label{test:testDeleteCourse_NotFound:Course}
+	\item \texttt{testUpdateCourse\_Found()} \label{test:testUpdateCourse_Found:Course}
+	\item \texttt{testUpdateCourse\_NotFound()} \label{test:testUpdateCourse_NotFound:Course}
+	\item \texttt{testUpdateCourse\_Invalid()} \label{test:testUpdateCourse_Invalid:Course}
+	\item \texttt{testListTeaching()} \label{test:testListTeaching:Course}
+	\item \texttt{testAddTeaching\_Valid()} \label{test:testAddTeaching_Valid:Course}
+	\item \texttt{testAddTeaching\_InvalidBody()} \label{test:testAddTeaching_InvalidBody:Course}
+	\item \texttt{testRemoveTeaching\_Found()} \label{test:testRemoveTeaching_Found:Course}
+	\item \texttt{testRemoveTeaching\_NotFound()} \label{test:testRemoveTeaching_NotFound:Course}
+\end{enumerate}
+
+\subsubsection{DegreeEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetDegree\_Found()} \label{test:testGetDegree_Found:Degree}
+	\item \texttt{testGetDegree\_NotFound()} \label{test:testGetDegree_NotFound:Degree}
+	\item \texttt{testSearchDegree\_All()} \label{test:testSearchDegree_All:Course}
+	\item \texttt{testSearchDegree\_Filtered()} \label{test:testSearchDegree_Filtered:Degree}
+	\item \texttt{testCreateDegree()} \label{test:testCreateDegree:Degree}
+	\item \texttt{testDeleteDegree\_Found()} \label{test:testDeleteDegree_Found:Degree}
+	\item \texttt{testDeleteDegree\_NotFound()} \label{test:testDeleteDegree_NotFound:Degree}
+	\item \texttt{testUpdateDegree\_Found()} \label{test:testUpdateDegree_Found:Degree}
+	\item \texttt{testUpdateDegree\_NotFound()} \label{test:testUpdateDegree_NotFound:Degree}
+	\item \texttt{testUpdateDegree\_Invalid()} \label{test:testUpdateDegree_Invalid:Degree}
+\end{enumerate}
+
+\subsubsection{ProfessorEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetProfessor\_Found()} \label{test:testGetProfessor_Found:Prof}
+	\item \texttt{testGetProfessor\_NotFound()} \label{test:testGetProfessor_NotFound:Prof}
+	\item \texttt{testSearchProfessor\_All()} \label{test:testSearchProfessor_All:Prof}
+	\item \texttt{testCreateProfessor()} \label{test:testCreateProfessor:Prof}
+	\item \texttt{testDeleteProfessor\_Found()} \label{test:testDeleteProfessor_Found:Prof}
+	\item \texttt{testDeleteProfessor\_NotFound()} \label{test:testDeleteProfessor_NotFound:Prof}
+	\item \texttt{testUpdateProfessor\_Found()} \label{test:testUpdateProfessor_Found:Prof}
+	\item \texttt{testUpdateProfessor\_NotFound()} \label{test:testUpdateProfessor_NotFound:Prof}
+	\item \texttt{testUpdateProfessor\_Invalid()} \label{test:testUpdateProfessor_Invalid:Prof}
+	\item \texttt{testListTeachings()} \label{test:testListTeachings:Prof}
+\end{enumerate}
+
+\subsubsection{PublishedReviewEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testSearch\_Authenticated()} \label{test:testSearch_Auth:PubReview}
+	\item \texttt{testSearch\_Unauthenticated()} \label{test:testSearch_Unauth:PubReview}
+	\item \texttt{testGet\_Authenticated\_Found()} \label{test:testGet_Authenticated_Found:PubReview}
+	\item \texttt{testGet\_Unauthenticated\_NotFound()} \label{test:testGet_Unauthenticated_NotFound:PubReview}
+	\item \texttt{testPublish} \label{test:testPublish:PubReview}
+	\item \texttt{testToggleVote()} \label{test:testToggleVote:PubReview}
+	\item \texttt{testDelete()} \label{test:testDelete:PubReview}
+	\item \texttt{testUpdate()} \label{test:testUpdate:PubReview}
+\end{enumerate}
+
+\subsubsection{ReportEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetAll()} \label{test:testGetAll:Report}
+	\item \texttt{testGet\_Found()} \label{test:testGetFound:Report}
+	\item \texttt{testGet\_NotFound()} \label{test:testGetNotFound:Report}
+	\item \texttt{testCreate()} \label{test:testCreate:Report}
+	\item \texttt{testDelete\_NotFound()} \label{test:testDeleteNotFound:Report}
+	\item \texttt{testAcceptReport\_Found()} \label{test:testAcceptReportFound:Report}
+	\item \texttt{testAcceptReport\_NotFound()} \label{test:testAcceptReportNotFound:Report}
+\end{enumerate}
+
+\subsubsection{SchoolEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetSchool\_Found()} \label{test:testGetSchool_Found:School}
+	\item \texttt{testGetSchool\_NotFound()} \label{test:testGetSchool_NotFound:School}
+	\item \texttt{testSearchSchool\_All()} \label{test:testSearchSchool_All:School}
+	\item \texttt{testSearchSchool\_Filtered())} \label{test:testSearchSchool_Filtered:School}
+	\item \texttt{testSearchSchool\_Empty())} \label{test:testSearchSchool_Empty:School}
+	\item \texttt{testCreateSchool()} \label{test:testCreateSchool:School}
+	\item \texttt{testDeleteSchool\_Found()} \label{test:testDeleteSchool_Found:School}
+	\item \texttt{testDeleteSchool\_NotFound()} \label{test:testDeleteSchool_NotFound:School}
+	\item \texttt{testUpdateSchool\_Found()} \label{test:testUpdateSchool_Found:School}
+	\item \texttt{testUpdateSchool\_NotFound()} \label{test:testUpdateSchool_NotFound:School}
+	\item \texttt{testUpdateSchool\_Invalid()} \label{test:testUpdateSchool_Invalid:School}
+\end{enumerate}
+
+\subsubsection{UserEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testSearch()} \label{test:testSearch:User}
+	\item \texttt{testBan\_Found()} \label{test:testBan_Found:User}
+	\item \texttt{testBan\_NotFound()} \label{test:testBan_NotFound:User}
+\end{enumerate}
+
+\subsubsection{DraftReviewEndpointsTest.java}
+\begin{enumerate}
+	\renewcommand{\theenumi}{\arabic{enumi}}
+	\renewcommand{\labelenumi}{\theenumi}
+	\item \texttt{testGetAll()} \label{test:testGetAll:Draft}
+	\item \texttt{testGet\_Found()} \label{test:testGet_Found:Draft}
+	\item \texttt{testGet\_NotFound()} \label{test:testGet_NotFound:Draft}
+	\item \texttt{testPublish()} \label{test:testPublish:Draft}
+	\item \texttt{testDelete\_Found()} \label{test:testDelete_Found:Draft}
+	\item \texttt{testDelete\_NotFound()} \label{test:testDelete_NotFound:Draft}
+	\item \texttt{testPublishDraftReview\_Success()} \label{test:testPublishDraftReview_Success:Draft}
+	\item \texttt{testPublishDraftReview\_NullTeachingId\_ThrowsBadRequest()} \label{test:testPublishDraftReview_NullTeachingId:Draft}
+	\item \texttt{testPublishDraftReview\_TeachingNotFound\_ThrowsNotFound()} \label{test:testPublishDraft_TeachingNF:Draft}
+	\item \texttt{testPublishDraftReview\_DraftNotFound\_ThrowsNotFound()} \label{test:testPublishDraft_DraftNF:Draft}
+\end{enumerate}
+\pagebreak
