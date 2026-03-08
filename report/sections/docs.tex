@@ -241,7 +241,14 @@ The EduMeter REST API uses standard HTTP methods to perform CRUD operations. Acc
 	\textbf{Access:} \texttt{@AdminGuard} \\
 	\textbf{Path Params:} \texttt{review\_id} (int) \\
 	\textbf{Response:} \texttt{\{ "message": "Review deleted" \}} \\
-	\textbf{Description:} Deletes a draft review from the system. Often used when a draft is rejected or manually converted to a published review.
+	\textbf{Description:} Deletes a draft review from the system. Used when a draft is rejected.
+
+	\item[\POST \quad \texttt{/review/draft/\{review\_id\}/publish}] \hfill \\
+	\textbf{Access:} \texttt{@AdminGuard} \\
+	\textbf{Body:} \texttt{\seqsplit{\{ "teachingId": int \}}} \\
+	\textbf{Path Params:} \texttt{review\_id} (int) \\
+	\textbf{Response:} \texttt{\{ "id": int, "message": "Published review" \}} \\
+	\textbf{Description:} Publishes a draft review, by creating a published review with the specified teachingId. Automatically deletes the draft review.
 \end{description}
 
 \subsection{Moderation and Reporting (\texttt{/report})}

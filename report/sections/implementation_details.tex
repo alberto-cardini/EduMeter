@@ -672,8 +672,9 @@ TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
 				\begin{tabular}{@{} l l @{}}
 					+ getAll() & : List<DraftReview> \\
 					+ get(int) &  : DraftReview \\
-					+ publish(DraftReview, SecurityContext) & : ApiObjectCreated \\
-					+ delete(int) & : ApiOk
+					+ insert(DraftReview, SecurityContext) & : ApiObjectCreated \\
+					+ delete(int) & : ApiOk \\
+					+ publish(int, PublishPayload) & : ApiObjectCreated
 				\end{tabular}
 			}
 			
