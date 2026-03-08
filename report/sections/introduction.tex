@@ -78,6 +78,41 @@ To ensure consistency and data integrity, each review follows a standardized str
 \end{itemize}
 Upon submission, reviews with a predefined teaching are published immediately. However, if the teaching was manually entered, an Admin must verify the provided data and add a new entry to the application database before the review becomes public.
 
+\subsection{Review validation system: iterative design}
+
+A major challenge during the system design of \textit{EduMeter} was conceptualizing the data collection process. The required dataset included courses, degree programs, schools, professors, and the specific relational mappings between courses and their respective instructors. \\
+
+Through an iterative design process, we evaluated several methodologies before finalizing the community-based data acquisition and maintenance system detailed later in this report.
+
+\subsubsection{Evaluated and Discarded Approaches}
+
+During the initial phases, we explored three main ideas, which were ultimately discarded due to technical or administrative constraints:
+
+\begin{itemize}[leftmargin=*]
+	\item \textbf{Institutional System Integration:} our initial idea was to automate data retrieval directly from the university's centralized IT systems, potentially leveraging identity providers like SPID (replicating how the university grants students access to their portals). Accessing to all the student personal information upon authentication automatically. In this way the user could only post reviews about those courses he have actually completed.
+	\begin{quote}
+		\textit{Outcome:} Discarded. This approach presented severe privacy implications and required official university authorization, which was unfeasible to obtain.
+	\end{quote}
+	
+	\item \textbf{Web Scraping:} we considered scraping the required data directly from the official Cineca database \href{https://unifi.coursecatalogue.cineca.it}{(link)}.
+	\begin{quote}
+		\textit{Outcome:} Discarded. After a preliminary analysis, building and maintaining web scrapers for this specific database proved to be too difficult and time consuming.
+	\end{quote}
+	
+	\item \textbf{Static Hardcoding:} we briefly evaluated manually hardcoding all existing courses from the Cineca database into our system.
+	\begin{quote}
+		\textit{Outcome:} Discarded. This idea was immediately rejected due to the massive volume of courses and professors, making it completely unscalable.
+	\end{quote}
+\end{itemize}
+
+\subsubsection{Final Solution: community-based data collection}
+
+To ensure independence and maintainability, we ultimately adopted a fully autonomous, user-driven system. Students populate the database by manually inputting course details as they submit their reviews. 
+
+To guarantee data integrity, the system utilizes a semi-automated validation process managed by administrators. The platform has two types of submitted data: \textbf{Verified Data}, if a user selects a course already present in the platform's internal database, the review is published automatically. \textbf{Unverified Data}, if a user inputs a \textit{new} course, the review enters a two-step publication pipeline where an administrator must verify that the submitted data officially exists before it is published.
+
+Unlike the previously explored methods, this crowdsourced approach does not rely on any external data sources and is highly maintainable. However, the trade-off is the necessity of an administrator role to validate new entries and a slightly longer, two-step publication process for reviews on previously unrecorded courses.
+
 \subsection{System architecture and tools}\label{system-architecture-section}
 
 EduMeter is a web application divided into two distinct parts that rely on several industrial-grade libraries:

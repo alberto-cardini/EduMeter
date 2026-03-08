@@ -57,28 +57,26 @@ JAX-RS leverages these Java features to enable a more quick and idiomatic way of
 \begin{itemize}
 	\item \verb|@Path(String subpath)|: when applied to a method, binds the method to the subpath. The subpath may contain '{varName}', which extracts the path segment to a variable (e.g. \verb|@Path("/user/{userId}")|), see \verb|@PathParam()|. When applied to a class, binds every method of the class to the subpath. If the annotation is present on both the class and the method, binds the method to the concatenation of subpaths.
 	\item \verb|@GET/@POST/@PUT/@DELETE|: applies to methods and binds only specific HTTP methods to it.
-	\item \verb|@Consums(MediaType type)/@Produces(MediaType type)|: defines what the endpoints accepts and what the endpoints while produce. Can be used as a filter, but it's especially useful to automatically parse and produce JSONs.
-	\item \verb|@Inject()|: can applied to field and constructors. As object instantiation is often delegated to the framework (e.g. endpoint classses are never explicitly constructed), it becomes a problem when the classes have dependencies that are being passed as constructor argument. In those cases, annotating the constructor with the \verb|Inject()| annotations allows JAX-RS the pass in registered objects as params or to set them as object fields.
+	\item \verb|@Consums(MediaType type)/@Produces(MediaType type)|: defines what the endpoints accepts and what the endpoints will produce. Can be used as a filter, but it's especially useful to automatically parse and produce JSONs.
+	\item \verb|@Inject()|: can be applied to fields and constructors. As object instantiation is often delegated to the framework (e.g. endpoint classses are never explicitly constructed), it becomes a problem when the classes have dependencies that are being passed as constructor argument. In those cases, annotating the constructor with the \verb|Inject()| annotations allows JAX-RS the pass in registered objects as params or to set them as object fields.
 
-	But what are registered objects? During application startup (inside of MainApplicaiton.java), some objects are registered along their type for dependency injection. The fact that objects are registered with their type as their identification, makes it impossibile to register two instance of the same class; this is usually never a problem, as injected dependencies often are or behave like Singletones.
+	But what are registered objects? During application startup (inside of \texttt{MainApplicaiton.java}), some objects are registered along their type for dependency injection. The fact that objects are registered with their type as their identification, makes it impossibile to register two instance of the same class; this is usually never a problem, as injected dependencies often are or behave like Singletones.
 
-	\item \verb|@Provider|: when applied to classes, makes them discoverable to JAX-RS. In our case, when annotate the exception handlers with \verb|@Provider| to enable them globally.
+	\item \verb|@Provider|: when applied to classes, makes them discoverable to JAX-RS. In our case, we annotated the exception handlers with \verb|@Provider| to enable them globally.
 
 	\item \verb|@NameBinding|: applies to custom annotations which need later to be applied to \verb|@Provider| classes. These classes are then only available when the custom annotation is present (for example the authentication filter is only applied when the linked annotation is present).
 
-	\item \verb|@QueryParam(String paramName)|: applies to endpoints' arguments. Parses the HTTP requests and sets the value of the argument as the query param's value.
+	\item \verb|@QueryParam(String paramName)|: applies to endpoints' arguments. Parses the HTTP requests and sets the value of the argument as the query parameter's value.
 
-	\item \verb|@PathParam(String paramName)|: applies to endpoints' arguments. Parses the HTTP request's subpath and sets the value of the argument as the path paramextracted with the \verb|@Path()| annotation.
+	\item \verb|@PathParam(String paramName)|: applies to endpoints' arguments. Parses the HTTP request's subpath and sets the value of the argument as the path parameter extracted with the \verb|@Path()| annotation.
 
 	\item \verb|@HeaderParam(String headerName)|: applies to endpoints' arguments. Parses the HTTP request's headers and sets the value of the argument as the header value of name \verb|headerName|.
 \end{itemize}
 
 \subsection{Project Structure}
-The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is expecially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing.
+The project has a standard structure divided into two parts: \verb|main| and \verb|test|. Both the parts got the same directory layout and file's name scheme. This is expecially useful in testing, where package-private field and methods can be accessed by the corresponding test classes, as \verb|main| and \verb|test| are merged together during testing. As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
 
-As highlighted by the directory tree (Figure \ref{fig:tree}), the project is realized following the system architecture described in section \ref{system-architecture-section}. Inside each one of the modules there are the directories containing the packages reported in the overall UML diagram in Figure \ref{UML-overall-diagram}.
-
-\begin{figure}[h]
+\begin{figure}[H]
 	\small
 	\begin{minipage}{0.8\textwidth}
 		\dirtree{%
@@ -433,8 +431,6 @@ In a couple of cases this principle is crossed. This occurs in those endpoints s
 
 TODO: se si aggiunge dettagli sulla spiegazione di JAX-RS magari alleggerire qui
 \paragraph{\textbf{Class structure.}} Each class defines a collection of endpoints all starting from a common root(e.g., \texttt{/user} in this example). The narrower endpoints characterize actions that user can perform on that path through an HTTP request. Different methods are annotated with different permission levels, some actions can be performed only by authenticated user or authenticated admins. This is perfectly visible on top of the method signature, along with all the other specific annotations enabling data emission or insertion. Every method concludes by returning a structured message to the client.
-
-\pagebreak
 
 \begin{lstlisting}[language=Java, caption=Fragment of Report endpoint class, label=reportEndpointCode]
 	
