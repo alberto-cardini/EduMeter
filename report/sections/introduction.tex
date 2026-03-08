@@ -127,8 +127,8 @@ This part is responsible for managing the core application logic, interfacing wi
 
 	\item \textbf{Domain Model}: Defines the system's core entities, such as: school, degree, course and user. Each class encapsulates specific invariants and behaviors that model real-world scenarios. 
 	
-	\item \textbf{DAO (Data Access Object)}: Abstracts the persistence layer from the business logic. This package includes an interface layer to provide an easy swap between DAOs implementations. \textbf{FIXME: sistema questa frase dalla virgola in poi}
-	Additionally to the DAOs for the PostgreSQL DB, there's an implementation of an \textbf{in-memory storage system}, which provides a lightweight testing environment that remains independent of the production database.
+	\item \textbf{ORM (Object-Relational Mapping)}: Abstracts the persistence layer from the business logic. This package includes an interface layer to provide an easy swap between DAOs implementations. 
+	Additionally to the DAOs for the PostgreSQL DB, it supports an \textbf{in-memory storage system}, which provides a lightweight testing environment that remains independent of the production database.
 \end{itemize}
 
 \begin{figure}[H]

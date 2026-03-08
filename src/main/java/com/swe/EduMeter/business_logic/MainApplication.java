@@ -13,7 +13,7 @@ public class MainApplication extends ResourceConfig {
     public static final String IN_MEM_DB = "IN_MEM_DB";
 
     public MainApplication() {
-        // where to find controllers
+        // where to find endpoints
         packages("com.swe.EduMeter.business_logic");
 
         // register types for injection
