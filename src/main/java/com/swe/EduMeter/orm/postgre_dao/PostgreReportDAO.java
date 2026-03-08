@@ -16,7 +16,7 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
         report.setId(rs.getInt("id"));
         report.setComment(rs.getString("comment"));
         report.setDate(rs.getDate("date").toLocalDate());
-        report.setIssuerHash(rs.getString("issuer_id"));
+        report.setIssuerHash(rs.getString("user_id"));
         report.setReviewId(rs.getInt("review_id"));
 
         return report;
@@ -39,7 +39,7 @@ public class PostgreReportDAO extends PostgreDAO<Report> implements ReportDAO {
 
     @Override
     public int add(Report report) {
-        String query = "INSERT INTO Report (comment, date, user_id, review_id) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Report (comment, date, user_id, review_id) VALUES(?, ?, ?, ?)";
         List<Object> params = List.of(
                 report.getComment(), report.getDate(),
                 report.getIssuerHash(), report.getReviewId()

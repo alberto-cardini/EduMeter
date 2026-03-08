@@ -8,12 +8,13 @@ CREATE TABLE IF NOT EXISTS Admin (
                                     email VARCHAR(255) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS Pin (
+CREATE TABLE IF NOT EXISTS Pin_Challenge (
                                     id SERIAL PRIMARY KEY,
                                     pin VARCHAR(22) NOT NULL,
                                     user_id CHAR(22) NOT NULL,
                                     expires_at TIMESTAMP NOT NULL,
-                                    isAdmin BOOLEAN NOT NULL
+                                    is_admin BOOLEAN NOT NULL,
+                                    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS School (

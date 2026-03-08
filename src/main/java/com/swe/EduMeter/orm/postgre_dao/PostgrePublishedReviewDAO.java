@@ -26,16 +26,23 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
 
     @Override
     public Optional<PublishedReview> get(int id, String userHash) {
-        String query = """
+        List<Object> params;
+        StringBuilder query = new StringBuilder("""
                 SELECT pr.*,
                     (SELECT count(*) FROM Up_vote WHERE review_id = pr.id) AS upvotes_count,
-                    EXISTS (SELECT 1 FROM Up_vote WHERE review_id = pr.id AND user_id = ?) AS is_upvoted
-                FROM Published_Review pr
-                WHERE pr.id = ?;
-                """;
-        List<Object> params = List.of(userHash, id);
+                    """);
 
-        try (ResultSet rs = rawQuery(query, params)) {
+        if (userHash == null) {
+            query.append(" TRUE AS is_upvoted");
+            params = List.of(id);
+        } else {
+            query.append(" EXISTS (SELECT 1 FROM Up_vote WHERE review_id = pr.id AND user_id = ?) AS is_upvoted");
+            params = List.of(userHash, id);
+        }
+        query.append(" FROM Published_Review pr WHERE pr.id = ?");
+
+
+        try (ResultSet rs = rawQuery(query.toString(), params)) {
             if (rs.next()) {
                 PublishedReview review = mapRowToObject(rs);
                 review.setUpvotes(rs.getInt("upvotes_count"));
@@ -109,8 +116,8 @@ public class PostgrePublishedReviewDAO extends PostgreDAO<PublishedReview> imple
     public List<PublishedReview> search(Integer schoolId, Integer degreeId, Integer courseId, Integer professorId, String userHash) {
         StringBuilder query = new StringBuilder("""
                 SELECT pr.*,
-                (SELECT count(*) FROM Up_vote WHERE review_id = r.id) AS upvotes_count
-                EXISTS (SELECT 1 FROM Up_vote WHERE review_id = r.id AND user_id = ?) AS is_upvoted
+                (SELECT count(*) FROM Up_vote WHERE review_id = pr.id) AS upvotes_count,
+                EXISTS (SELECT 1 FROM Up_vote WHERE review_id = pr.id AND user_id = ?) AS is_upvoted
                 FROM Published_Review pr
                 """);
         List<Object> params = new ArrayList<>();
