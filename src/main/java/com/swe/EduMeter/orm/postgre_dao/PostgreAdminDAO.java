@@ -25,8 +25,8 @@ public class PostgreAdminDAO extends PostgreDAO<Admin> implements AdminDAO {
 
     @Override
     public Optional<Admin> getByEmail(String email) {
-        String query = "SELECT * FROM Admin WHERE email = ?";
-        List<Object> params = List.of(email);
+        String query = "SELECT * FROM Admin WHERE LOWER(email) = ?";
+        List<Object> params = List.of(email.toLowerCase());
 
         return selectQuery(query, params).stream().findFirst();
     }
