@@ -1,5 +1,7 @@
 package com.swe.EduMeter.models;
 
+import java.util.Objects;
+
 public class User {
     private String hash;
     private Boolean banned;
@@ -31,5 +33,18 @@ public class User {
                 "hash='" + hash + '\'' +
                 ", banned=" + banned +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return banned == user.banned && Objects.equals(hash, user.hash);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hash, banned);
     }
 }

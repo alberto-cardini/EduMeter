@@ -145,6 +145,35 @@ public class AuthEndpointsTest {
     }
 
     @Test
+    public void testLogin_NewUser() {
+        int challengeId = 42;
+        String pin = "1234";
+        String userHash = "user_hash";
+        AuthEndpoints.LoginBody body = new AuthEndpoints.LoginBody(challengeId, pin);
+
+        // Instant in the future to simulate unexpired pin
+        PinChallenge challenge = new PinChallenge(challengeId, pin, userHash, Instant.now().plusSeconds(600), false);
+        when(pinDAO.get(challengeId)).thenReturn(Optional.of(challenge));
+
+        CryptoService mockCrypto = mock(CryptoService.class);
+        String expectedToken = "encoded_jwt_token";
+        when(mockCrypto.generateToken(userHash, false)).thenReturn(expectedToken);
+
+        when(userDAO.get(userHash)).thenReturn(Optional.empty());
+
+        try (MockedStatic<CryptoService> mockedStatic = mockStatic(CryptoService.class)) {
+            mockedStatic.when(CryptoService::getInstance).thenReturn(mockCrypto);
+
+            var response = authEndpoints.login(false, body);
+
+            assertEquals("LoginResponse[token=" + expectedToken + "]", response.toString());
+
+            verify(userDAO, times(1)).get(userHash);
+            verify(userDAO, times(1)).add(new User(userHash, false));
+        }
+    }
+
+    @Test
     public void testLogin_Banned() {
         int challengeId = 42;
         String pin = "1234";
