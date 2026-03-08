@@ -2,6 +2,9 @@ package com.swe.EduMeter.business_logic.auth.filters;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.models.Token;
+import com.swe.EduMeter.models.User;
+import com.swe.EduMeter.orm.dao.UserDAO;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.SecurityContext;
@@ -17,12 +20,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthFilterTest {
+
+    @Mock
+    private UserDAO userDAO;
 
     @Mock
     private ContainerRequestContext requestContext;
@@ -95,13 +102,16 @@ public class AuthFilterTest {
     @Test
     public void testFilter_ValidBaseUserToken() throws IOException {
         String tokenString = "valid_encoded_base_token";
+        String userHash = "user_hash_456";
         when(requestContext.getHeaderString("Authorization")).thenReturn("Bearer " + tokenString);
         when(requestContext.getSecurityContext()).thenReturn(originalSecurityContext);
         when(originalSecurityContext.isSecure()).thenReturn(false);
 
         CryptoService mockCrypto = mock(CryptoService.class);
-        Token baseToken = new Token("user_hash_456", Instant.now().plusSeconds(3600).toEpochMilli(), false);
+        Token baseToken = new Token(userHash, Instant.now().plusSeconds(3600).toEpochMilli(), false);
         when(mockCrypto.decodeToken(tokenString)).thenReturn(baseToken);
+
+        when(userDAO.get(userHash)).thenReturn(Optional.of(new User(userHash, false)));
 
         try (MockedStatic<CryptoService> mockedStatic = mockStatic(CryptoService.class)) {
             mockedStatic.when(CryptoService::getInstance).thenReturn(mockCrypto);
@@ -122,6 +132,27 @@ public class AuthFilterTest {
 
             assertEquals("Bearer", injectedContext.getAuthenticationScheme());
             assertFalse(injectedContext.isSecure()); // Delegates to the original context
+        }
+    }
+
+    @Test
+    public void testFilter_ValidBaseUserToken_Banned() throws IOException {
+        String tokenString = "valid_encoded_base_token";
+        String userHash = "user_hash_456";
+        when(requestContext.getHeaderString("Authorization")).thenReturn("Bearer " + tokenString);
+
+        CryptoService mockCrypto = mock(CryptoService.class);
+        Token baseToken = new Token(userHash, Instant.now().plusSeconds(3600).toEpochMilli(), false);
+        when(mockCrypto.decodeToken(tokenString)).thenReturn(baseToken);
+
+        when(userDAO.get(userHash)).thenReturn(Optional.of(new User(userHash, true)));
+
+        try (MockedStatic<CryptoService> mockedStatic = mockStatic(CryptoService.class)) {
+            mockedStatic.when(CryptoService::getInstance).thenReturn(mockCrypto);
+
+            ForbiddenException exception = assertThrows(ForbiddenException.class, () -> authFilter.filter(requestContext));
+
+            assertEquals("User is banned", exception.getMessage());
         }
     }
 

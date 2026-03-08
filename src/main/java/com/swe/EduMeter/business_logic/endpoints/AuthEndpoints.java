@@ -3,9 +3,11 @@ package com.swe.EduMeter.business_logic.endpoints;
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.models.PinChallenge;
+import com.swe.EduMeter.models.User;
 import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 import com.swe.EduMeter.orm.dao.PinChallengeDAO;
+import com.swe.EduMeter.orm.dao.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -21,6 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 
 @Path("/auth")
@@ -29,11 +32,13 @@ public class AuthEndpoints {
     public static final int PIN_EXPIRATION_MIN = 10;
     private final PinChallengeDAO pinDAO;
     private final AdminDAO adminDAO;
+    private final UserDAO userDAO;
 
     @Inject
-    public AuthEndpoints(PinChallengeDAO pinChallengeDAO, AdminDAO adminDAO) {
+    public AuthEndpoints(PinChallengeDAO pinChallengeDAO, AdminDAO adminDAO, UserDAO userDAO) {
         this.pinDAO = pinChallengeDAO;
         this.adminDAO = adminDAO;
+        this.userDAO = userDAO;
     }
 
     @POST
@@ -98,13 +103,22 @@ public class AuthEndpoints {
             throw new NotAuthorizedException("Pin challenge expired", "Bearer");
         }
 
-        if (pinChallenge.getPin().equals(body.pin())) {
-            String userHash = pinChallenge.getUserHash();
-            String encodedToken = CryptoService.getInstance().generateToken(userHash, isAdmin);
-            return new LoginResponse(encodedToken);
+        if (!pinChallenge.getPin().equals(body.pin())) {
+            throw new NotAuthorizedException("Invalid Pin", "Bearer");
         }
 
-        throw new NotAuthorizedException("Invalid Pin", "Bearer");
+        String userHash = pinChallenge.getUserHash();
+        Optional<User> user = userDAO.get(userHash);
+
+        if (user.isEmpty()) {
+            User newUser = new User(userHash, false);
+            userDAO.add(newUser);
+        } else if (user.get().isBanned()) {
+            throw new ForbiddenException("User is banned");
+        }
+
+        String encodedToken = CryptoService.getInstance().generateToken(userHash, isAdmin);
+        return new LoginResponse(encodedToken);
     }
 
     @POST

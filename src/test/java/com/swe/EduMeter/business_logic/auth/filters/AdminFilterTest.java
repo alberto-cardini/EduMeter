@@ -2,6 +2,8 @@ package com.swe.EduMeter.business_logic.auth.filters;
 
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.models.Token;
+import com.swe.EduMeter.models.User;
+import com.swe.EduMeter.orm.dao.UserDAO;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.SecurityContext;
@@ -13,6 +15,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +26,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class AdminFilterTest {
 
+    @Mock
+    private UserDAO userDAO;
     @Mock
     private ContainerRequestContext requestContext;
 
@@ -64,6 +69,8 @@ public class AdminFilterTest {
         CryptoService mockCrypto = mock(CryptoService.class);
         // Create a dummy token representing a standard user
         Token userToken = new Token("user_hash", Instant.now().plusSeconds(3600).toEpochMilli(), false);
+
+        when(userDAO.get("user_hash")).thenReturn(Optional.of(new User("user_hash", false)));
 
         setupAuthFilterBypass(mockCrypto, userToken);
 

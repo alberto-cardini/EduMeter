@@ -3,6 +3,10 @@ package com.swe.EduMeter.business_logic.auth.filters;
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.business_logic.auth.annotations.AuthGuard;
 import com.swe.EduMeter.models.Token;
+import com.swe.EduMeter.models.User;
+import com.swe.EduMeter.orm.dao.UserDAO;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -15,6 +19,13 @@ import java.security.Principal;
 @AuthGuard
 @Provider
 public class AuthFilter implements ContainerRequestFilter {
+    private final UserDAO userDAO;
+
+    @Inject
+    public AuthFilter(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         // Extract authorization header. A valid header looks like this:
@@ -28,6 +39,15 @@ public class AuthFilter implements ContainerRequestFilter {
         String tokenString = authHeader.substring("Bearer ".length()).trim();
 
         Token token = CryptoService.getInstance().decodeToken(tokenString);
+
+        if (!token.isAdmin()) {
+            User user = userDAO.get(token.userHash())
+                    .orElseThrow(() -> new RuntimeException("Issued token to non-existing user"));
+
+            if (user.isBanned()) {
+                throw new ForbiddenException("User is banned");
+            }
+        }
 
         SecurityContext securityContext = requestContext.getSecurityContext();
         requestContext.setSecurityContext(new SecurityContext() {

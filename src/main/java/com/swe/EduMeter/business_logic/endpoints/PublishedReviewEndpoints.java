@@ -7,6 +7,7 @@ import com.swe.EduMeter.models.PublishedReview;
 import com.swe.EduMeter.models.response.ApiObjectCreated;
 import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.PublishedReviewDAO;
+import com.swe.EduMeter.orm.dao.UserDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -30,10 +31,12 @@ import java.util.List;
 public class PublishedReviewEndpoints {
 
     private final PublishedReviewDAO publishedReviewDAO;
+    private final UserDAO userDAO;
 
     @Inject
-    public PublishedReviewEndpoints(PublishedReviewDAO publishedReviewDAO) {
+    public PublishedReviewEndpoints(PublishedReviewDAO publishedReviewDAO, UserDAO userDAO) {
         this.publishedReviewDAO = publishedReviewDAO;
+        this.userDAO = userDAO;
     }
 
     @GET
@@ -43,7 +46,7 @@ public class PublishedReviewEndpoints {
                                         @QueryParam("course_id") Integer courseId,
                                         @QueryParam("professor_id") Integer profId,
                                         @Context ContainerRequestContext ctx) {
-        AuthFilter filter = new AuthFilter();
+        AuthFilter filter = new AuthFilter(userDAO);
 
         try {
             filter.filter(ctx);
@@ -60,7 +63,7 @@ public class PublishedReviewEndpoints {
     @Produces(MediaType.APPLICATION_JSON)
     public PublishedReview get(@PathParam("review_id") int id,
                                @Context ContainerRequestContext ctx) {
-        AuthFilter filter = new AuthFilter();
+        AuthFilter filter = new AuthFilter(userDAO);
 
         try {
             filter.filter(ctx);

@@ -3,9 +3,11 @@ package com.swe.EduMeter.business_logic.endpoints;
 import com.swe.EduMeter.business_logic.auth.CryptoService;
 import com.swe.EduMeter.models.Admin;
 import com.swe.EduMeter.models.PinChallenge;
+import com.swe.EduMeter.models.User;
 import com.swe.EduMeter.models.response.ApiOk;
 import com.swe.EduMeter.orm.dao.AdminDAO;
 import com.swe.EduMeter.orm.dao.PinChallengeDAO;
+import com.swe.EduMeter.orm.dao.UserDAO;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -32,6 +34,9 @@ public class AuthEndpointsTest {
 
     @Mock
     private AdminDAO adminDAO;
+
+    @Mock
+    private UserDAO userDAO;
 
     @InjectMocks
     private AuthEndpoints authEndpoints;
@@ -113,8 +118,6 @@ public class AuthEndpointsTest {
         verify(pinDAO, never()).add(any(PinChallenge.class));
     }
 
-    // --- login Tests ---
-
     @Test
     public void testLogin_Valid() {
         int challengeId = 42;
@@ -130,12 +133,38 @@ public class AuthEndpointsTest {
         String expectedToken = "encoded_jwt_token";
         when(mockCrypto.generateToken(userHash, false)).thenReturn(expectedToken);
 
+        when(userDAO.get(userHash)).thenReturn(Optional.of(new User(userHash, false)));
+
         try (MockedStatic<CryptoService> mockedStatic = mockStatic(CryptoService.class)) {
             mockedStatic.when(CryptoService::getInstance).thenReturn(mockCrypto);
 
             var response = authEndpoints.login(false, body);
 
             assertEquals("LoginResponse[token=" + expectedToken + "]", response.toString());
+        }
+    }
+
+    @Test
+    public void testLogin_Banned() {
+        int challengeId = 42;
+        String pin = "1234";
+        String userHash = "user_hash";
+        AuthEndpoints.LoginBody body = new AuthEndpoints.LoginBody(challengeId, pin);
+
+        // Instant in the future to simulate unexpired pin
+        PinChallenge challenge = new PinChallenge(challengeId, pin, userHash, Instant.now().plusSeconds(600), false);
+        when(pinDAO.get(challengeId)).thenReturn(Optional.of(challenge));
+
+        CryptoService mockCrypto = mock(CryptoService.class);
+
+        when(userDAO.get(userHash)).thenReturn(Optional.of(new User(userHash, true)));
+
+        try (MockedStatic<CryptoService> mockedStatic = mockStatic(CryptoService.class)) {
+            mockedStatic.when(CryptoService::getInstance).thenReturn(mockCrypto);
+
+            ForbiddenException exception = assertThrows(ForbiddenException.class, () -> authEndpoints.login(false, body));
+
+            assertEquals("User is banned", exception.getMessage());
         }
     }
 
