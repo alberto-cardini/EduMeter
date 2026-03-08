@@ -1,7 +1,5 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.orm.DatabaseManager;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

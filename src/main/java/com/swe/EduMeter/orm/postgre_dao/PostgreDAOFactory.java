@@ -1,6 +1,5 @@
 package com.swe.EduMeter.orm.postgre_dao;
 
-import com.swe.EduMeter.orm.*;
 import com.swe.EduMeter.orm.dao.*;
 
 import java.io.IOException;
