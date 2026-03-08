@@ -28,7 +28,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
 
     @Override
     public Optional<DraftReview> get(int id) {
-        String query = "SELECT * FROM DraftReview WHERE id = ?";
+        String query = "SELECT * FROM Drafted_Review WHERE id = ?";
         List<Object> params = List.of(id);
 
         return selectQuery(query, params).stream().findFirst();
@@ -36,7 +36,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
 
     @Override
     public List<DraftReview> getAll() {
-        String query = "SELECT * FROM DraftReview";
+        String query = "SELECT * FROM Drafted_Review";
 
         return selectQuery(query);
     }
@@ -78,7 +78,7 @@ public class PostgreDraftReviewDAO extends PostgreDAO<DraftReview> implements Dr
 
     @Override
     public void delete(int id) {
-        String query = "DELETE FROM DraftReview WHERE id = ?";
+        String query = "DELETE FROM Drafted_Review WHERE id = ?";
         List<Object> params = List.of(id);
 
         updateQuery(query, params);
