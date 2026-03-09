@@ -48,6 +48,35 @@ A base test class initializes a PostgreSQL container. The container is configure
 
 Each DAO test class extends this base test class, allowing it to reuse the same container configuration. After each test execution, the database tables are cleared using SQL TRUNCATE and then repopulated with a fixed set of data. This guarantees that every test does not interfere with other tests.
 
+\vspace{1em}
+
+\begin{lstlisting}[language=Java, caption=PostgreIT class responsible for continer initialization, label=PostgreIT]
+	public abstract class PostgreIT {
+		static final PostgreSQLContainer<?> postgres;
+		static {
+			postgres = new PostgreSQLContainer<>("postgres:16")
+			.withDatabaseName("testdb")
+			.withUsername("test")
+			.withPassword("test")
+			.withInitScript("init.sql");
+			postgres.start();
+			
+			DatabaseManager.initWithCredentials(
+			postgres.getJdbcUrl(),
+			postgres.getUsername(),
+			postgres.getPassword()
+			);
+		}
+		@AfterEach
+		void cleanUp() throws SQLException {
+			try (var stmt = DatabaseManager.getInstance().getConnection().createStatement()) {
+				stmt.execute("TRUNCATE Users, Admin, Pin_Challenge, School, Professor, Degree, Course, Teaching," +
+				"Drafted_Review, Published_Review, Up_vote, Report RESTART IDENTITY CASCADE");
+			}
+		}
+	}
+\end{lstlisting}
+
 \subsection{Endpoints unit test documentation:}
 	
 \subsubsection{AdminEndpointsTest.java}
