@@ -15,12 +15,12 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\umlusecase[name = submit-review ,x = 14   ,y = -6.7  ,width = 2.5cm] {Submit Review}
 		\umlusecase[name = up-vote       ,x = 6    ,y = -5    ,width = 2.5cm] {Up-Vote}
 		\umlusecase[name = report-user   ,x = 9    ,y = -6.4  ,width = 2.5cm] {Report User}
-		\umlusecase[name = login-admin   ,x = 4.5  ,y = -9    ,width = 2.5cm] {Login}				
-		\umlusecase[name = manage-review ,x = 6.5  ,y = -11   ,width = 2.5cm] {Manage Reviews}				
-		\umlusecase[name = delete-review ,x = 13   ,y = -12.5 ,width = 2.5cm] {Delete Review}
-		\umlusecase[name = validate-data ,x = 13   ,y = -9.5  ,width = 3.0cm] {Validate Review Information}
-		\umlusecase[name = manage-report ,x = 4.5  ,y = -13   ,width = 2.5cm] {Manage Report}
-		\umlusecase[name = validate-rep  ,x = 10   ,y = -15   ,width = 2.5cm] {Validate Report}
+		\umlusecase[name = manage-review ,x = 4.5  ,y = -9    ,width = 2.5cm] {Manage Reviews}				
+		\umlusecase[name = login-admin   ,x = 6.5  ,y = -11.5 ,width = 2.5cm] {Login}				
+		\umlusecase[name = delete-review ,x = 13   ,y = -11.5 ,width = 2.5cm] {Delete Review}
+		\umlusecase[name = validate-data ,x = 13   ,y = -9    ,width = 2.5cm] {Validate Draft}
+		\umlusecase[name = manage-report ,x = 8  ,y = -14     ,width = 2.5cm] {Manage Report}
+		\umlusecase[name = validate-rep  ,x = 13   ,y = -15   ,width = 2.5cm] {Validate Report}
 		\umlusecase[name = ban-user      ,x = 5    ,y = -15.5 ,width = 2.5cm] {Ban User}
 		
 		\umlactor[y = -1]  {Guest}
@@ -40,14 +40,16 @@ The presented diagram covers the entirety of actions that the different kinds of
 		\umlassoc{Admin}  {manage-review}
 		\umlassoc{Admin}  {manage-report}
 		
-		\draw [tikzuml dependency style] (browse-review) edge[bend left  = 10] node[right] {$\ll \text{extends} \gg$} (apply-filter);
+		\draw [tikzuml dependency style] (apply-filter) edge[bend right  = 10] node[right] {$\ll \text{extends} \gg$} (browse-review);
 		\draw [tikzuml dependency style] (submit-review) edge[bend right = 35] node[right] {$\ll \text{include} \gg$} (login);
 		\draw [tikzuml dependency style] (up-vote)       --                    node[left]  {$\ll \text{include} \gg$} (login);
 		\draw [tikzuml dependency style] (manage-review) --                    node[above] {$\ll \text{include} \gg$} (validate-data);
-		\draw [tikzuml dependency style] (delete-review) --                    node[right] {$\ll \text{extends} \gg$} (manage-review);
+		\draw [tikzuml dependency style] (delete-review) edge[bend right = 10] node[right] {$\ll \text{extends} \gg$} (manage-review);
 		\draw [tikzuml dependency style] (report-user)   --                    node[right] {$\ll \text{include} \gg$} (login);
-		\draw [tikzuml dependency style] (manage-report) --					   node[right] {$\ll \text{include} \gg$} (validate-rep);
-		\draw [tikzuml dependency style] (ban-user)      --					   node[left]  {$\ll \text{extends} \gg$} (manage-report);
+		\draw [tikzuml dependency style] (manage-report) edge[bend left  = 20] node[right] {$\ll \text{include} \gg$} (validate-rep);
+		\draw [tikzuml dependency style] (ban-user)      edge[bend left  = 20] node[left]  {$\ll \text{extends} \gg$} (manage-report);
+		\draw [tikzuml dependency style] (manage-report) edge[bend right  = 20] node[left]  {$\ll \text{include} \gg$} (login-admin);
+		\draw [tikzuml dependency style] (manage-review) edge[bend left  = 20] node[left]  {$\ll \text{include} \gg$} (login-admin);
 	\end{tikzpicture}
 	\caption[Use Case Diagram]{Complete use case diagram, comprehensive of every action that every type of use can do in the platform.}
 \end{figure}
@@ -80,7 +82,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\begin{tabenum}
 			\item The guest accesses the EduMeter platform (Mock-up \ref{mock-up-1-landing-page}).
 			\item The system displays a list of reviews (Mock-up \ref{mock-up-2-browsing-page}, Test \ref{test:testSearch_Unauth:PubReview}).
-			\item The guest scrolls through and reads them (Tests \ref{test:testSearch_Unauth:PubReview}, \ref{test:testGet_Unauthenticated_NotFound:PubReview}).
+			\item The guest scrolls through and reads them.
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The user has viewed the desired information. \\
 		\textbf{Alternative Steps} & 
@@ -88,7 +90,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 			\item[2a.] \textbf{Extension (Apply Filter):} The guest wants to narrow down the search results:
 			\begin{itemize}
 				\item The guest applies filters to one or more fields (School, Degree, Course or Professor).
-				\item The system updates the view to show only matching reviews (Test \ref{test:testSearch_Unauth:PubReview}).
+				\item The system updates the view to show only matching reviews.
 			\end{itemize}
 		\end{tabitem}
 	\end{tabularx}
@@ -104,11 +106,11 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Pre-conditions} & The user possesses a valid institutional email address. \\
 		\textbf{Steps} &
 		\begin{tabenum}
-			\item The user provides their institutional email address (Mock-up \ref{mock-up-3-auth-page-step-1}).
-			\item The system sends a verification code to the provided address (Tests \ref{test:testSendPin_Student_ValidDomain:Auth}, \ref{test:testSendPin_Student_InvalidDomain:Auth}, \ref{test:testSendPin_MissingEmail:Auth}).
+			\item The user provides their institutional email address (Mock-up \ref{mock-up-3-auth-page-step-1}, Tests \ref{test:testSendPin_Student_ValidDomain:Auth}, \ref{test:testSendPin_Student_InvalidDomain:Auth}, \ref{test:testSendPin_MissingEmail:Auth}).
+			\item The system sends a verification code to the provided address.
 			\item The user enters the code (Mock-up \ref{mock-up-4-auth-page-step-2}).
-			\item The system verifies if the entered code matches the one sent (Tests \ref{test:testLogin_Vaid:Auth}, \ref{test:testLogin_WrongPin:Auth}, \ref{test:testLogin_ExpiredPin:Auth}, \ref{test:testLogin_MissingFields:Auth}, \ref{test:testLogin_NotFound:Auth}).
-			\item The system retrieves the existing unique ID (or generates a new one for first-time access) (Test \ref{test:testLogin_Vaid:Auth}).
+			\item The system verifies if the entered code matches the one sent (Tests \ref{test:testLogin_Vaid:Auth}).
+			\item The system retrieves the existing unique ID (or generates a new one for first-time access) (Test \ref{test:testLoginNewUser:Auth}).
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The student is authenticated and identified by their unique ID. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
@@ -129,7 +131,7 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\begin{tabenum}
 			\item The user selects the option to create a review.
 			\item The system displays the review form (Mock-up \ref{mock-up-7-review-form-a}).
-			\item The user fills the Teaching field by selecting an existing option from a provided list.
+			\item The user fills the Teaching field by selecting an existing option from a provided list (Test \ref{test:testListTeaching:Course}, \ref{test:testListTeachings:Prof}).
 			\item The user completes the enjoyment, difficulty and comment fields.
 			\item The user confirms the submission (Mock-up \ref{mock-up-7-review-form-b}, Test \ref{test:testPublish:PubReview}).
 		\end{tabenum} \\
@@ -137,8 +139,8 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\textbf{Alternative Steps} & \begin{tabitem}
 			\item[3a.] If the desired teaching is not available: 
 			\begin{itemize}
-				\item The user manually register the new teaching data by completing the Professor, Course, Degree and School string fields.
-				\item Upon submission, the system saves the review but is not published until an Admin approves it (UC \#5: Validate Review Data, Test \ref{test:testPublish:Draft}).
+				\item The user manually register the new teaching data by completing the Professor, Course, Degree and School string fields .
+				\item Upon submission, the system saves the review but is not published until an Admin approves it (Test \ref{test:testPublish:Draft}).
 			\end{itemize} 
 		\end{tabitem}
 	\end{tabularx}
@@ -196,16 +198,16 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\begin{tabenum}
 			\item The admin accesses the dedicated administrative login interface.
 			\item The admin provides their registered email address.
-			\item The system verifies if the email is in the admin whitelist (Test \ref{test:testSendPin_Admin_Valid:Auth}).
-			\item The system sends a verification code to the provided address (Tests \ref{test:testSendPin_Admin_Valid:Auth}, \ref{test:testSendPin_MissingEmail:Auth}).
+			\item The system verifies if the email is in the admin whitelist.
+			\item The system sends a verification code to the provided address.
 			\item The admin enters the code.
-			\item The system verifies if the entered code matches the one sent (Tests \ref{test:testLogin_Vaid:Auth}, \ref{test:testLogin_WrongPin:Auth}, \ref{test:testLogin_ExpiredPin:Auth}, \ref{test:testLogin_MissingFields:Auth}, \ref{test:testLogin_NotFound:Auth}).
-			\item The system notifies the successful login (Test \ref{test:testLogin_Vaid:Auth}).
+			\item The system verifies if the entered code matches the one sent (Tests \ref{test:testLogin_Vaid:Auth}).
+			\item The system notifies the successful login.
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The admin is logged in and has access to his functionality. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[3a.] If the provided email is not recognized, the system signal the error and ask the admin to provide a new one (Test \ref{test:testSendPin_MissingEmail:Auth}).
-			\item[7a.] If the provided code don't match the one send, the system ask the Admin to re-enter the code or request a new one (Tests \ref{test:testLogin_WrongPin:Auth}, \ref{test:testLogin_ExpiredPin:Auth}).
+			\item[3a.] If the provided email is not recognized, the system signal the error and ask the admin to provide a new one (Test \ref{test:testSendPin_MissingEmail:Auth}, \ref{test:testSendPin_Admin_InvalidEmail:Auth}).
+			\item[7a.] If the provided code don't match the one send, the system ask the Admin to re-enter the code or request a new one (Tests \ref{test:testLogin_WrongPin:Auth}, \ref{test:testLogin_ExpiredPin:Auth}, \ref{test:testLogin_MissingFields:Auth}, \ref{test:testLogin_NotFound:Auth}).
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
@@ -223,11 +225,11 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 			\item The admin verifies the submitted data against official university documentation. 
 			\item The admin links the information in the fields to existing database entries (Mock-up \ref{mock-up-6-admin-edit-panel}).
 			\item The admin approves and publishes the review (Test \ref{test:testPublishDraftReview_Success:Draft}).
-			\item The system creates the new Teaching entry in the database (Test \ref{test:testPublishDraftReview_Success:Draft}).
+			\item The system creates the new Teaching entry in the database (Test \ref{test:testAddTeaching_Valid:Course}).
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The review is published and the new Teaching entry is available for future reviews. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[2a.] If the submitted information is invalid or false, the admin discard the review (Test \ref{test:testDelete_Found:Draft}).
+			\item[2a.] If the submitted information is invalid or false, the admin discard the review (Test \ref{test:testDelete_Found:Draft}, \ref{test:testPublishDraftReview_NullTeachingId:Draft}, \ref{test:testPublishDraft_DraftNF:Draft}, \ref{test:testPublishDraft_TeachingNF:Draft}).
 			\item[3a.] If a specific entity doesn't exist in the database, the admin creates it before linking it.
 		\end{tabitem}
 	\end{tabularx}
@@ -248,8 +250,8 @@ To ensure a standardized analysis, each use case is detailed across seven core f
 		\end{tabenum} \\
 		\textbf{Post-conditions} & The report has been processed and the moderation procedure is consistent in the database. \\
 		\textbf{Alternative Steps} & \begin{tabitem}
-			\item[3a.] If the review  doesn't contain any violation, the report is dismissed and the review remains visible.
-			\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria, the admin gets the student ID related to the review and suspend the student's account.
+			\item[3a.] If the review  doesn't contain any violation, the report is dismissed and the review remains visible (Test \ref{test:testDeleteFound:Report}).
+			\item[4a.] \textbf{Extension (Ban User)}: If the content of the review meets the Ban Criteria, the admin gets the student ID related to the review and suspend the student's account (Test \ref{test:testAcceptReportFound:Report}).
 		\end{tabitem}
 	\end{tabularx}
 \end{usecasetable}
